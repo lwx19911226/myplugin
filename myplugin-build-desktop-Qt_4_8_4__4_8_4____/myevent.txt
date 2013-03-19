@@ -1,0 +1,22 @@
+//myevent
+//comments start with //
+//events start with >
+//6 parts, split by |
+//1. name
+//2~5. something about const data
+//2. types, split by comma
+//3. names, split by comma
+//4. remarks, split by comma(EN)
+//5. translation, start&&end split by ;;, mod -> \%, \n -> ; 
+//6. remark
+>GameStart|||||游戏开始时
+>EventPhaseStart|mynum|phase|时机触发者当前阶段|local phase=player:getPhase()|阶段开始
+>DrawNCards|mynum|drawnum|摸牌阶段摸牌数|local drawnum=data:toInt();;data:setValue(drawnum);return false|摸牌阶段摸X张牌
+>CardUsed|mysplayer,mycard,mysplayerlist|use.from,use.card,use.to|牌的使用者,使用的牌,牌的使用对象列表|local use=data:toCardUse()|使用牌时
+>CardEffected|mysplayer,mycard,mysplayer|effect.from,effect.card,effect.to|牌的使用者，使用的牌，牌的生效对象|local effect=data:toCardEffect()|被使用牌生效时
+>Damaged|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage()|受到伤害时
+>Damage|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage()|造成伤害时
+>Predamage|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage();;data:setValue(damage);return false|将造成伤害时
+>FinishJudge|mysplayer,mycard|judge.who,judge.card|判定者,判定牌|local judge=data:toJudge()|判定结束
+>CardsMoveOneTime|mynumlist,mynumlist,mynum,myplayer,myplayer|mv.card_ids,mv.from_places,mv.to_places,mv.from,mv.to|牌的ID列表,牌的来源位置列表,牌的目标位置,牌的来源角色,牌的目标角色|local mv=data:toMoveOneTime()|牌移动时
+>Death|mysplayer|death.who|死亡角色|local death=data:toDeath()|一名角色死亡时

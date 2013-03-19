@@ -1,0 +1,89 @@
+//myconst
+//comments start with //
+//const start with >
+//4 parts, split by |
+//1. name
+//2. type
+//3. remark
+//4. extra, split by ,,
+//4.1 translation, start with tr:, mod -> \%, \n -> ;
+//4.2 skill and block, start with bl:
+//4.3 tag
+//tags start with >>
+//2 parts, split by |
+//1. name
+//2. remark
+>>cl|类名
+>>ob|对象名
+>>pt|模式
+>>suit|花色
+>>phase|阶段
+>>place|牌的位置
+>>nature|伤害属性
+
+>selfplayer|mysplayer|此技能拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:trs
+>player|mysplayer|此时机触发者|bl:trs
+>sgs.Self|myplayer|视为技拥有者|bl:vs_vf
+>sgs.Self|myplayer|视为技拥有者|bl:vs_ep
+>sgs.Self|myplayer|视为技拥有者|bl:vs_er
+>to_select|mycard|视为技将选的一张牌|bl:vs_vf
+>#selected|mynum|视为技已选牌数|bl:vs_vf
+>true|mybool|TRUE|
+>false|mybool|FALSE|
+>nil|all|不存在|
+//damage
+>sgs.DamageStruct_Normal|mynum|普通属性（伤害）|nature
+>sgs.DamageStruct_Fire|mynum|火属性（伤害）|nature
+>sgs.DamageStruct_Thunder|mynum|雷属性（伤害）|nature
+//phase
+>sgs.Player_Start|mynum|回合开始阶段|phase
+>sgs.Player_Judge|mynum|判定阶段|phase
+>sgs.Player_Draw|mynum|摸牌阶段|phase
+>sgs.Player_Play|mynum|出牌阶段|phase
+>sgs.Player_Discard|mynum|弃牌阶段|phase
+>sgs.Player_Finish|mynum|回合结束阶段|phase
+>sgs.Player_NoActive|mynum|回合外|phase
+//suit
+>sgs.Card_Spade|mynum|黑桃花色|suit
+>sgs.Card_Club|mynum|梅花花色|suit
+>sgs.Card_Heart|mynum|红桃花色|suit
+>sgs.Card_Diamond|mynum|方块花色|suit
+//place
+>sgs.Player_PlaceHand|mynum|位置：手牌|place
+>sgs.Player_PlaceEquip|mynum|位置：装备|place
+>sgs.Player_PlaceDelayedTrick|mynum|位置：延时锦囊|place
+>sgs.Player_PlaceJudge|mynum|位置：判定区|place
+>sgs.Player_PlaceSpecial|mynum|位置：特殊区|place
+>sgs.Player_DiscardPile|mynum|位置：弃牌堆|place
+>sgs.Player_DrawPile|mynum|位置：摸牌堆|place
+>sgs.Player_PlaceTable|mynum|位置：面板|place
+>sgs.Player_PlaceUnknown|mynum|位置：未知|place
+>sgs.Player_PlaceWuGu|mynum|位置：五谷|place
+//pattern
+>.|mystrc|任意一张手牌|pt
+>.S|mystrc|任意一张黑桃手牌|pt
+>.C|mystrc|任意一张梅花手牌|pt
+>.H|mystrc|任意一张红桃手牌|pt
+>.D|mystrc|任意一张方块手牌|pt
+>.black|mystrc|任意一张黑色手牌|pt
+>.red|mystrc|任意一张红色手牌|pt
+>..|mystrc|任意一张牌|pt
+>..S|mystrc|任意一张黑桃|pt
+>..C|mystrc|任意一张梅花|pt
+>..H|mystrc|任意一张红桃|pt
+>..D|mystrc|任意一张方块|pt
+>.Basic|mystrc|任意一张基本牌|pt
+>.Trick|mystrc|任意一张锦囊牌|pt
+>.Equip|mystrc|任意一张装备牌|pt
+>.Weapon|mystrc|任意一张武器牌|pt
+>slash|mystrc|模式（任意一张杀），也表示对象名【杀】|pt,,ob
+>jink|mystrc|模式（任意一张闪），也表示对象名【闪】|pt,,ob
+>peach|mystrc|模式（任意一张桃），也表示对象名【桃】|pt,,ob
+>peach+analeptic|mystrc|任意一张桃或酒|pt
+>nullification|mystrc|模式（任意一张无懈），也表示对象名【无懈可击】|pt,,ob
+//classname
+>BasicCard|mystrc|类名【基本牌】|cl
+>TrickCard|mystrc|类名【锦囊牌】|cl
+>EquipCard|mystrc|类名【装备牌】|cl
+>Slash|mystrc|类名【杀】|cl
+>Duel|mystrc|类名【决斗】|cl

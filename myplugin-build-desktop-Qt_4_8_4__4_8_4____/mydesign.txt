@@ -1,0 +1,30 @@
+//mydesign
+//comments start with //
+//package start with >
+//2 parts, split by |
+//1. name
+//2. translation
+//general start with >>
+//noless than 5 parts, split by |
+//1. name
+//2. translation
+//3. kingdom(wei|shu|wu|qun|god)
+//4. sex(m|f)
+//5. hp
+//6. title, start with #
+//7. words before death, start with ~
+//8. cv, start with cv:
+//skill start with >>>
+//noless than 4 parts, split by |
+//1. name
+//2. translation
+//3. type(NotFrequent|Frequent|Compulsory|Limited|Wake)
+//4. owner
+//5. discription, start with :
+//6. words, start with $
+
+>flhs|风林火山
+>>luasmy|司马|wei|m|3|#狼顾之鬼|~天命难违|cv:who
+>>>luaguicai|鬼才|NotFrequent|luasmy|:改判定|$天命哈哈哈
+>>>luafankui|反馈|NotFrequent|luasmy|:卖血|$下次注意点|$出来混早晚要还
+>>luagj|郭嘉|wei|m|3|#早逝|~咳|cv:whoelse
