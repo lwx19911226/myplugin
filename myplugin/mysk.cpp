@@ -370,6 +370,28 @@ QStringList myvs::trans(){
     strlist<<name+"=sgs.CreateViewAsSkill{";
     strlist<<QString("name=\"%1\",").arg(name);
     strlist<<QString("n=%1,").arg(vsn);
+    if(vfblock){
+        strlist<<"view_filter=function(self,selected,to_select)";
+        strlist<<vfblock->trans();
+        strlist<<"end,";
+    }
+    strlist<<"view_as=function(self,cards)";
+    strlist<<"if #cards~="+QString::number(vsn)+" then return nil end";
+    strlist<<QString("local a_card=sgs.Sanguosha:cloneCard(\"%1\",sgs.Card_SuitToBeDecided,0)").arg(objname_viewas);
+    strlist<<"for var=1,#cards,1 do a_card:addSubcard(cards[var]) end";
+    strlist<<"a_card:setSkillName(self:objectName())";
+    strlist<<"return a_card";
+    strlist<<"end,";
+    if(epblock){
+        strlist<<"enabled_at_play=function(self,player)";
+        strlist<<epblock->trans();
+        strlist<<"end,";
+    }
+    if(erblock){
+        strlist<<"enabled_at_response=function(self,player,pattern)";
+        strlist<<erblock->trans();
+        strlist<<"end,";
+    }
     strlist<<"}";
     return strlist;
 }
@@ -461,7 +483,7 @@ QString myvs::findRemarkByName_block(QString getname){
 void myvs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap){
     mysk::propertymap_get(strmap,strlistmap);
     strmap.insert(property2str(CardsNum),QString::number(vsn));
-    strmap.insert(property2str(CardViewAs),objname_viewas);
+    strmap.insert(property2str(CardViewAs),myobj::name2remark(objname_viewas));
     strlistmap.insert(property2str(CardViewAs),myobj::getconstrmlist_tag("ob"));
 }
 void myvs::propertymap_set(QMap<QString, QString> &strmap){    
@@ -473,7 +495,7 @@ void myvs::propertymap_set(QMap<QString, QString> &strmap){
     if(strmap.contains(property2str(CardViewAs))){
         QString getstr=strmap.value(property2str(CardViewAs));
         QString getname=myobj::remark2name(getstr);
-        objname_viewas=((getname=="")?getstr:getname);
+        objname_viewas=getname;
     }
     mysk::propertymap_set(strmap);
 }

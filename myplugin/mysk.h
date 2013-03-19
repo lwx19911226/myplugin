@@ -191,6 +191,7 @@ class myvs:public mysk
 public:
     explicit myvs(QObject *parent=0):mysk(parent){
         vsn=1;vfblock=NULL;epblock=NULL;erblock=NULL;
+        objname_viewas=myobj::getconstlist_tag("ob").first();
     }
     int getType(){return ViewAsSkill;}    
     enum vsProperty{CardsNum=11,CardViewAs=12};

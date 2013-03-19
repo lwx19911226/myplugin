@@ -106,6 +106,13 @@ QString myobj::remark2name(QString getrm){
     }
     return QString();
 }
+QString myobj::name2remark(QString getname){
+    myini();
+    foreach(QString stri,myconstlist){
+        if(stri.split("|").at(Name)==getname){return stri.split("|").at(Remark);}
+    }
+    return QString();
+}
 QString myobj::remark2tag(QString getrm){
     myini();
     foreach(QString stri,myconsttaglist){

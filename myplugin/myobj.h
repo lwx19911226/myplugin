@@ -120,6 +120,7 @@ public:
     static QStringList getconstrmlist_tag(QString);
     static QStringList getconsttaglist();
     static QString remark2name(QString);
+    static QString name2remark(QString);
     static QString remark2tag(QString);
     static bool matchTag(QString getname,QString gettag);
 signals:
