@@ -119,13 +119,14 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
         strlist=myfun::need(getfunstr);
         if(!strlist.isEmpty()){
             QList<myobj *> objlist;
-            QString gettypestr=strlist.at(pp->type+1-myinputitem::func_Obj);
+            int geti=pp->type+1-myinputitem::func_Obj;
+            QString gettypestr=strlist.at(geti);
             pp->newChild(QVariant(">OBJECT("+gettypestr+"):"),false,true);
             foreach(QString stri,gettypestr.split("+")){
-                getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr);
+                getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr,!myfun::notnil(getfunstr,geti));
             }
             foreach(myobj *ip,objlist){
-                pp->newChild(QVariant(ip->name),pp->type+1-myinputitem::func_Obj<strlist.length()-1);
+                pp->newChild(QVariant(ip->name),geti<strlist.length()-1);
             }
         }
     }

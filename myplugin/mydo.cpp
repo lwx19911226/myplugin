@@ -64,8 +64,8 @@ QString mydo::trans(){
     QStringList strlist,tstrlist;
     strlist.clear();
     myfunction *pfunc=static_cast<myfunction *>(blocklist.first());
-    strlist<<pfunc->inilist.first().toString();
-    QString getblockstr=pfunc->inilist.at(1).toString();
+    strlist<<pfunc->getEvent();
+    QString getblockstr=pfunc->upperLayer->name;
     strlist<<trans4block(getblockstr);
     strlist<<pfunc->funname;    
     tstrlist.clear();
@@ -186,6 +186,7 @@ void mydo::dotrans(mysk *psk0, QString gettrans){
                 int gettype=myobj::str2type(myfun::need(getfunstr).at(i));
                 if(!myobj::b4input(gettype)){qWarning()<<"dotrans_b4input"<<gettype;}
                 pobj->type=gettype;
+                pobj->isVerified=true;
                 //pobj->isDynamic=false;
             }            
         }

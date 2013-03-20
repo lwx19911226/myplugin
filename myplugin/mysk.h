@@ -98,7 +98,7 @@ public:
     void setOwner(mygeneral *getp);
     void setDefaultName();
     void setName(QString getname);
-    void getavlobjlist(int gettype,QList<myobj *> &list,QString getstr="");
+    void getavlobjlist(int gettype,QList<myobj *> &list,QString getstr,bool b4nil);
     //void getusdobjlist(int gettype,QList<myobj *> &list,QString getstr="");
     //void addusdobjlist(QList<myobj *> &list);
     //void addusdobjlist(myobj *getp);

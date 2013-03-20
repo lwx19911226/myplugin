@@ -112,6 +112,7 @@ void myinputwidget::myadd(){
             pobj=new myobj(pmain->psys);
             pobj->name=list.at(i);
             pobj->type=gettype;
+            pobj->isVerified=true;
             //pobj->isDynamic=false;
         }
         getobjlist.append(pobj);

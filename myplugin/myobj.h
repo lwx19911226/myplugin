@@ -34,6 +34,7 @@ public:
     bool isGlobal;
     static QStringList myconstlist;
     static QStringList myconsttaglist;
+
     virtual bool matchType(int gettype){        
         return isSubtype(gettype,type) or (name=="nil");
     }
@@ -76,6 +77,12 @@ public:
     static bool b4input(int &gettype){
         if(gettype==Mystr){gettype=Mystrc;}
         return isSubtype(Mynum,gettype)||isSubtype(Mystr,gettype);
+    }
+    static bool b4vrstr(int gettype){
+        if(isSubtype(Mynum,gettype)){return true;}
+        if(isSubtype(Mystr,gettype)){return true;}
+        if(isSubtype(Mylist,gettype)){return true;}
+        return false;
     }
     static bool isSubtype(int gettype0,int gettype){
         if(gettype0==All){return true;}

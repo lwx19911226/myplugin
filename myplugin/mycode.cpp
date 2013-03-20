@@ -83,8 +83,8 @@ bool myblock::removeBlock(myblock *getp){
         //qWarning()<<name<<i;
         if(blocklist.at(i)==getp){
             blocklist.removeAt(i);
-            getp->inilist.clear();
-            getp->inilist<<QVariant(getEvent())<<QVariant(name)<<QVariant(i);
+            //getp->inilist.clear();
+            //getp->inilist<<QVariant(getEvent())<<QVariant(name)<<QVariant(i);
             return true;
         }
         if(blocklist.at(i)->getType()>=Block){
@@ -93,6 +93,7 @@ bool myblock::removeBlock(myblock *getp){
     }
     return false;
 }
+/*
 bool myblock::insertBlock(myblock *getp){
     if(getp->inilist.length()<3){return false;}
     if(getp->inilist.at(1).toString()==name){
@@ -110,24 +111,31 @@ bool myblock::insertBlock(myblock *getp){
     }
     return false;
 }
-QString myblock::getEvent(){
+*/
+myblock *myblock::getTopBlock(){
     myblock *p=this;
     while(p->upperLayer){p=p->upperLayer;}
-    if(!myevent::isEvent(p->name)){qWarning()<<"getevent:"<<p->name;}
+    return p;
+}
+mysk *myblock::getsk0(){
+    return static_cast<mysk *>(getTopBlock()->parent());
+}
+QString myblock::getEvent(){
+    myblock *p=getTopBlock();
+    if(!getsk0()->eventstrlist().contains(p->name)){qWarning()<<"getevent:"<<p->name;}
     return p->name;
 }
 
-void myfunction::myini(QStringList &rtrmlist, QStringList &blrmlist){
-    name=inilist.at(1).toString()+","+funname+QString::number(globalint++);
-    QString tstr=myfun::getTrans(funname);
+void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrmlist, QStringList &blrmlist){
+    name=getblockstr+","+funname+QString::number(globalint++);
+    //QString tstr=myfun::getTrans(funname);
     for(int i=0;i<objlist.length();i++){
-        if(tstr.contains("<"+QString::number(i+1)+":")&&!objlist.at(i)->isVerified){
+        if(myfun::notnil(funname,i)&&!objlist.at(i)->isVerified){
             objlist.at(i)->isVerified=true;
             vrlist<<i;
         }
     }
-    QStringList list;
-    list=myfun::get(funname);
+    QStringList list=myfun::get(funname);
     for(int i=0;i<list.length();i++){
         myobj *p=new myobj(this);
         QString typestr=list.at(i);
@@ -138,12 +146,13 @@ void myfunction::myini(QStringList &rtrmlist, QStringList &blrmlist){
             //p->isDynamic=false;
         }
         else{
-            p->blockstr=inilist.first().toString();
+            p->blockstr=geteventstr;
         }
         p->name=QString("%1_%2_%3").arg(funname,typestr).arg(globalint++);
         if(typestr==""){qWarning()<<"0227here2?"<<funname<<i;}
         p->type=myobj::str2type(typestr);
         p->remark=rtrmlist.at(i);
+        p->isVerified=myfun::notnil(funname,objlist.length()+i);
         rtobjlist.append(p);
     }
     for(int i=0;i<myfun::getBlock_cnt(funname);i++){
@@ -163,6 +172,7 @@ QStringList myfunction::trans(){
             QString tstr;
             if(vrlist.contains(i)){
                 if(rx.cap(1)!=""){tstr="\\1";}
+                else if(myobj::b4vrstr(objlist.at(i)->type)){tstr="";}
                 else{tstr="if not %"+QString::number(i+1)+" then return false end;";}
             }
             str.replace(rx,tstr);
@@ -170,7 +180,9 @@ QStringList myfunction::trans(){
     }
     if(str.contains("%%")){str.replace(QRegExp("%%"),QString::number(globalint++));}
     for(int i=0;i<list.length();i++){
-        str.replace(QRegExp("([^\\\\]?)%"+QString::number(i+1)),"\\1"+list[i]->trans());
+        if(str.contains("%"+QString::number(i+1))){
+            str.replace(QRegExp("([^\\\\]?)%"+QString::number(i+1)),"\\1"+list[i]->trans());
+        }
     }
     QStringList strlist=str.split(";");
     QStringList tlist;

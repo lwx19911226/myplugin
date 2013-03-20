@@ -29,6 +29,7 @@ signals:
 public slots:
     
 };
+class mysk;
 class myfunction;
 class myblock : public QObject
 {
@@ -42,7 +43,7 @@ public:
     myblock *upperLayer;
     QString name;
     QString remark;
-    QList<QVariant> inilist;
+    //QList<QVariant> inilist;
     virtual void addBlock(myblock *);
     virtual void addBlock(myblock *,QString);
     //virtual void addStc(myfunction *);
@@ -52,10 +53,11 @@ public:
     virtual myblock *findBlockByName(QString getname);
     virtual myfunction *findFuncByObj(myobj *);
     virtual bool removeBlock(myblock *getp);
-    virtual bool insertBlock(myblock *getp);
+    //virtual bool insertBlock(myblock *getp);
     virtual int getLayer();
-    virtual QString getEvent();
-
+    QString getEvent();
+    myblock *getTopBlock();
+    mysk *getsk0();
     virtual void myshow(){qWarning()<<name<<getLayer()<<blocklist.length();for(int i=0;i<blocklist.length();i++){blocklist.at(i)->myshow();}}
 };
 
@@ -70,7 +72,7 @@ public:
     QList<myobj *> rtobjlist;
     QList<int> vrlist;
     QStringList trans();
-    void myini(QStringList &rtrmlist,QStringList &blrmlist);
+    void myini(QString geteventstr,QString getblockstr,QStringList &rtrmlist,QStringList &blrmlist);
     QStringList need4block();
     void addBlock(myblock *, QString);
     myfunction *findFuncByObj(myobj *);

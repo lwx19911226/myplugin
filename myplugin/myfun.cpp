@@ -71,6 +71,10 @@ int myfun::getBlock_cnt(QString getstr){
     }
     return 0;
 }
+bool myfun::notnil(QString getstr, int geti){
+    myini();
+    return myfun::getTrans(getstr).contains("<"+QString::number(geti+1)+":");
+}
 
 QString myfun::getTrans(QString getstr){
     myini();

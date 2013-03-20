@@ -3,26 +3,27 @@
 QStringList myobj::myconstlist;
 QStringList myobj::myconsttaglist;
 void myobj::myini(){
-    if(!myconstlist.isEmpty()){return;}
-    QFile fin("myconst.txt");
-    if(!fin.open(QFile::ReadOnly)){
-        QMessageBox::warning(NULL,"FILE ERROR","No myconst.txt");
-        qWarning("no myconst.txt\n");
-        return;
+    if(myconstlist.isEmpty()){
+        QFile fin("myconst.txt");
+        if(!fin.open(QFile::ReadOnly)){
+            QMessageBox::warning(NULL,"FILE ERROR","No myconst.txt");
+            qWarning("no myconst.txt\n");
+            return;
+        }
+        QTextStream cin(&fin);
+        cin.setCodec("UTF-8");
+        QString str;
+        for(;;){
+            if(cin.atEnd()){break;}
+            str=cin.readLine();
+            if(str==""){continue;}
+            if(str.startsWith("//")){continue;}
+            if(str.startsWith(">>")){myconsttaglist<<str.mid(2);continue;}
+            if(str.startsWith(">")&&(str.count("|")==Parts-1)){myconstlist<<str.mid(1);continue;}
+            qWarning()<<"myconstini:"<<str<<",";
+        }
+        fin.close();
     }
-    QTextStream cin(&fin);
-    cin.setCodec("UTF-8");
-    QString str;
-    for(;;){
-        if(cin.atEnd()){break;}
-        str=cin.readLine();
-        if(str==""){continue;}
-        if(str.startsWith("//")){continue;}
-        if(str.startsWith(">>")){myconsttaglist<<str.mid(2);continue;}
-        if(str.startsWith(">")&&(str.count("|")==Parts-1)){myconstlist<<str.mid(1);continue;}
-        qWarning()<<"myconstini:"<<str<<",";
-    }
-    fin.close();
 }
 bool myobj::isConst(QString getstr){
     myini();

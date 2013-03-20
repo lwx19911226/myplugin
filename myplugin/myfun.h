@@ -30,6 +30,7 @@ public:
     //static QString need(QString,int);
     static QStringList get(QString);
     static int getBlock_cnt(QString);
+    static bool notnil(QString,int);
     static QString getTrans(QString);
     static QStringList getfunstrlist(QStringList taglist);
     static QStringList getfuntagrmlist(bool visibility=true);

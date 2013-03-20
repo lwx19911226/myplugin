@@ -112,16 +112,17 @@ void mysk::setOwner(mygeneral *getp){
     if(getp&&!getp->sklist.contains(this)){getp->sklist.append(this);}
     sig_update();
 }
-void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr){
+void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr,bool b4nil){
     QList<myobj *> tlist;
     foreach(myobj *ip,avlobjlist){
-        if(ip->matchBlock(getstr)&&!ip->isGlobal){
-            tlist<<ip;
-        }
+        if(ip->matchBlock(getstr)&&!ip->isGlobal){tlist<<ip;}
     }
     getsys()->getavlobjlist_global(tlist);
     foreach(myobj *ip,tlist){
-        if(ip->matchType(gettype)){list<<ip;}
+        if(ip->matchType(gettype)){
+            if(!b4nil&&ip->name=="nil"){continue;}
+            list<<ip;
+        }
     }
 }
 
@@ -164,8 +165,8 @@ void mysk::addFunction(QString geteventstr, QString getblockstr,
     myfunction *pfunc=new myfunction(this);
     pfunc->funname=getfunstr;
     pfunc->objlist<<getobjlist;
-    pfunc->inilist<<QVariant(geteventstr)<<QVariant(getblockstr);
-    pfunc->myini(getrtrmlist,getblrmlist);
+    //pfunc->inilist<<QVariant(geteventstr)<<QVariant(getblockstr);
+    pfunc->myini(geteventstr,getblockstr,getrtrmlist,getblrmlist);
     avlobjlist<<pfunc->rtobjlist;
     myblock *pt=findBlockByName(geteventstr);
     if(!pt){
@@ -224,7 +225,7 @@ bool mysk::removeObj(myobj *getp){
 }
 myobj *mysk::findObjByName(QString getname, QString getstr){
     QList<myobj *> tlist;
-    getavlobjlist(myobj::All,tlist,getstr);
+    getavlobjlist(myobj::All,tlist,getstr,true);
     foreach(myobj *ip,tlist){
         if(ip->name==getname){return ip;}
     }
@@ -351,7 +352,7 @@ QStringList myvs::trans(){
     strlist<<QString("n=%1,").arg(vsn);
     myblock *pt;
     pt=findBlockByName(vsbtype2str(ViewFilter));
-    if(pt){
+    if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"view_filter=function(self,selected,to_select)";
         strlist<<mycode::myindent(trans4avlobjlist(vsbtype2str(ViewFilter)));
         strlist<<pt->trans();
@@ -365,14 +366,14 @@ QStringList myvs::trans(){
     strlist<<"return a_card";
     strlist<<"end,";
     pt=findBlockByName(vsbtype2str(EnabledAtPlay));
-    if(pt){
+    if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"enabled_at_play=function(self,player)";
         strlist<<mycode::myindent(trans4avlobjlist(vsbtype2str(EnabledAtPlay)));
         strlist<<pt->trans();
         strlist<<"end,";
     }
     pt=findBlockByName(vsbtype2str(EnabledAtResponse));
-    if(pt){
+    if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"enabled_at_response=function(self,player,pattern)";
         strlist<<mycode::myindent(trans4avlobjlist(vsbtype2str(EnabledAtResponse)));
         strlist<<pt->trans();
