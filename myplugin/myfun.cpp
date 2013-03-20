@@ -50,15 +50,6 @@ QStringList myfun::need(QString getstr){
     }
     return QStringList();
 }
-/*
-QString myfun::need(QString getstr, int index){
-    myini();
-    QList<QString> list;
-    need(getstr,list);
-    if(index>=list.length()){return "";}
-    return list.at(index);
-}
-*/
 QStringList myfun::get(QString getstr){
     myini();
     foreach(QString stri,myfunlist){
@@ -91,11 +82,12 @@ QString myfun::getTrans(QString getstr){
     return QString();
 }
 
-QStringList myfun::getfunstrlist(){
+QStringList myfun::getfunstrlist(QStringList taglist){
     myini();
     QStringList strlist;
     foreach(QString stri,myfunlist){
-        strlist<<stri.split("|").at(Name);
+        QString getname=stri.split("|").at(Name);
+        if(matchTaglist(getname,taglist)){strlist<<getname;}
     }
     return strlist;
 }
@@ -115,11 +107,20 @@ QString myfun::remark2tag(QString getrm){
     }
     return QString();
 }
-bool myfun::matchTag(QString getname, QString gettag){
+bool myfun::matchTaglist(QString getname, QStringList gettaglist){
     myini();
     foreach(QString stri,myfunlist){
         if(stri.startsWith(getname+"|")){
-            return stri.split("|").at(Tag).split(",").contains(gettag);
+            QStringList taglist=stri.split("|").at(Tag).split(",");
+            foreach(QString tagstri,taglist.filter(QRegExp("\\$$"))){
+                if(gettaglist.contains(tagstri)||gettaglist.contains(tagstri.mid(0,tagstri.length()-1))){}
+                else{return false;}
+            }
+            foreach(QString tagstri,gettaglist.filter(QRegExp("[^\\$]$"))){
+                if(taglist.contains(tagstri)||taglist.contains(tagstri+"$")){}
+                else{return false;}
+            }
+            return true;
         }
     }
     return true;

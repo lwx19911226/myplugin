@@ -25,14 +25,15 @@ public:
     void getsklist(QList<mysk *> &rsklist,int gettype);
     void getavlobjlist_global(QList<myobj *> &list);    
     mygeneral *newGeneral(QString getname,int getkingdom=mygeneral::kingdom_God,int gethp=4,bool getsex=true);
-    mytrs *newTrs(QString getname,int gettype=mytrs::NotFrequent);
+    mysk *newSkill(QString getname,int gettype);
+    mytrs *newTrs(QString getname,int getsubtype=mytrs::NotFrequent);
     myvs *newVs(QString getname,int getn=0);
     bool delGeneral(mygeneral *getp);
     bool delSkill(mysk *getp);
     mygeneral *findGeneralByName(QString getname);
     mysk *findSkillByName(QString getname);
     QStringList trans();
-    QString trans4design();    
+    QStringList trans4design();
     void myini_design(QString path);
 
     QStringList getgstrlist(){QStringList strlist;foreach(mygeneral *ip,glist){strlist<<ip->name;}return strlist;}

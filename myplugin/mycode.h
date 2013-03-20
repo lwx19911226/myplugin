@@ -10,9 +10,8 @@ class mycode : public QObject
 {
     Q_OBJECT
 public:
-    explicit mycode(QObject *parent = 0);
-    enum codeType{Code=0,Block=1,Function=2};
-    virtual int getType(){return Code;}    
+    explicit mycode(QObject *parent = 0):QObject(parent){}
+    //virtual int getType(){return Code;}
     static QStringList mymdf(QStringList getlist,QString getstr,bool front=true){
         QString getstr_front=(front?getstr:"");
         QString getstr_back=(front?"":getstr);
@@ -31,11 +30,12 @@ public slots:
     
 };
 class myfunction;
-class myblock : public mycode
+class myblock : public QObject
 {
     Q_OBJECT
 public:
-    explicit myblock(QObject *parent = 0):mycode(parent){upperLayer=NULL;}
+    explicit myblock(QObject *parent = 0):QObject(parent){upperLayer=NULL;}
+    enum blockType{Block=1,Function=2,Opr=3};
     virtual int getType(){return Block;}
     static int globalint;
     QList<myblock *> blocklist;
@@ -75,6 +75,22 @@ public:
     void addBlock(myblock *, QString);
     myfunction *findFuncByObj(myobj *);
     void myshow(){qWarning()<<funname;}
+};
+class myopr : public myblock
+{
+    Q_OBJECT
+public:
+    explicit myopr(QObject *parent = 0):myblock(parent){
+
+    }
+    int getType(){return Opr;}
+    QString eventstr;
+    void myini();
+    QStringList trans();
+signals:
+
+public slots:
+
 };
 /*
 class mycondition:public myblock

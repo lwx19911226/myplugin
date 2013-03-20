@@ -2,7 +2,6 @@ INPUT(
 ./release\main.o
 ./release\mainwindow.o
 ./release\mysys.o
-./release\myopr.o
 ./release\myobj.o
 ./release\myfun.o
 ./release\myevent.o
@@ -16,7 +15,6 @@ INPUT(
 ./release\mysk.o
 ./release\moc_mainwindow.o
 ./release\moc_mysys.o
-./release\moc_myopr.o
 ./release\moc_myobj.o
 ./release\moc_myfun.o
 ./release\moc_myevent.o

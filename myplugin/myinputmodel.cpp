@@ -27,15 +27,8 @@ void myinputmodel::myini(){
 
     rootitem0->newChild(QVariant(">EVENT:"));
     if(getsk0()){
-        if(getsk0()->getType()==mysk::TriggerSkill){
-            foreach(QString stri,myevent::geteventstrlist()){
-                rootitem0->newChild(QVariant(stri),true);
-            }
-        }
-        else if(getsk0()->getType()==mysk::ViewAsSkill){
-            foreach(QString stri,myvs::getvsbstrlist()){
-                rootitem0->newChild(QVariant(stri),true);
-            }
+        foreach(QString stri,getsk0()->eventstrlist()){
+            rootitem0->newChild(QVariant(stri),true);
         }
     }
     myinputitem::mycpy(rootitem0,rootitem,true);
@@ -98,7 +91,7 @@ bool myinputmodel::canFetchMore(const QModelIndex &parent) const{
 }
 
 void myinputmodel::fetchMore(const QModelIndex &parent){
-    qWarning()<<"fetchmore0";
+    //qWarning()<<"fetchmore0";
     myinputitem *pp=getItem0(parent);
     myinputitem *p=getItem(parent);
     if(pp->type+1==myinputitem::func_Block){
@@ -112,8 +105,9 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
         }
     }
     else if(pp->type+1==myinputitem::func_Fun){
+        QString geteventstr=pp->getParent(myinputitem::func_Event)->getstr();
         pp->newChild(QVariant(">FUNCTION:"),false,true);
-        foreach(QString stri,myfun::getfunstrlist()){
+        foreach(QString stri,myfun::getfunstrlist(getsys()->psk0->funtaglist(geteventstr))){
             pp->newChild(QVariant(stri),!myfun::need(stri).isEmpty());
         }
     }
@@ -137,103 +131,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     }
     p->delAllChildren();
     myinputitem::mycpy(pp,p,true);
-    qWarning()<<"fetchmore";
-    /*
-    switch(getType()){
-    case mydo::Sentence:
-        if(pp->type+1==myinputitem::func_Block){
-            pp->newChild(QVariant(">BLOCK:"),false,true);
-            QString geteventstr=pp->mydata.toString();
-            QStringList list;
-            list=getsys()->psk0->need4block(geteventstr);
-            if(list.isEmpty()){list.append(geteventstr);}
-            foreach(QString stri,list){
-                pp->newChild(QVariant(stri),true);
-            }
-        }
-        else if(pp->type+1==myinputitem::func_Fun){
-            pp->newChild(QVariant(">FUNCTION:"),false,true);
-            foreach(QString stri,getsys()->funstrlist){
-                pp->newChild(QVariant(stri),true);
-            }
-        }
-        else if(pp->type+1>=myinputitem::func_Obj){
-            //if(!pp->getParent(myinputitem::stc_Fun,true)){return;}
-            QString geteventstr=pp->getParent(myinputitem::func_Event)->getstr();
-            QString getfunstr=pp->getParent(myinputitem::func_Fun,true)->getstr();
-            QStringList strlist;
-            strlist=myfun::need(getfunstr);
-            if(!strlist.isEmpty()){
-                QList<myobj *> objlist;
-                QString gettypestr=strlist.at(pp->type+1-myinputitem::func_Obj);
-                pp->newChild(QVariant(">OBJECT("+gettypestr+"):"),false,true);
-                foreach(QString stri,gettypestr.split("+")){
-                    getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr);
-                }
-                foreach(myobj *ip,objlist){
-                    pp->newChild(QVariant(ip->name),pp->type+1-myinputitem::func_Obj<strlist.length()-1);
-                }
-            }
-        }
-        break;
-    case mydo::Condition:
-        if(pp->type+1==myinputitem::condition_Block){
-            pp->newChild(QVariant(">BLOCK:"),false,true);
-            QString geteventstr=pp->mydata.toString();
-            QStringList list;
-            list=getsys()->psk0->need4block(geteventstr);
-            if(list.isEmpty()){list.append(geteventstr);}
-            foreach(QString stri,list){
-                pp->newChild(QVariant(stri),true);
-            }
-        }
-        else if(pp->type+1==myinputitem::condition_Obj0){
-            pp->newChild(QVariant(">OBJECT(switch):"),false,true);
-            QList<myobj *> objlist;
-            getsys()->psk0->getavlobjlist(myobj::All,objlist,pp->getParent(myinputitem::condition_Event)->getstr());
-            foreach(myobj *ip,objlist){
-                pp->newChild(QVariant(ip->name),true);
-            }
-        }
-        else if(pp->type+1>=myinputitem::condition_Obj){
-            pp->newChild(QVariant(">OBJECT(case):"),false,true);
-            //qWarning()<<pp->getParent(myinputitem::condition_Obj0,true)->getstr();
-            QString geteventstr=pp->getParent(myinputitem::condition_Event)->getstr();
-            myobj *pobj=getsys()->psk0->findObjByName(pp->getParent(myinputitem::condition_Obj0,true)->getstr(),geteventstr);
-            if(pobj){
-                QList<myobj *> objlist;
-                getsys()->psk0->getavlobjlist(pobj->type,objlist,pp->getParent(myinputitem::condition_Event)->getstr());
-                foreach(myobj *ip,objlist){
-                    if(pp->getParent(ip->name,true)){continue;}
-                    pp->newChild(QVariant(ip->name),true);
-                }
-            }
-        }
-        break;
-    case mydo::Foreach:
-        if(pp->type+1==myinputitem::foreach_Block){
-            pp->newChild(QVariant(">BLOCK:"),false,true);
-            QString geteventstr=pp->mydata.toString();
-            QStringList list;
-            list=getsys()->psk0->need4block(geteventstr);
-            if(list.isEmpty()){list.append(geteventstr);}
-            foreach(QString stri,list){
-                pp->newChild(QVariant(stri),true);
-            }
-        }
-        else if(pp->type+1==myinputitem::foreach_Obj){
-            pp->newChild(QVariant(">OBJECT("+myobj::type2str(myobj::Mylist)+"):"),false,true);
-            QString geteventstr=pp->getParent(myinputitem::foreach_Event)->getstr();
-            QList<myobj *> objlist;
-            getsys()->psk0->getavlobjlist(myobj::Mylist,objlist,geteventstr);
-            foreach(myobj *ip,objlist){
-                pp->newChild(QVariant(ip->name));
-            }
-        }
-        break;
-    default:;
-    }
-    */
+    //qWarning()<<"fetchmore";
 }
 
 bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int role){

@@ -31,10 +31,10 @@ public:
     static QStringList get(QString);
     static int getBlock_cnt(QString);
     static QString getTrans(QString);
-    static QStringList getfunstrlist();
+    static QStringList getfunstrlist(QStringList taglist);
     static QStringList getfuntagrmlist(bool visibility=true);
     static QString remark2tag(QString);
-    static bool matchTag(QString getname,QString gettag);
+    static bool matchTaglist(QString getname,QStringList gettaglist);
     static QString findRemarkByName(QString getname);
 signals:
     

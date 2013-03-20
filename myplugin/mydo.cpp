@@ -1,9 +1,10 @@
 #include "mydo.h"
 #include "mysk.h"
+mysk *mydo::getsk0(){return static_cast<mysk *>(parent());}
 QString mydo::trans4block(QString getblockstr){
     QList<mydo *> prevlist;
     getprevlist(prevlist);
-    if(myevent::isEvent(getblockstr)){return getblockstr;}
+    if(getsk0()->eventstrlist().contains(getblockstr)){return getblockstr;}
     else{
         for(int i=0;i<prevlist.length();i++){
             myfunction *pt=static_cast<myfunction *>(prevlist.at(i)->blocklist.first());
@@ -76,14 +77,14 @@ QString mydo::trans(){
     QString str="";
     QStringList strlist;
     strlist.clear();
-    myfunction *pstc=static_cast<myfunction *>(blocklist.first());
-    strlist<<pstc->inilist.first().toString();
-    QString getblockstr=pstc->inilist.at(1).toString();
+    myfunction *pfunc=static_cast<myfunction *>(blocklist.first());
+    strlist<<pfunc->inilist.first().toString();
+    QString getblockstr=pfunc->inilist.at(1).toString();
     strlist<<trans4block(getblockstr);
-    strlist<<pstc->funname;
+    strlist<<pfunc->funname;
     QStringList tstrlist;
     tstrlist.clear();
-    foreach(myobj *ip,pstc->objlist){
+    foreach(myobj *ip,pfunc->objlist){
         tstrlist<<trans4obj(ip);
     }
     strlist<<tstrlist.join(",");
@@ -93,7 +94,7 @@ QString mydo::trans(){
     }
     strlist<<tstrlist.join(",");
     tstrlist.clear();
-    foreach(myblock *ip,pstc->blocklist){
+    foreach(myblock *ip,pfunc->blocklist){
         tstrlist<<ip->remark;
     }
     strlist<<tstrlist.join(",");
@@ -165,7 +166,7 @@ void mydo::getprevlist(QList<mydo *> &list){
         list<<pf->dolist.mid(0,pf->dolist.indexOf(this));
     }
 }
-void mydo::dotrans(mytrs *psk0, QString gettrans){
+void mydo::dotrans(mysk *psk0, QString gettrans){
     qWarning()<<gettrans;
     QString tstr=gettrans;
     tstr.replace("\\|","\\\\");
@@ -173,7 +174,7 @@ void mydo::dotrans(mytrs *psk0, QString gettrans){
     strlist.replaceInStrings("\\\\","|");
     QString geteventstr=strlist.first();
     QString getblockstr;
-    if(myevent::isEvent(strlist.at(1))){getblockstr=strlist.at(1);}
+    if(psk0->eventstrlist().contains(strlist.at(1))){getblockstr=strlist.at(1);}
     else{
         int index1=strlist.at(1).split("->").first().toInt();
         int index2=strlist.at(1).split("->").last().toInt();
@@ -207,7 +208,7 @@ void mydo::dotrans(mytrs *psk0, QString gettrans){
     getrtrmlist<<strlist.at(4).split(",");
     QStringList getblrmlist;
     if(strlist.length()>=6){getblrmlist<<strlist.at(5).split(",");}
-    psk0->addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist);
+    psk0->addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist,true);
     /*
     if(gettrans.startsWith(type2trans(Sentence)+":")){
         QString tstr=gettrans.mid(type2trans(Sentence).length()+1);

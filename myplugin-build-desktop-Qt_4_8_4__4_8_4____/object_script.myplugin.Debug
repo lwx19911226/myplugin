@@ -2,7 +2,6 @@ INPUT(
 ./debug\main.o
 ./debug\mainwindow.o
 ./debug\mysys.o
-./debug\myopr.o
 ./debug\myobj.o
 ./debug\myfun.o
 ./debug\myevent.o
@@ -16,7 +15,6 @@ INPUT(
 ./debug\mysk.o
 ./debug\moc_mainwindow.o
 ./debug\moc_mysys.o
-./debug\moc_myopr.o
 ./debug\moc_myobj.o
 ./debug\moc_myfun.o
 ./debug\moc_myevent.o

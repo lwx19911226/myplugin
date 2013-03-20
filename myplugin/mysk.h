@@ -2,7 +2,6 @@
 #define MYTRS_H
 
 #include <QObject>
-#include "myopr.h"
 #include "mydo.h"
 
 class mygeneral;
@@ -26,6 +25,19 @@ public:
         if(getstr==type2str(TriggerSkill)){return TriggerSkill;}
         if(getstr==type2str(ViewAsSkill)){return ViewAsSkill;}
         return -1;
+    }
+    static QString type2abb(int gettype){
+        switch(gettype){
+        case TriggerSkill:return "trs";
+        case ViewAsSkill:return "vs";
+        default:qWarning()<<"type2abb:"<<gettype;return QString();
+        }
+    }
+    static int abb2type(QString getstr){
+        if(getstr==type2abb(TriggerSkill)){return TriggerSkill;}
+        if(getstr==type2abb(ViewAsSkill)){return ViewAsSkill;}
+        qWarning()<<"abb2type"<<getstr;
+        return Skill;
     }
     enum skProperty{Name=0,Translation=1,Owner=2,Description=3,Words=4};
     static QString property2str(int getproperty){
@@ -57,6 +69,11 @@ public:
     }
     virtual void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap);
     virtual void propertymap_set(QMap<QString,QString> &strmap);
+    virtual QString propertystr_get();
+    QStringList propertystr_get(bool front);
+    virtual void propertystr_set(QString getstr);
+    void propertystr_set(QStringList getstrlist,bool front);
+    bool propertystr_dvd(QString getstr,QStringList &frlist,QStringList &midlist,QStringList &bklist);
     QString name;
     mygeneral *owner;
     QString translation;
@@ -65,6 +82,9 @@ public:
 
     QList<myobj *> avlobjlist;
     //QList<myobj *> usdobjlist;
+    QList<mydo *> dolist;
+    QStringList undostrlist;
+    QList<mydo *> dolist_r;
     static int globalint;
     void getavlobjlist(int gettype,QList<myobj *> &list,QString getstr="");
     //void getusdobjlist(int gettype,QList<myobj *> &list,QString getstr="");
@@ -75,7 +95,7 @@ public:
 
     virtual void addFunction(QString geteventstr,QString getblockstr,
                              QString getfunstr,QList<myobj *> &getobjlist,
-                             QStringList &getrtrmlist,QStringList &getblrmlist)=0;
+                             QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false)=0;
     virtual void undo(){}
     virtual void redo(){}
     virtual QStringList need4block(QString getstr)=0;
@@ -90,6 +110,9 @@ public:
     void setDefaultName();
     void setName(QString getname);
     virtual QStringList trans()=0;
+    QStringList trans4avlobjlist(QString getstr="");
+    virtual QStringList funtaglist(QString getstr){qWarning()<<"funtaglist:"<<getstr;return QStringList();}
+    virtual QStringList eventstrlist()=0;
     virtual void sig_update();
 };
 
@@ -118,44 +141,53 @@ public:
     }
     void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap);
     void propertymap_set(QMap<QString, QString> &strmap);
+    void propertystr_set(QString getstr);
+    QString propertystr_get();
     enum trsType{NotFrequent=0,Frequent=1,Compulsory=2,Limited=3,Wake=4};
-    static QString type2str(int gettype){
+    static QString subtype2str(int gettype){
         switch(gettype){
         case NotFrequent:return "NotFrequent";
         case Frequent:return "Frequent";
         case Compulsory:return "Compulsory";
         case Limited:return "Limited";
         case Wake:return "Wake";
-        default:return type2str(NotFrequent);
+        default:return subtype2str(NotFrequent);
         }
     }
-    static int str2type(QString getstr){
-        if(getstr==type2str(NotFrequent)){return NotFrequent;}
-        if(getstr==type2str(Frequent)){return Frequent;}
-        if(getstr==type2str(Compulsory)){return Compulsory;}
-        if(getstr==type2str(Limited)){return Limited;}
-        if(getstr==type2str(Wake)){return Wake;}
+    static int str2subtype(QString getstr){
+        if(getstr==subtype2str(NotFrequent)){return NotFrequent;}
+        if(getstr==subtype2str(Frequent)){return Frequent;}
+        if(getstr==subtype2str(Compulsory)){return Compulsory;}
+        if(getstr==subtype2str(Limited)){return Limited;}
+        if(getstr==subtype2str(Wake)){return Wake;}
         qWarning()<<"TRSstr2type:"<<getstr;
         return NotFrequent;
     }    
     static QStringList typestrlist(){
         QStringList strlist;
-        strlist<<type2str(NotFrequent)<<type2str(Frequent)<<type2str(Compulsory)<<type2str(Limited)<<type2str(Wake);
+        strlist<<subtype2str(NotFrequent)<<subtype2str(Frequent)<<subtype2str(Compulsory)<<subtype2str(Limited)<<subtype2str(Wake);
         return strlist;
     }
-
-    static QString type2trans(int gettype){return "sgs.Skill_"+type2str(gettype);}
+    static QString type2trans(int gettype){return "sgs.Skill_"+subtype2str(gettype);}
+    QStringList funtaglist(QString getstr){
+        if(!myevent::isEvent(getstr)){qWarning()<<"funtaglist:"<<getstr;}
+        QStringList strlist;
+        strlist<<"room$";
+        return strlist;
+    }
+    QStringList eventstrlist(){
+        return myevent::geteventstrlist();
+    }
 
     int subtype;
     QList<myopr *> oprlist;
 
-    QList<mydo *> dolist;
-    QList<mydo *> undolist;    
+
 
     int getType(){return TriggerSkill;}
     void addFunction(QString geteventstr,QString getblockstr,
                 QString getfunstr,QList<myobj *> &getobjlist,
-                QStringList &getrtrmlist,QStringList &getblrmlist);
+                QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false);
     //void addCondition(QString geteventstr,QString getblockstr,QList<myobj *> &getobjlist,QString getrm);
     //void addForeach(QString geteventstr,QString getblockstr,myobj *getobj,QString getrm);
     void undo();
@@ -164,9 +196,9 @@ public:
     void rfrObj();
     void iniObj();
     bool removeObj(myobj *getp);
-    QStringList trans();
-    QStringList trans4avlobjlist(QString geteventstr="");
-    QString trans4design();
+    QStringList trans();    
+    QStringList trans4design();
+
     //void need(QList<QString> &);
     QStringList need4block(QString getstr);
 
@@ -178,7 +210,7 @@ public:
     QString findRemarkByName_event(QString getname);
     QString findRemarkByName_block(QString getname);
 
-    void myshow(){foreach(myopr *ip,oprlist){ip->blockp->myshow();}}
+    void myshow(){foreach(myopr *ip,oprlist){ip->myshow();}}
 signals:
     
 public slots:
@@ -231,6 +263,13 @@ public:
         strlist<<vsbtype2str(ViewFilter)<<vsbtype2str(EnabledAtPlay)<<vsbtype2str(EnabledAtResponse);
         return strlist;
     }
+    QStringList funtaglist(QString getstr){
+        QStringList strlist;
+        if(getstr==vsbtype2str(ViewFilter)){strlist<<"selected$";}
+        if(getstr==vsbtype2str(EnabledAtResponse)){strlist<<"pattern$";}
+        return strlist;
+    }
+    QStringList eventstrlist(){return getvsbstrlist();}
 
     int vsn;
     QString objname_viewas;
@@ -246,7 +285,7 @@ public:
                QStringList &getrtrmlist,QStringList &getblrmlist);
     void addFunction(QString geteventstr,QString getblockstr,
                 QString getfunstr,QList<myobj *> &getobjlist,
-                QStringList &getrtrmlist,QStringList &getblrmlist);
+                QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false);
     QStringList need4block(QString getstr);
     myblock *findBlockByName(QString);
     myfunction *findFuncByObj(myobj *);

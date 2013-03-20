@@ -5,6 +5,7 @@
 #include "myobj.h"
 #include "mycode.h"
 
+class mysk;
 class mytrs;
 class mydo : public QObject
 {
@@ -22,7 +23,8 @@ public:
     QString getBlockName(int index);
     myobj *getObj(int index);
     void getprevlist(QList<mydo *> &list);
-    static void dotrans(mytrs *psk0,QString gettrans);
+    mysk *getsk0();
+    static void dotrans(mysk *psk0,QString gettrans);
     /*
     static QString type2trans(int gettype){
         switch(gettype){

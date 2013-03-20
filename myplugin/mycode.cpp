@@ -1,10 +1,7 @@
 #include "mycode.h"
+#include "mysk.h"
 
 int myblock::globalint=0;
-mycode::mycode(QObject *parent) :
-    QObject(parent)
-{
-}
 void myblock::addBlock(myblock *getp){
     if(getp->name==name){
         foreach(myblock *ip,getp->blocklist){
@@ -41,7 +38,7 @@ QStringList myblock::trans(){
     foreach(myblock *ip,blocklist){
         strlist<<ip->trans();
     }
-    return myindent(strlist);
+    return mycode::myindent(strlist);
 }
 int myblock::getLayer(){
     myblock *p=this;
@@ -197,6 +194,20 @@ void myfunction::addBlock(myblock *getp, QString getstr){
 myfunction *myfunction::findFuncByObj(myobj *getp){
     if(rtobjlist.contains(getp)){return this;}
     return myblock::findFuncByObj(getp);
+}
+
+void myopr::myini(){
+    name=eventstr;
+}
+QStringList myopr::trans(){
+    QStringList strlist;
+    strlist<<QString("if event==%1 then").arg(myevent::trans(eventstr));
+    strlist<<mycode::myindent(myevent::trans4eventdata(eventstr,true));
+    strlist<<mycode::myindent(static_cast<mytrs *>(parent())->trans4avlobjlist(eventstr));
+    strlist<<myblock::trans();
+    strlist<<mycode::myindent(myevent::trans4eventdata(eventstr,false));
+    strlist<<"end";
+    return strlist;
 }
 
 /*

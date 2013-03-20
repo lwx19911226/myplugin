@@ -73,8 +73,13 @@ void mysys::myini_design(QString path){
     }
     foreach(QString stri,strlist_trs){
         if(stri.count("|")>=3){
-            QStringList tstrlist=stri.mid(3).split("|");
-            QString getname=tstrlist.at(0);
+            QString tstr=stri.mid(3);
+            QString getabb=tstr.split("|").at(0);
+            QString getname=tstr.split("|").at(1);
+            mysk *psk=findSkillByName(getname);
+            if(!psk){psk=newSkill(getname,mysk::abb2type(getabb));}
+            psk->propertystr_set(tstr);
+            /*
             QString gettranslation=tstrlist.at(1);
             int gettype=mytrs::str2type(tstrlist.at(2));
             mygeneral *pg=findGeneralByName(tstrlist.at(3));
@@ -97,16 +102,17 @@ void mysys::myini_design(QString path){
                     psk->wordslist<<tstrlist.at(i).mid(1);
                 }
             }
+            */
         }
         else{
             qWarning()<<stri;
         }
     }
     foreach(QString stri,strlist_do){
-        QString trsname=stri.mid(4,stri.indexOf("::")-4);
+        QString skname=stri.mid(4,stri.indexOf("::")-4);
         QString getstr=stri.mid(stri.indexOf("::")+2);
         //qWarning()<<trsname<<getstr;
-        mydo::dotrans(static_cast<mytrs *>(findSkillByName(trsname)),getstr);
+        mydo::dotrans(findSkillByName(skname),getstr);
     }
 
     qWarning()<<"design success";
@@ -135,10 +141,16 @@ mygeneral *mysys::newGeneral(QString getname, int getkingdom, int gethp, bool ge
     sig_update();
     return pg0;
 }
-mytrs *mysys::newTrs(QString getname,int gettype){
+mysk *mysys::newSkill(QString getname, int gettype){
+    if(gettype==mysk::TriggerSkill){return newTrs(getname);}
+    if(gettype==mysk::ViewAsSkill){return newVs(getname);}
+    qWarning()<<"newskill"<<getname<<gettype;
+    return NULL;
+}
+mytrs *mysys::newTrs(QString getname,int getsubtype){
     mytrs *ptrs=new mytrs(this);    
     ptrs->setName(getname);
-    ptrs->subtype=gettype;    
+    ptrs->subtype=getsubtype;
     ptrs->iniObj();
     psk0=ptrs;
     sklist.append(psk0);
@@ -172,9 +184,7 @@ mysk *mysys::findSkillByName(QString getname){
 bool mysys::delGeneral(mygeneral *getp){
     if(!getp){return false;}
     if(!glist.contains(getp)){return false;}
-    foreach(mysk *ip,getp->sklist){
-        ip->owner=NULL;
-    }
+    foreach(mysk *ip,getp->sklist){ip->owner=NULL;}
     glist.removeOne(getp);
     glist_r.append(getp);
     if(getp==pg0){pg0=(glist.isEmpty()?NULL:glist.first());}
@@ -240,26 +250,28 @@ QStringList mysys::trans(){
 
     return strlist;
 }
-QString mysys::trans4design(){
-    QString str="";
-    str+=QString(">%1|%2\n").arg(packagename,package_trans);
+QStringList mysys::trans4design(){
+    //QString str="";
+    QStringList strlist;
+    strlist<<QString(">%1|%2").arg(packagename,package_trans);
     foreach(mygeneral *ip,glist){
-        str+=QString(">>%1|%2|%3|%4|%5|#%6|~%7|cv:%8\n").arg(ip->name,ip->translation,mygeneral::kingdom2str(ip->kingdom),mygeneral::sex2str(ip->sex)).arg(ip->hp).arg(ip->title,ip->word,ip->cv);
+        strlist<<QString(">>%1|%2|%3|%4|%5|#%6|~%7|cv:%8").arg(ip->name,ip->translation,mygeneral::kingdom2str(ip->kingdom),mygeneral::sex2str(ip->sex)).arg(ip->hp).arg(ip->title,ip->word,ip->cv);
     }
     QList<mysk *> rsklist;
     getsklist(rsklist,mysk::TriggerSkill);
     foreach(mysk *ip,rsklist){
         mytrs *pt=static_cast<mytrs *>(ip);
-        str+=QString(">>>%1|%2|%3|%4|:%5").arg(pt->name,pt->translation,mytrs::type2str(pt->subtype),pt->owner?pt->owner->name:"",pt->description);
-        str+=mycode::mymdf(pt->wordslist,"|$").join("");
-        str+="\n";
+        strlist<<">>>"+pt->propertystr_get();
+        //QString tstr="";
+        //tstr+=QString(">>>%1|%2|%3|%4|:%5").arg(pt->name,pt->translation,mytrs::type2str(pt->subtype),pt->owner?pt->owner->name:"",pt->description);
+        //tstr+=mycode::mymdf(pt->wordslist,"|$").join("");
+        //strlist<<tstr;
     }
     foreach(mysk *ip,rsklist){
         mytrs *pt=static_cast<mytrs *>(ip);
-        str+=pt->trans4design();
+        strlist<<mycode::mymdf(pt->trans4design(),">>>>");
     }
-
-    return str;
+    return strlist;
 }
 
 /*

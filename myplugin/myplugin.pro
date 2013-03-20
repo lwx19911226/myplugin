@@ -13,7 +13,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     mysys.cpp \
-    myopr.cpp \
     myobj.cpp \
     myfun.cpp \
     myevent.cpp \
@@ -28,7 +27,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     mysys.h \
-    myopr.h \
     myobj.h \
     myfun.h \
     myevent.h \

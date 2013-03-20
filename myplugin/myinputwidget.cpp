@@ -120,59 +120,6 @@ void myinputwidget::myadd(){
     pmain->psys->psk0->addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist);
     pmain->myexport_design("tmp4design.txt");
     close();
-    /*
-    if(type==mydo::Sentence){
-        QString geteventstr=list.at(0);
-        QString getblockstr=list.at(1).split("|").at(0);
-        QString getfunstr=list.at(2);
-        if(myfun::need(getfunstr).length()!=list.length()-3){return;}
-        QList<myobj *> getobjlist;
-        QStringList getrtrmlist;
-        QStringList getblrmlist;
-        for(int i=3;i<list.length();i++){
-            myobj *pobj=pmain->psys->psk0->findObjByName(list.at(i),geteventstr);
-            if(!pobj){
-                pobj=new myobj(pmain->psys);
-                pobj->name=list.at(i);
-                pobj->type=myobj::str2type(myfun::need(getfunstr).at(i-3));
-                pobj->isDynamic=false;
-            }
-            getobjlist.append(pobj);
-        }
-        int n=myfun::get(getfunstr).length();
-        for(int i=1;i<=n;i++){getrtrmlist<<p_lineedit_list.at(i)->text();}
-        for(int i=1;i<=myfun::getBlock_cnt(getfunstr);i++){getblrmlist<<p_lineedit_list.at(n+i+1)->text();}
-        pmain->psys->psk0->addOpr(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist);
-        //qWarning()<<pmain->psys->psk0->trans();
-    }
-    else if(type==mydo::Condition){
-        QString geteventstr=list.at(0);
-        QString getblockstr=list.at(1).split("|").at(0);
-        QList<myobj *> getobjlist;
-        QString getrm="";
-        getobjlist<<pmain->psys->psk0->findObjByName(list.at(2),geteventstr);
-        for(int i=3;i<list.length();i++){
-            myobj *pobj=pmain->psys->psk0->findObjByName(list.at(i),geteventstr);
-            if(!pobj){
-                pobj=new myobj(pmain->psys);
-                pobj->name=list.at(i);
-                pobj->type=getobjlist.first()->type;
-                pobj->isDynamic=false;
-            }
-            getobjlist.append(pobj);
-        }
-        getrm=p_lineedit_list.at(0)->text();
-        pmain->psys->psk0->addCondition(geteventstr,getblockstr,getobjlist,getrm);
-    }
-    else if(type==mydo::Foreach){
-        QString geteventstr=list.at(0);
-        QString getblockstr=list.at(1);
-        myobj *pobj=pmain->psys->psk0->findObjByName(list.at(2),geteventstr);
-        QString getrm=p_lineedit_list.at(0)->text();
-        qWarning()<<geteventstr<<getblockstr<<pobj->name;
-        pmain->psys->psk0->addForeach(geteventstr,getblockstr,pobj,getrm);
-    }
-    */
 }
 void myinputwidget::myptg(){
     myptgwidget *p_ptgwidget=new myptgwidget;
@@ -198,67 +145,6 @@ QString myinputwidget::getRemark(myinputitem *pi){
         return tstr;
     }
     return "";
-    /*
-    if(type==mydo::Sentence){
-        if(i==myinputitem::func_Event){
-            return myevent::findRemarkByName(pi->getstr());
-        }
-        else if(i==myinputitem::func_Block){
-            if(myevent::isEvent(pi->getstr())){
-                return "default";
-            }
-            else{
-                myblock *pt=pmain->psys->psk0->findBlockByName(pi->getstr());
-                if(pt){return pt->remark;}
-                else{qWarning()<<pi->getstr();}
-            }
-        }
-        else if(i==myinputitem::func_Fun){
-            return myfun::findRemarkByName(pi->getstr());
-        }
-        else if(i>=myinputitem::func_Obj){
-            myobj *pt=pmain->psys->psk0->findObjByName(pi->getstr(),pi->getParent(myinputitem::stc_Event)->getstr());
-            if(pt){return pt->remark;}
-        }
-    }
-    else if(type==mydo::Condition){
-        if(i==myinputitem::condition_Event){
-            return myevent::findRemarkByName(pi->getstr());
-        }
-        else if(i==myinputitem::condition_Block){
-            if(myevent::isEvent(pi->getstr())){
-                return "default";
-            }
-            else{
-                myblock *pt=pmain->psys->psk0->findBlockByName(pi->getstr());
-                if(pt){return pt->remark;}
-                else{qWarning()<<"getRemark:"<<pi->getstr();}
-            }
-        }
-        else if(i>=myinputitem::condition_Obj0){
-            myobj *pt=pmain->psys->psk0->findObjByName(pi->getstr(),pi->getParent(myinputitem::condition_Event)->getstr());
-            if(pt){return pt->remark;}
-        }
-    }
-    else if(type==mydo::Foreach){
-        if(i==myinputitem::foreach_Event){
-            return myevent::findRemarkByName(pi->getstr());
-        }
-        else if(i==myinputitem::foreach_Block){
-            if(myevent::isEvent(pi->getstr())){
-                return "default";
-            }
-            else{
-                myblock *pt=pmain->psys->psk0->findBlockByName(pi->getstr());
-                if(pt){return pt->remark;}
-                else{qWarning()<<"getRemark:"<<pi->getstr();}
-            }
-        }
-        else if(i==myinputitem::foreach_Obj){
-            myobj *pt=pmain->psys->psk0->findObjByName(pi->getstr(),pi->getParent(myinputitem::foreach_Event)->getstr());
-            if(pt){return pt->remark;}
-        }
-    }*/
 }
 
 void myinputwidget::showRemark(){
@@ -273,61 +159,12 @@ void myinputwidget::showRemark(){
         strlist.prepend(QString("%1 : %2").arg(pi->getstr()).arg(getRemark(pi)));
         pi=pi->pf;
     }
-/*
-    for(int i=0;i<list.length();i++){
-        QString str1,str2;
-        str1=list.at(i);
-        if(type==Sentence){
-            if(i+1==myinputitem::stc_Event){
-                str2=myevent::findRemarkByName(list.at(i));
-            }
-            else if(i+1==myinputitem::stc_Block){
-                if(myevent::isEvent(list.at(i))){
-                    str2="default";
-                }
-                else{
-                    myblock *pt=pmain->psys->psk0->findBlockByName(list.at(i));
-                    if(pt){str2=pt->remark;}
-                    else{qWarning()<<list.at(i);}
-                }
-            }
-            else if(i+1==myinputitem::stc_Fun){
-                str2=myfun::findRemarkByName(list.at(i));
-            }
-            else if(i+1>=myinputitem::stc_Obj){
-                myobj *pt=pmain->psys->psk0->findObjByName(list.at(i));
-                if(pt){str2=pt->remark;}
-            }
-        }
-        else if(type==Condition){
-            if(i+1==myinputitem::condition_Event){
-                str2=myevent::findRemarkByName(list.at(i));
-            }
-            else if(i+1==myinputitem::condition_Block){
-                if(myevent::isEvent(list.at(i))){
-                    str2="default";
-                }
-                else{
-                    myblock *pt=pmain->psys->psk0->findBlockByName(list.at(i));
-                    if(pt){str2=pt->remark;}
-                    else{qWarning()<<list.at(i);}
-                }
-            }
-            else if(i+1>=myinputitem::condition_Obj0){
-                myobj *pt=pmain->psys->psk0->findObjByName(list.at(i));
-                if(pt){str2=pt->remark;}
-            }
-        }
-        str+=QString("%1 : %2\n").arg(str1).arg(str2);
-    }
-*/
     strlist.prepend(tr("Remarks :"));
     p_textedit->setText(strlist.join("\n"));
     //qWarning()<<"showremark";
 }
 
 void myinputwidget::changeRTR(){
-
     QStringList list=getSel();
     if(!list.isEmpty()&&list.last()=="input others"){return;}
     foreach(QLabel *ip,p_label_list){ip->hide();}
@@ -357,47 +194,7 @@ void myinputwidget::changeRTR(){
             p_lineedit_list.at(nn+i+1)->show();
         }
     }
-    //qWarning()<<"changertr";
-    /*
-    if(type==mydo::Sentence){
-        if(list.length()<myinputitem::func_Fun){return;}
-        QString getfunstr=list.at(myinputitem::func_Fun-1);
-        QStringList rtlist;
-        rtlist=myfun::get(getfunstr);
-        if(!rtlist.isEmpty()){
-            p_label_list.at(0)->setText(tr("Remarks for return values : "));
-            p_label_list.at(0)->show();
-            for(int i=0;i<rtlist.length();i++){
-                p_label_list.at(i+1)->setText(rtlist.at(i)+" : ");
-                p_label_list.at(i+1)->show();
-                p_lineedit_list.at(i+1)->show();
-            }
-        }
-        int n=myfun::getBlock_cnt(getfunstr);
-        if(n>0){
-            int nn=rtlist.length()+1;
-            p_label_list.at(nn)->setText(tr("Remarks for blocks : "));
-            p_label_list.at(nn)->show();
-            for(int i=0;i<n;i++){
-                p_label_list.at(nn+i+1)->setText("block"+QString::number(i+1)+" : ");
-                p_label_list.at(nn+i+1)->show();
-                p_lineedit_list.at(nn+i+1)->show();
-            }
-        }
-    }
-    else if(type==mydo::Condition){
-        if(list.length()<myinputitem::condition_Obj){return;}
-        p_label_list.at(0)->setText("Remarks for CONDITION block : ");
-        p_label_list.at(0)->show();
-        p_lineedit_list.at(0)->show();
-    }
-    else if(type==mydo::Foreach){
-        if(list.length()<myinputitem::foreach_Obj){return;}
-        p_label_list.at(0)->setText("Remarks for FOREACH block : ");
-        p_label_list.at(0)->show();
-        p_lineedit_list.at(0)->show();
-    }
-    */
+    //qWarning()<<"changertr";    
 }
 void myinputwidget::changeFilter(){
     //qWarning()<<"0228changefilter0";
@@ -436,9 +233,9 @@ void myinputwidget::changeFilter(){
     seltype=pi->type;    
 }
 void myinputwidget::changeColumnView(){
-    showRemark();qWarning()<<"showRemark";
-    changeRTR();qWarning()<<"changeRTR";
-    changeFilter();qWarning()<<"changeFilter";
+    showRemark();//qWarning()<<"showRemark";
+    changeRTR();//qWarning()<<"changeRTR";
+    changeFilter();//qWarning()<<"changeFilter";
     //qWarning()<<"changecolumnview";
 }
 /*
@@ -500,8 +297,10 @@ void myinputwidget::filterItems_obj(){
         if(ip->getstr().startsWith(">")){continue;}
         if(ip->getstr()=="input others"){continue;}
         if(p_combobox_filter->currentText()=="ALL"){ip->visible=true;continue;}
+        QStringList gettaglist=pmain->psys->psk0->funtaglist(ip->getParent(myinputitem::func_Event)->getstr());
+        gettaglist<<myfun::remark2tag(p_combobox_filter->currentText());
         if(p0->type+1==myinputitem::func_Fun){
-            ip->visible=myfun::matchTag(ip->getstr(),myfun::remark2tag(p_combobox_filter->currentText()));
+            ip->visible=myfun::matchTaglist(ip->getstr(),gettaglist);
         }
         else if(p0->type+1>=myinputitem::func_Obj){
             myobj *pt=pmain->psys->psk0->findObjByName(ip->getstr(),ip->getParent(myinputitem::func_Event)->getstr());

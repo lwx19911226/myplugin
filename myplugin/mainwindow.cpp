@@ -218,7 +218,7 @@ void MainWindow::myexport_design(QString getpath){
         qWarning()<<"save2";return;
     }
     QTextStream cout2(&fout2);
-    cout2<<psys->trans4design();
+    cout2<<mycode::mymdf(psys->trans4design(),QString("\n"),false).join("");
     if(getpath!="tmp4design.txt"){QMessageBox::warning(this,"SAVE","Save the DESIGN file successfully as "+getpath);}
     fout2.close();
 }
@@ -567,8 +567,9 @@ void MainWindow::myredo(){
 }
 void MainWindow::mynew(){
     if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mygeneral::tabstr()){psys->newGeneral("");}
-    if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mysk::type2str(mysk::TriggerSkill)){psys->newTrs("");}
-    if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mysk::type2str(mysk::ViewAsSkill)){psys->newVs("");}    
+    psys->newSkill("",mysk::str2type(p_tabwidget1->tabText(p_tabwidget1->currentIndex())));
+    //if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mysk::type2str(mysk::TriggerSkill)){psys->newTrs("");}
+    //if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mysk::type2str(mysk::ViewAsSkill)){psys->newVs("");}
 }
 void MainWindow::mydel(){
     if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mygeneral::tabstr()){

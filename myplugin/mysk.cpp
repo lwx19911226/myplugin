@@ -33,6 +33,71 @@ void mysk::propertymap_set(QMap<QString, QString> &strmap){
     }
     getsys()->sig_update();
 }
+QString mysk::propertystr_get(){
+    QStringList strlist;
+    strlist<<propertystr_get(true)<<propertystr_get(false);
+    return strlist.join("|");
+}
+QStringList mysk::propertystr_get(bool front){
+    QStringList strlist;
+    if(front){
+        strlist<<type2abb(getType());
+        strlist<<name;
+        strlist<<translation;
+        strlist<<(owner?owner->name:"NULL");
+    }
+    else{
+        strlist<<":"+description;
+        strlist<<mycode::mymdf(wordslist,QString("$"));
+    }
+    return strlist;
+}
+void mysk::propertystr_set(QString getstr){
+    QStringList frlist,bklist,midlist;
+    if(!propertystr_dvd(getstr,frlist,midlist,bklist)){qWarning()<<"propertystr_set:"<<getstr;return;}
+    propertystr_set(frlist,true);
+    propertystr_set(bklist,false);
+}
+void mysk::propertystr_set(QStringList getstrlist, bool front){
+    QMap<QString,QString> strmap;
+    if(front){
+        if(getstrlist.length()!=4){qWarning()<<"propertystr_setfr"<<getstrlist;return;}
+        strmap.insert(property2str(Name),getstrlist.at(1));
+        strmap.insert(property2str(Translation),getstrlist.at(2));
+        strmap.insert(property2str(Owner),getstrlist.at(3));
+    }
+    else{
+        if(!getstrlist.isEmpty()&&getstrlist.first().startsWith(":")){
+            strmap.insert(property2str(Description),getstrlist.first().mid(1));
+            for(int i=1;i<getstrlist.length();i++){
+                if(!getstrlist.at(i).startsWith("$")){qWarning()<<"propertystr_set"<<getstrlist;return;}
+                else{
+                    strmap.insertMulti(property2str(Words),getstrlist.at(i).mid(1));
+                }
+            }
+        }
+        else{
+            qWarning()<<"propertystr_setbk"<<getstrlist;return;
+        }
+    }
+    propertymap_set(strmap);
+}
+bool mysk::propertystr_dvd(QString getstr, QStringList &frlist, QStringList &midlist, QStringList &bklist){
+    QStringList strlist=getstr.split("|");
+    int i1,i2;
+    for(i2=strlist.length()-1;i2>=0;i2--){
+        bklist.prepend(strlist.at(i2));
+        if(strlist.at(i2).startsWith(":")){break;}
+    }
+    for(i1=0;i1<=3;i1++){
+        frlist<<strlist.at(i1);
+    }
+    for(int i=i1;i<i2;i++){
+        midlist<<strlist.at(i);
+    }
+    return i1<=i2;
+}
+
 void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr){
     QList<myobj *> tlist;
     foreach(myobj *ip,avlobjlist){
@@ -44,6 +109,20 @@ void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr){
     foreach(myobj *ip,tlist){
         if(ip->matchType(gettype)){list<<ip;}
     }
+}
+
+QStringList mysk::trans4avlobjlist(QString getstr){
+    QStringList strlist;
+    foreach(myobj *ip,avlobjlist){
+        if(ip->blockstr!=getstr){continue;}
+        if(ip->noDeclaration){continue;}
+        if(myobj::isConst(ip->name)){
+            strlist<<myobj::transConst(ip->name);
+            continue;
+        }
+        strlist<<QString("local %1").arg(ip->name);
+    }
+    return strlist;
 }
 /*
 void mysk::getusdobjlist(int gettype, QList<myobj *> &list, QString getstr){
@@ -102,7 +181,7 @@ void mysk::sig_update(){
 
 void mytrs::addFunction(QString geteventstr,QString getblockstr,
                    QString getfunstr ,QList<myobj *> &getobjlist,
-                   QStringList &getrtrmlist, QStringList &getblrmlist){
+                   QStringList &getrtrmlist, QStringList &getblrmlist,bool b4redo){
     myfunction *pfunc=new myfunction(this);
     pfunc->funname=getfunstr;
     pfunc->objlist<<getobjlist;
@@ -129,7 +208,7 @@ void mytrs::addFunction(QString geteventstr,QString getblockstr,
     pdo->objlist<<pfunc->rtobjlist;
     pdo->blocklist.append(pfunc);
     dolist.append(pdo);
-    undolist.clear();
+    if(!b4redo){undostrlist.clear();}
     //rfrObj();
     //addusdobjlist(getobjlist);
     sig_update();
@@ -208,6 +287,7 @@ void mytrs::addForeach(QString geteventstr, QString getblockstr, myobj *getobj, 
 */
 void mytrs::undo(){
     if(dolist.isEmpty()){return;}
+    undostrlist<<dolist.last()->trans();
     mydo *pdo=dolist.takeLast();
     foreach(myblock *ip,pdo->blocklist){
         bool b=false;
@@ -221,11 +301,14 @@ void mytrs::undo(){
     foreach(myobj *ip,pdo->objlist){
         if(!removeObj(ip)){qWarning()<<"removeobj:"<<ip->name;}
     }
-    undolist.append(pdo);    
+    dolist_r.append(pdo);
     sig_update();
 }
 void mytrs::redo(){
-    if(undolist.isEmpty()){return;}    
+    //if(undolist.isEmpty()){return;}
+    if(undostrlist.isEmpty()){return;}
+    mydo::dotrans(this,undostrlist.takeLast());
+/*
     mydo *pdo=undolist.takeLast();
     foreach(myblock *ip,pdo->blocklist){
         bool b=false;
@@ -236,7 +319,7 @@ void mytrs::redo(){
     }
     avlobjlist.append(pdo->objlist);
     dolist.append(pdo);
-
+*/
     sig_update();
 }
 
@@ -281,25 +364,12 @@ QStringList mytrs::trans(){
     strlist<<"end,\n}";
     return strlist;
 }
-QStringList mytrs::trans4avlobjlist(QString geteventstr){
-    QStringList strlist;    
-    foreach(myobj *ip,avlobjlist){
-        if(ip->blockstr!=geteventstr){continue;}
-        if(ip->noDeclaration){continue;}
-        if(myobj::isConst(ip->name)){
-            strlist<<myobj::transConst(ip->name);
-            continue;
-        }        
-        strlist<<QString("local %1").arg(ip->name);        
+QStringList mytrs::trans4design(){
+    QStringList strlist;
+    foreach(mydo *ip,dolist){
+        strlist<<name+"::"+ip->trans();
     }
     return strlist;
-}
-QString mytrs::trans4design(){
-    QString str="";
-    foreach(mydo *ip,dolist){
-        str+=">>>>"+name+"::"+ip->trans()+"\n";
-    }
-    return str;
 }
 
 QStringList mytrs::need4block(QString getstr){
@@ -342,12 +412,12 @@ QString mytrs::findRemarkByName_event(QString getname){
     return myevent::findRemarkByName(getname);
 }
 QString mytrs::findRemarkByName_block(QString getname){
-    if(myevent::isEvent(getname)){return "default";}
+    if(eventstrlist().contains(getname)){return "default";}
     QString tstr="";
     myblock *pt=findBlockByName(getname);
     if(pt){
         tstr+=pt->remark;
-        if(pt->upperLayer->getType()==mycode::Function){
+        if(pt->upperLayer->getType()==myblock::Function){
             tstr+="  /from:";
             tstr+=myfun::findRemarkByName(static_cast<myfunction *>(pt->upperLayer)->funname);
         }
@@ -357,12 +427,29 @@ QString mytrs::findRemarkByName_block(QString getname){
 }
 void mytrs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap){
     mysk::propertymap_get(strmap,strlistmap);
-    strmap.insert(property2str(Subtype),type2str(subtype));
+    strmap.insert(property2str(Subtype),subtype2str(subtype));
     strlistmap.insert(property2str(Subtype),typestrlist());
 }
 void mytrs::propertymap_set(QMap<QString, QString> &strmap){    
     if(strmap.contains(property2str(Subtype))){subtype=str2type(strmap.value(property2str(Subtype)));}
     mysk::propertymap_set(strmap);
+}
+QString mytrs::propertystr_get(){
+    QStringList strlist;
+    strlist<<mysk::propertystr_get(true);
+    strlist<<subtype2str(subtype);
+    strlist<<mysk::propertystr_get(false);
+    return strlist.join("|");
+}
+void mytrs::propertystr_set(QString getstr){
+    QStringList frlist,bklist,midlist;
+    if(!propertystr_dvd(getstr,frlist,midlist,bklist)){qWarning()<<"propertystr_set:0"<<getstr;return;}
+    if(midlist.length()!=1){qWarning()<<"propertystr_set:1"<<getstr;return;}
+    QMap<QString,QString> strmap;
+    strmap.insert(property2str(Subtype),midlist.first());
+    propertymap_set(strmap);
+    mysk::propertystr_set(frlist,true);
+    mysk::propertystr_set(bklist,false);
 }
 
 QStringList myvs::trans(){
@@ -372,6 +459,7 @@ QStringList myvs::trans(){
     strlist<<QString("n=%1,").arg(vsn);
     if(vfblock){
         strlist<<"view_filter=function(self,selected,to_select)";
+        strlist<<mycode::myindent(trans4avlobjlist(vfblock->name));
         strlist<<vfblock->trans();
         strlist<<"end,";
     }
@@ -384,11 +472,13 @@ QStringList myvs::trans(){
     strlist<<"end,";
     if(epblock){
         strlist<<"enabled_at_play=function(self,player)";
+        strlist<<mycode::myindent(trans4avlobjlist(epblock->name));
         strlist<<epblock->trans();
         strlist<<"end,";
     }
     if(erblock){
         strlist<<"enabled_at_response=function(self,player,pattern)";
+        strlist<<mycode::myindent(trans4avlobjlist(erblock->name));
         strlist<<erblock->trans();
         strlist<<"end,";
     }
@@ -425,7 +515,7 @@ void myvs::addVF(QString getblockstr,QString getfunstr ,QList<myobj *> &getobjli
 }
 void myvs::addFunction(QString geteventstr, QString getblockstr,
                        QString getfunstr, QList<myobj *> &getobjlist,
-                       QStringList &getrtrmlist, QStringList &getblrmlist){
+                       QStringList &getrtrmlist, QStringList &getblrmlist,bool b4redo){
     if(geteventstr==vsbtype2str(ViewFilter)){
         addVF(getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist);
     }
