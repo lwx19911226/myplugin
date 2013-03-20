@@ -56,33 +56,18 @@ QString mydo::trans4obj(myobj *getp){
         }
     }
     return getp->name;
-    /*
-    if(!getp->isDynamic){return getp->name;}
-    else{
-        for(int i=0;i<prevlist.length();i++){
-            if(prevlist.at(i)->objlist.contains(getp)){
-                //i
-                //prevlist.at(i)->objlist.indexOf(getp)
-                return QString("%1->%2").arg(i).arg(prevlist.at(i)->objlist.indexOf(getp));
-            }            
-        }
-    }
-    */
-    qWarning()<<"trans4obj:"<<getp->name;
-    return QString();
 }
 
 QString mydo::trans(){
     if(blocklist.isEmpty()){qWarning()<<"mydo trans";return "";}
     QString str="";
-    QStringList strlist;
+    QStringList strlist,tstrlist;
     strlist.clear();
     myfunction *pfunc=static_cast<myfunction *>(blocklist.first());
     strlist<<pfunc->inilist.first().toString();
     QString getblockstr=pfunc->inilist.at(1).toString();
     strlist<<trans4block(getblockstr);
-    strlist<<pfunc->funname;
-    QStringList tstrlist;
+    strlist<<pfunc->funname;    
     tstrlist.clear();
     foreach(myobj *ip,pfunc->objlist){
         tstrlist<<trans4obj(ip);
@@ -161,13 +146,13 @@ QString mydo::trans(){
 }
 void mydo::getprevlist(QList<mydo *> &list){
     if(!list.isEmpty()){qWarning()<<"getprevlist";}
-    mytrs *pf=static_cast<mytrs *>(parent());
-    if(!pf->dolist.isEmpty()&&pf->dolist.contains(this)&&pf->dolist.first()!=this){
-        list<<pf->dolist.mid(0,pf->dolist.indexOf(this));
+    //mytrs *pf=static_cast<mytrs *>(parent());
+    if(!getsk0()->dolist.isEmpty()&&getsk0()->dolist.contains(this)&&getsk0()->dolist.first()!=this){
+        list<<getsk0()->dolist.mid(0,getsk0()->dolist.indexOf(this));
     }
 }
 void mydo::dotrans(mysk *psk0, QString gettrans){
-    qWarning()<<gettrans;
+    qWarning()<<"dotrans"<<psk0->name<<gettrans;
     QString tstr=gettrans;
     tstr.replace("\\|","\\\\");
     QStringList strlist=tstr.split("|");
@@ -187,22 +172,25 @@ void mydo::dotrans(mysk *psk0, QString gettrans){
     tstrlist=strlist.at(3).split(",");
     if(strlist.at(3)==""){tstrlist.clear();}
     for(int i=0;i<tstrlist.length();i++){
+        myobj *pobj=NULL;
         if(tstrlist.at(i).contains("->")){
             int index1=tstrlist.at(i).split("->").first().toInt();
             int index2=tstrlist.at(i).split("->").last().toInt();
-            getobjlist<<psk0->dolist.at(index1)->getObj(index2);
+            pobj=psk0->dolist.at(index1)->getObj(index2);
         }
         else{
-            myobj *pobj=psk0->findObjByName(tstrlist.at(i),geteventstr);
+            pobj=psk0->findObjByName(tstrlist.at(i),geteventstr);
             if(!pobj){
                 pobj=new myobj(psk0->parent());
                 pobj->name=tstrlist.at(i);
-                if(myfun::need(getfunstr).at(i)==""){qWarning()<<"0227here1?";}
-                pobj->type=myobj::str2type(myfun::need(getfunstr).at(i));
+                int gettype=myobj::str2type(myfun::need(getfunstr).at(i));
+                if(!myobj::b4input(gettype)){qWarning()<<"dotrans_b4input"<<gettype;}
+                pobj->type=gettype;
                 //pobj->isDynamic=false;
-            }
-            getobjlist<<pobj;
+            }            
         }
+        if(!pobj){qWarning()<<"dotrans_pobj"<<gettrans;}
+        getobjlist<<pobj;
     }
     QStringList getrtrmlist;
     getrtrmlist<<strlist.at(4).split(",");
@@ -326,7 +314,7 @@ QString mydo::getBlockName(int index){
     myfunction *pt=static_cast<myfunction *>(blocklist.first());
     QStringList tstrlist;
     tstrlist=pt->need4block();
-    if(index>=tstrlist.length()){qWarning()<<"getblockname"<<pt->name;}
+    if(index>=tstrlist.length()){qWarning()<<"getblockname"<<pt->name<<pt->funname<<index<<tstrlist.length();}
     return tstrlist.at(index);
     /*
     if(type==Sentence){

@@ -73,7 +73,8 @@ public:
         qWarning()<<"OBJstr2type:"<<getstr;
         return All;
     }
-    static bool b4input(int gettype){
+    static bool b4input(int &gettype){
+        if(gettype==Mystr){gettype=Mystrc;}
         return isSubtype(Mynum,gettype)||isSubtype(Mystr,gettype);
     }
     static bool isSubtype(int gettype0,int gettype){
@@ -107,6 +108,7 @@ public:
             return QString(array.at(getnum));
         }
     }
+    static QString objname_nullification(){return "nullification";}
 
     QString trans(){
         if(type==Mystrc){return QString("\"%1\"").arg(name);}

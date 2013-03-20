@@ -42,3 +42,37 @@ void mygeneral::propertymap_set(QMap<QString,QString> &strmap){
     if(strmap.contains(property2str(CV))){cv=strmap.value(property2str(CV));}
     getsys()->sig_update();
 }
+QString mygeneral::propertystr_get(){
+    QStringList strlist;
+    strlist<<name;
+    strlist<<translation;
+    strlist<<kingdom2str(kingdom);
+    strlist<<sex2str(sex);
+    strlist<<QString::number(hp);
+    if(title!=""){strlist<<property2prefix(Title)+title;}
+    if(word!=""){strlist<<property2prefix(Word)+word;}
+    if(cv!=""){strlist<<property2prefix(CV)+cv;}
+    return strlist.join("|");
+}
+void mygeneral::propertystr_set(QString getstr){
+    QStringList strlist=getstr.split("|");
+    if(strlist.length()<5){qWarning()<<"propertystr_set"<<getstr;}
+    QMap<QString,QString> strmap;
+    strmap.insert(property2str(Name),strlist.at(0));
+    strmap.insert(property2str(Translation),strlist.at(1));
+    strmap.insert(property2str(Kingdom),strlist.at(2));
+    strmap.insert(property2str(Sex),strlist.at(3));
+    strmap.insert(property2str(HP),strlist.at(4));
+    for(int i=5;i<strlist.length();i++){
+        if(strlist.at(i).startsWith(property2prefix(Title))){
+            strmap.insert(property2str(Title),strlist.at(i).mid(property2prefix(Title).length()));
+        }
+        if(strlist.at(i).startsWith(property2prefix(Word))){
+            strmap.insert(property2str(Word),strlist.at(i).mid(property2prefix(Word).length()));
+        }
+        if(strlist.at(i).startsWith(property2prefix(CV))){
+            strmap.insert(property2str(CV),strlist.at(i).mid(property2prefix(CV).length()));
+        }
+    }
+    propertymap_set(strmap);
+}

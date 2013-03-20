@@ -38,13 +38,16 @@ void mysys::myini_design(QString path){
     }
     foreach(QString stri,strlist_general){
         if(stri.count("|")>=4){
-            QStringList tstrlist=stri.mid(2).split("|");
-            QString getname=tstrlist.at(0);
+            QString tstr=stri.mid(2);
+            QString getname=tstr.split("|").at(0);
+            mygeneral *pg=findGeneralByName(getname);
+            if(!pg){pg=newGeneral(getname);}
+            pg->propertystr_set(tstr);
+            /*
             QString gettranslation=tstrlist.at(1);
             int getkingdom=mygeneral::str2kingdom(tstrlist.at(2));
             bool getsex=mygeneral::str2sex(tstrlist.at(3));
             int gethp=tstrlist.at(4).toInt();
-            mygeneral *pg=findGeneralByName(getname);
             if(pg){
                 pg->translation=gettranslation;
                 pg->kingdom=getkingdom;
@@ -66,6 +69,7 @@ void mysys::myini_design(QString path){
                     pg->cv=tstrlist.at(i).mid(3);
                 }
             }
+            */
         }
         else{
             qWarning()<<stri;
@@ -114,7 +118,6 @@ void mysys::myini_design(QString path){
         //qWarning()<<trsname<<getstr;
         mydo::dotrans(findSkillByName(skname),getstr);
     }
-
     qWarning()<<"design success";
     fin.close();
     sig_update();
@@ -147,20 +150,18 @@ mysk *mysys::newSkill(QString getname, int gettype){
     qWarning()<<"newskill"<<getname<<gettype;
     return NULL;
 }
-mytrs *mysys::newTrs(QString getname,int getsubtype){
+mytrs *mysys::newTrs(QString getname){
     mytrs *ptrs=new mytrs(this);    
     ptrs->setName(getname);
-    ptrs->subtype=getsubtype;
     ptrs->iniObj();
     psk0=ptrs;
     sklist.append(psk0);
     sig_update();
     return ptrs;
 }
-myvs *mysys::newVs(QString getname, int getn){
+myvs *mysys::newVs(QString getname){
     myvs *pvs=new myvs(this);
     pvs->setName(getname);
-    pvs->vsn=getn;
     pvs->iniObj();
     psk0=pvs;
     sklist.append(psk0);
@@ -169,7 +170,7 @@ myvs *mysys::newVs(QString getname, int getn){
 }
 
 mygeneral *mysys::findGeneralByName(QString getname){
-    if(getname=="NULL"){return NULL;}
+    if(getname==mygeneral::nullname()){return NULL;}
     foreach(mygeneral *ip,glist){
         if(ip->name==getname){return ip;}
     }
@@ -255,21 +256,22 @@ QStringList mysys::trans4design(){
     QStringList strlist;
     strlist<<QString(">%1|%2").arg(packagename,package_trans);
     foreach(mygeneral *ip,glist){
-        strlist<<QString(">>%1|%2|%3|%4|%5|#%6|~%7|cv:%8").arg(ip->name,ip->translation,mygeneral::kingdom2str(ip->kingdom),mygeneral::sex2str(ip->sex)).arg(ip->hp).arg(ip->title,ip->word,ip->cv);
+        strlist<<">>"+ip->propertystr_get();
+        //strlist<<QString(">>%1|%2|%3|%4|%5|#%6|~%7|cv:%8").arg(ip->name,ip->translation,mygeneral::kingdom2str(ip->kingdom),mygeneral::sex2str(ip->sex)).arg(ip->hp).arg(ip->title,ip->word,ip->cv);
     }
     QList<mysk *> rsklist;
     getsklist(rsklist,mysk::TriggerSkill);
-    foreach(mysk *ip,rsklist){
-        mytrs *pt=static_cast<mytrs *>(ip);
-        strlist<<">>>"+pt->propertystr_get();
+    foreach(mysk *ip,sklist){
+        //mytrs *pt=static_cast<mytrs *>(ip);
+        strlist<<">>>"+ip->propertystr_get();
         //QString tstr="";
         //tstr+=QString(">>>%1|%2|%3|%4|:%5").arg(pt->name,pt->translation,mytrs::type2str(pt->subtype),pt->owner?pt->owner->name:"",pt->description);
         //tstr+=mycode::mymdf(pt->wordslist,"|$").join("");
         //strlist<<tstr;
     }
-    foreach(mysk *ip,rsklist){
-        mytrs *pt=static_cast<mytrs *>(ip);
-        strlist<<mycode::mymdf(pt->trans4design(),">>>>");
+    foreach(mysk *ip,sklist){
+        //mytrs *pt=static_cast<mytrs *>(ip);
+        strlist<<mycode::mymdf(ip->trans4design(),">>>>");
     }
     return strlist;
 }

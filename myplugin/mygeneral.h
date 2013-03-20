@@ -43,6 +43,15 @@ public:
                 <<property2str(Title)<<property2str(Word)<<property2str(CV);
         return strlist;
     }
+    static QString property2prefix(int getproperty){
+        switch(getproperty){
+        case Title:return "#";
+        case Word:return "~";
+        case CV:return "cv:";
+        default:qWarning()<<"property2prefix"<<getproperty;return QString();
+        }
+    }
+    static QString nullname(){return tr("NULL");}
     QString name;
     enum kingdomType{kingdom_Default=0,kingdom_Wei=1,kingdom_Shu=2,kingdom_Wu=3,kingdom_Qun=4,kingdom_God=5};
     int kingdom;
@@ -100,6 +109,8 @@ public:
     void setDefaultName();
     void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap);
     void propertymap_set(QMap<QString,QString> &strmap);
+    QString propertystr_get();
+    void propertystr_set(QString getstr);
 signals:
     
 public slots:

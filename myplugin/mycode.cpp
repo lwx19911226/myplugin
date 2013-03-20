@@ -195,7 +195,7 @@ myfunction *myfunction::findFuncByObj(myobj *getp){
     if(rtobjlist.contains(getp)){return this;}
     return myblock::findFuncByObj(getp);
 }
-
+/*
 void myopr::myini(){
     name=eventstr;
 }
@@ -209,7 +209,7 @@ QStringList myopr::trans(){
     strlist<<"end";
     return strlist;
 }
-
+*/
 /*
 void mycondition::myini(){
     name=inilist.at(1).toString()+","+tgtobj->name;

@@ -145,8 +145,9 @@ bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int 
     strlist=myfun::need(pi->getParent(myinputitem::func_Fun)->getstr());
     if(!strlist.isEmpty()){
         QString getstr=strlist.at(pi->type-myinputitem::func_Obj);
-        if(!myobj::b4input(myobj::str2type(getstr))){return false;}
-        if(myobj::str2type(getstr)==myobj::Mynum){
+        int gettype=myobj::str2type(getstr);
+        if(!myobj::b4input(gettype)){return false;}
+        if(gettype==myobj::Mynum){
             bool b;
             value.toString().toInt(&b);
             if(!b){return false;}
@@ -211,7 +212,8 @@ Qt::ItemFlags myinputmodel::flags(const QModelIndex &index) const{
         strlist=myfun::need(pi->getParent(myinputitem::func_Fun)->getstr());
         if(!strlist.isEmpty()){
             QString getstr=strlist.at(pi->type-myinputitem::func_Obj);
-            if(!myobj::b4input(myobj::str2type(getstr))){return Qt::NoItemFlags;}
+            int gettype=myobj::str2type(getstr);
+            if(!myobj::b4input(gettype)){return Qt::NoItemFlags;}
             else{r=r|Qt::ItemIsEditable;}
         }
     }

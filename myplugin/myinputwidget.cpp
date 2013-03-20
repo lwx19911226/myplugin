@@ -107,9 +107,11 @@ void myinputwidget::myadd(){
     for(int i=3;i<list.length();i++){
         myobj *pobj=pmain->psys->psk0->findObjByName(list.at(i),geteventstr);
         if(!pobj){
+            int gettype=myobj::str2type(myfun::need(getfunstr).at(i-3));
+            if(!myobj::b4input(gettype)){qWarning()<<"myadd"<<gettype;}
             pobj=new myobj(pmain->psys);
             pobj->name=list.at(i);
-            pobj->type=myobj::str2type(myfun::need(getfunstr).at(i-3));
+            pobj->type=gettype;
             //pobj->isDynamic=false;
         }
         getobjlist.append(pobj);

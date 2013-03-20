@@ -67,6 +67,13 @@ public:
         if(b4tab){strlist<<property2str(Words);}
         return strlist;
     }
+    static QString property2prefix(int getproperty){
+        switch(getproperty){
+        case Description:return ":";
+        case Words:return "$";
+        default:qWarning()<<"property2prefix"<<getproperty;return QString();
+        }
+    }
     virtual void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap);
     virtual void propertymap_set(QMap<QString,QString> &strmap);
     virtual QString propertystr_get();
@@ -80,40 +87,43 @@ public:
     QString description;
     QStringList wordslist;
 
+    QList<myblock *> blocklist;
     QList<myobj *> avlobjlist;
     //QList<myobj *> usdobjlist;
     QList<mydo *> dolist;
     QStringList undostrlist;
     QList<mydo *> dolist_r;
     static int globalint;
-    void getavlobjlist(int gettype,QList<myobj *> &list,QString getstr="");
-    //void getusdobjlist(int gettype,QList<myobj *> &list,QString getstr="");
-    //void addusdobjlist(QList<myobj *> &list);
-    //void addusdobjlist(myobj *getp);
-    myobj *findObjByName(QString getname,QString getstr);
-    mysys *getsys();
-
-    virtual void addFunction(QString geteventstr,QString getblockstr,
-                             QString getfunstr,QList<myobj *> &getobjlist,
-                             QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false)=0;
-    virtual void undo(){}
-    virtual void redo(){}
-    virtual QStringList need4block(QString getstr)=0;
-    virtual myblock *findBlockByName(QString)=0;
-    virtual myfunction *findFuncByObj(myobj *)=0;
-    virtual QString findRemarkByName_event(QString getname)=0;
-    virtual QString findRemarkByName_block(QString getname)=0;
-    virtual void rfrObj(){}
-    virtual void iniObj(){}
     virtual int getType(){return Skill;}
     void setOwner(mygeneral *getp);
     void setDefaultName();
     void setName(QString getname);
+    void getavlobjlist(int gettype,QList<myobj *> &list,QString getstr="");
+    //void getusdobjlist(int gettype,QList<myobj *> &list,QString getstr="");
+    //void addusdobjlist(QList<myobj *> &list);
+    //void addusdobjlist(myobj *getp);
+    void addFunction(QString geteventstr,QString getblockstr,
+                             QString getfunstr,QList<myobj *> &getobjlist,
+                             QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false);
+    void undo();
+    void redo();
+    bool removeObj(myobj *getp);
+    QStringList need4block(QString getstr);
+    myobj *findObjByName(QString getname,QString getstr);
+    myblock *findBlockByName(QString);
+    myfunction *findFuncByObj(myobj *);
+    virtual QString findRemarkByName_event(QString getname)=0;
+    QString findRemarkByName_block(QString getname);
+    virtual void rfrObj(){}
+    virtual void iniObj(){}    
     virtual QStringList trans()=0;
     QStringList trans4avlobjlist(QString getstr="");
+    QStringList trans4design();
     virtual QStringList funtaglist(QString getstr){qWarning()<<"funtaglist:"<<getstr;return QStringList();}
     virtual QStringList eventstrlist()=0;
-    virtual void sig_update();
+    mysys *getsys();
+    void sig_update();
+    void myshow(){foreach(myblock *ip,blocklist){ip->myshow();}}
 };
 
 class mytrs : public mysk
@@ -180,41 +190,10 @@ public:
     }
 
     int subtype;
-    QList<myopr *> oprlist;
-
-
-
     int getType(){return TriggerSkill;}
-    void addFunction(QString geteventstr,QString getblockstr,
-                QString getfunstr,QList<myobj *> &getobjlist,
-                QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false);
-    //void addCondition(QString geteventstr,QString getblockstr,QList<myobj *> &getobjlist,QString getrm);
-    //void addForeach(QString geteventstr,QString getblockstr,myobj *getobj,QString getrm);
-    void undo();
-    void redo();
-
-    void rfrObj();
     void iniObj();
-    bool removeObj(myobj *getp);
-    QStringList trans();    
-    QStringList trans4design();
-
-    //void need(QList<QString> &);
-    QStringList need4block(QString getstr);
-
-    bool newEvent(QString);
-    void newObj(QString geteventstr);
-
-    myblock *findBlockByName(QString);
-    myfunction *findFuncByObj(myobj *);
+    QStringList trans();
     QString findRemarkByName_event(QString getname);
-    QString findRemarkByName_block(QString getname);
-
-    void myshow(){foreach(myopr *ip,oprlist){ip->myshow();}}
-signals:
-    
-public slots:
-    //void setName(QString get){name=get;sig_update();}
 };
 
 class myvs:public mysk
@@ -222,8 +201,7 @@ class myvs:public mysk
     Q_OBJECT
 public:
     explicit myvs(QObject *parent=0):mysk(parent){
-        vsn=1;vfblock=NULL;epblock=NULL;erblock=NULL;
-        objname_viewas=myobj::getconstlist_tag("ob").first();
+        vsn=1;objname_viewas=myobj::getconstlist_tag("ob").first();
     }
     int getType(){return ViewAsSkill;}    
     enum vsProperty{CardsNum=11,CardViewAs=12};
@@ -272,25 +250,9 @@ public:
     QStringList eventstrlist(){return getvsbstrlist();}
 
     int vsn;
-    QString objname_viewas;
-    myblock *vfblock;
-    myblock *epblock;
-    myblock *erblock;
-    void iniObj();
-    void addVF(QString getblockstr,QString getfunstr,QList<myobj *> &getobjlist,
-               QStringList &getrtrmlist,QStringList &getblrmlist);
-    void addEP(QString getblockstr,QString getfunstr,QList<myobj *> &getobjlist,
-               QStringList &getrtrmlist,QStringList &getblrmlist);
-    void addER(QString getblockstr,QString getfunstr,QList<myobj *> &getobjlist,
-               QStringList &getrtrmlist,QStringList &getblrmlist);
-    void addFunction(QString geteventstr,QString getblockstr,
-                QString getfunstr,QList<myobj *> &getobjlist,
-                QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false);
-    QStringList need4block(QString getstr);
-    myblock *findBlockByName(QString);
-    myfunction *findFuncByObj(myobj *);
-    QString findRemarkByName_event(QString getname);
-    QString findRemarkByName_block(QString getname);
+    QString objname_viewas;    
+    void iniObj();    
+    QString findRemarkByName_event(QString getname);    
     QStringList trans();
 };
 

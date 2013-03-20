@@ -67,7 +67,7 @@
 
 //action
 >drawCards|mysplayer,mynum||<1:>%1:drawCards(%2)|角色（参数1）摸X（参数2）张牌|pl
->obtainCard|mysplayer,mycard,mybool||<1:>%1:obtainCard(%2,%3)|角色（参数1）获得一张牌（参数2），是否明牌（参数3）|pl,cd
+>obtainCard|mysplayer,mycard,mybool||<1:><2:>%1:obtainCard(%2,%3)|角色（参数1）获得一张牌（参数2），是否明牌（参数3）|pl,cd
 >throwCard|mycard,mysplayer||room:throwCard(%1,%2)|弃置角色（参数2）的一张牌（参数1）|pl,cd,room$
 >turnOver|mysplayer||<1:>%1:turnOver()|角色（参数1）翻面|pl
 >loseHp|mysplayer,mynum||<1:>room:loseHp(%1,%2)|角色（参数1）失去X（参数2）点体力|pl,room$

@@ -76,6 +76,7 @@ public:
     myfunction *findFuncByObj(myobj *);
     void myshow(){qWarning()<<funname;}
 };
+/*
 class myopr : public myblock
 {
     Q_OBJECT
@@ -85,13 +86,14 @@ public:
     }
     int getType(){return Opr;}
     QString eventstr;
-    void myini();
+    void myini();    
     QStringList trans();
 signals:
 
 public slots:
 
 };
+*/
 /*
 class mycondition:public myblock
 {

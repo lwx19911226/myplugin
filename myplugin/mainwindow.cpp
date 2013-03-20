@@ -610,12 +610,12 @@ void MainWindow::myrfr_g(mygeneral *getp, int getrow){
 void MainWindow::myrfr_trs(mytrs *getp, int getrow){
     if(!getp){return;}
     QStringList gstrlist=psys->getgstrlist();
-    gstrlist.prepend("NULL");
+    gstrlist.prepend(mygeneral::nullname());
     for(int i=0;i<p_tablewidget_trs->columnCount();i++){
         QString hstr=p_tablewidget_trs->horizontalHeaderItem(i)->text();
         if(mytrs::str2property(hstr)==mytrs::Name){myrfr_tablewidget_str(p_tablewidget_trs,getrow,i,getp->name);}
         else if(mytrs::str2property(hstr)==mytrs::Translation){myrfr_tablewidget_str(p_tablewidget_trs,getrow,i,getp->translation);}
-        else if(mytrs::str2property(hstr)==mytrs::Owner){myrfr_tablewidget_cbb(p_tablewidget_trs,getrow,i,getp->owner?getp->owner->name:"NULL",gstrlist);}
+        else if(mytrs::str2property(hstr)==mytrs::Owner){myrfr_tablewidget_cbb(p_tablewidget_trs,getrow,i,getp->owner?getp->owner->name:mygeneral::nullname(),gstrlist);}
         else if(mytrs::str2property(hstr)==mytrs::Subtype){myrfr_tablewidget_cbb(p_tablewidget_trs,getrow,i,mytrs::type2str(getp->subtype),mytrs::typestrlist());}
         else if(mytrs::str2property(hstr)==mytrs::Description){myrfr_tablewidget_str(p_tablewidget_trs,getrow,i,getp->description);}
         else if((mytrs::str2property(hstr)==mytrs::Words)){
