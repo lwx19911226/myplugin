@@ -73,7 +73,10 @@ int myfun::getBlock_cnt(QString getstr){
 }
 bool myfun::notnil(QString getstr, int geti){
     myini();
-    return myfun::getTrans(getstr).contains("<"+QString::number(geti+1)+":");
+    QStringList strlist=myfun::need(getstr);
+    strlist<<myfun::get(getstr);
+    //return myfun::getTrans(getstr).contains("<"+QString::number(geti+1)+":");
+    return myobj::gettypesuffix(strlist.at(geti)).contains("~");
 }
 
 QString myfun::getTrans(QString getstr){

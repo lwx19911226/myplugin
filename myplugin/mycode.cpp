@@ -138,9 +138,9 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
     QStringList list=myfun::get(funname);
     for(int i=0;i<list.length();i++){
         myobj *p=new myobj(this);
-        QString typestr=list.at(i);
-        if(list.at(i).endsWith("$")){
-            typestr=typestr.mid(0,typestr.length()-1);
+        QString typestr=myobj::gettypestr(list.at(i));
+        QString typesuffix=myobj::gettypesuffix(list.at(i));
+        if(typesuffix.contains("$")){
             p->noDeclaration=true;
             p->isGlobal=true;
             //p->isDynamic=false;
@@ -149,8 +149,7 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
             p->blockstr=geteventstr;
         }
         p->name=QString("%1_%2_%3").arg(funname,typestr).arg(globalint++);
-        if(typestr==""){qWarning()<<"0227here2?"<<funname<<i;}
-        p->type=myobj::str2type(typestr);
+        p->type=myobj::str2type(list.at(i));
         p->remark=rtrmlist.at(i);
         p->isVerified=myfun::notnil(funname,objlist.length()+i);
         rtobjlist.append(p);
@@ -165,14 +164,14 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
 QStringList myfunction::trans(){
     QString str=myfun::getTrans(funname);
     QList<myobj *> list;
-    list<<objlist<<rtobjlist;    
-    for(int i=0;i<objlist.length();i++){
+    list<<objlist<<rtobjlist;
+    for(int i=0;i<list.length();i++){
         QRegExp rx("<"+QString::number(i+1)+":([^>]*)>");
         if(rx.indexIn(str)!=-1){
             QString tstr;
             if(vrlist.contains(i)){
                 if(rx.cap(1)!=""){tstr="\\1";}
-                else if(myobj::b4vrstr(objlist.at(i)->type)){tstr="";}
+                //else if(myobj::b4vrstr(objlist.at(i)->type)){tstr="";}
                 else{tstr="if not %"+QString::number(i+1)+" then return false end;";}
             }
             str.replace(rx,tstr);

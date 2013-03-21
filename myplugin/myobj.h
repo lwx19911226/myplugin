@@ -78,12 +78,14 @@ public:
         if(gettype==Mystr){gettype=Mystrc;}
         return isSubtype(Mynum,gettype)||isSubtype(Mystr,gettype);
     }
+    /*
     static bool b4vrstr(int gettype){
         if(isSubtype(Mynum,gettype)){return true;}
         if(isSubtype(Mystr,gettype)){return true;}
         if(isSubtype(Mylist,gettype)){return true;}
         return false;
     }
+    */
     static bool isSubtype(int gettype0,int gettype){
         if(gettype0==All){return true;}
         if(gettype0==Mylist){
@@ -99,7 +101,18 @@ public:
         }
         return (gettype0==gettype);
     }
-
+    static QString gettypestr(QString getstr){
+        QString typestr=type2str(str2type(getstr));
+        if(getstr.startsWith(typestr)){return typestr;}
+        qWarning()<<"typestr"<<getstr;
+        return QString();
+    }
+    static QString gettypesuffix(QString getstr){
+        QString typestr=gettypestr(getstr);
+        if(getstr.startsWith(typestr)){return getstr.mid(typestr.length());}
+        qWarning()<<"typesuffix"<<getstr;
+        return QString();
+    }
     static QString suitstr(QString getstr){
         if(getstr.contains(QRegExp("Spade"))){return "spade";}
         if(getstr.contains(QRegExp("Club"))){return "club";}
