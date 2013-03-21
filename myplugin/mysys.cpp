@@ -116,7 +116,9 @@ void mysys::myini_design(QString path){
         QString skname=stri.mid(4,stri.indexOf("::")-4);
         QString getstr=stri.mid(stri.indexOf("::")+2);
         //qWarning()<<trsname<<getstr;
-        mydo::dotrans(findSkillByName(skname),getstr);
+        mysk *psk=findSkillByName(skname);
+        if(!psk){qWarning()<<"myini_design_psk"<<skname;}
+        else{psk->dotrans(getstr);}
     }
     qWarning()<<"design success";
     fin.close();
@@ -198,6 +200,14 @@ bool mysys::delSkill(mysk *getp){
     if(getp->owner){getp->owner->sklist.removeOne(getp);}
     sklist.removeOne(getp);
     sklist_r.append(getp);
+    QList<mydo *> tdolist;
+    foreach(mydo *ip,dolist){
+        if(ip->psktgt!=getp){tdolist<<ip;}
+        else{dolist_r<<ip;}
+    }
+    dolist.clear();
+    dolist<<tdolist;
+    undostrlist.clear();
     if(getp==psk0){        
         QList<mysk *> rsklist;
         getsklist(rsklist,getp->getType());
@@ -269,11 +279,59 @@ QStringList mysys::trans4design(){
         //tstr+=mycode::mymdf(pt->wordslist,"|$").join("");
         //strlist<<tstr;
     }
-    foreach(mysk *ip,sklist){
-        //mytrs *pt=static_cast<mytrs *>(ip);
-        strlist<<mycode::mymdf(ip->trans4design(),">>>>");
+    foreach(mydo *ip,dolist){
+        strlist<<">>>>"+ip->trans();
     }
     return strlist;
+}
+
+void mysys::undo(){
+    if(dolist.isEmpty()){return;}
+    undostrlist<<dolist.last()->trans();
+    mydo *pdo=dolist.takeLast();
+    foreach(myblock *ip,pdo->blocklist){
+        bool b=false;
+        foreach(myblock *pt,pdo->psktgt->blocklist){
+            if(pt->removeBlock(ip)){b=true;break;}
+        }
+        if(!b){qWarning()<<"removecode:"<<ip->name;}
+    }
+    foreach(myobj *ip,pdo->objlist){
+        if(!pdo->psktgt->avlobjlist.removeOne(ip)){qWarning()<<"removeobj:"<<ip->name;}
+    }
+    dolist_r.append(pdo);
+    psk0=pdo->psktgt;
+    sig_update();
+}
+void mysys::redo(){
+    //if(undolist.isEmpty()){return;}
+    if(undostrlist.isEmpty()){return;}
+    QString str=undostrlist.takeLast();
+    QRegExp rx("([^:]*)::([^:]*)");
+    if(rx.indexIn(str)!=-1){
+        QString skname=rx.cap(1);
+        QString tstr=rx.cap(2);qWarning()<<"redo:"<<skname<<tstr;
+        mysk *psk=findSkillByName(skname);
+        if(!psk){qWarning()<<"redo_psk"<<str;}
+        else{
+            psk0=psk;
+            psk->dotrans(tstr);
+        }
+    }
+    //mydo::dotrans(this,);
+    sig_update();
+/*
+    mydo *pdo=undolist.takeLast();
+    foreach(myblock *ip,pdo->blocklist){
+        bool b=false;
+        foreach(myopr *ipopr,oprlist){
+            if(ipopr->insertBlock(ip)){b=true;break;}
+        }
+        if(!b){qWarning()<<"insertcode:"<<ip->name;}
+    }
+    avlobjlist.append(pdo->objlist);
+    dolist.append(pdo);
+*/
 }
 
 /*

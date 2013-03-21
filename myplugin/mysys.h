@@ -13,10 +13,13 @@ public:
     QList<mysk *> sklist_r;
     mysk *psk0;    
     QString packagename;
+    QString package_trans;
     QList<mygeneral *> glist;
     QList<mygeneral *> glist_r;
     mygeneral *pg0;
-    QString package_trans;    
+    QList<mydo *> dolist;
+    QStringList undostrlist;
+    QList<mydo *> dolist_r;
     static int globalint;
 
     explicit mysys(QObject *parent = 0):QObject(parent){packagename="mypackage";psk0=NULL;pg0=NULL;}
@@ -35,6 +38,8 @@ public:
     QStringList trans();
     QStringList trans4design();
     void myini_design(QString path);
+    void undo();
+    void redo();
 
     QStringList getgstrlist(){QStringList strlist;foreach(mygeneral *ip,glist){strlist<<ip->name;}return strlist;}
     QStringList getskstrlist(){QStringList strlist;foreach(mysk *ip,sklist){strlist<<ip->name;}return strlist;}

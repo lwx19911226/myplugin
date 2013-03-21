@@ -55,6 +55,7 @@ public:
     QTabWidget *p_tabwidget1,*p_tabwidget2;
     //QTableWidget *p_tablewidget_g,*p_tablewidget_trs,*p_tablewidget_vs;
     QLabel *p_label_skname;
+    QPushButton *p_pushbutton_undo,*p_pushbutton_redo;
 
 
     bool b4rfr;

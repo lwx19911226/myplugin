@@ -177,49 +177,16 @@ void mysk::addFunction(QString geteventstr, QString getblockstr,
     pt->addBlock(pfunc,getblockstr);
 
     mydo *pdo=new mydo(this);
+    pdo->psktgt=this;
     pdo->objlist<<pfunc->rtobjlist;
     pdo->blocklist.append(pfunc);
-    dolist.append(pdo);
-    if(!b4redo){undostrlist.clear();}
+    getsys()->dolist<<pdo;
+    if(!b4redo){getsys()->undostrlist.clear();}
     //rfrObj();
     //addusdobjlist(getobjlist);
     sig_update();
 }
-void mysk::undo(){
-    if(dolist.isEmpty()){return;}
-    undostrlist<<dolist.last()->trans();
-    mydo *pdo=dolist.takeLast();
-    foreach(myblock *ip,pdo->blocklist){
-        bool b=false;
-        foreach(myblock *pt,blocklist){
-            if(pt->removeBlock(ip)){b=true;break;}
-        }
-        if(!b){qWarning()<<"removecode:"<<ip->name;}
-    }
-    foreach(myobj *ip,pdo->objlist){
-        if(!removeObj(ip)){qWarning()<<"removeobj:"<<ip->name;}
-    }
-    dolist_r.append(pdo);
-    sig_update();
-}
-void mysk::redo(){
-    //if(undolist.isEmpty()){return;}
-    if(undostrlist.isEmpty()){return;}
-    mydo::dotrans(this,undostrlist.takeLast());
-    sig_update();
-/*
-    mydo *pdo=undolist.takeLast();
-    foreach(myblock *ip,pdo->blocklist){
-        bool b=false;
-        foreach(myopr *ipopr,oprlist){
-            if(ipopr->insertBlock(ip)){b=true;break;}
-        }
-        if(!b){qWarning()<<"insertcode:"<<ip->name;}
-    }
-    avlobjlist.append(pdo->objlist);
-    dolist.append(pdo);
-*/
-}
+
 bool mysk::removeObj(myobj *getp){
     return avlobjlist.removeOne(getp);
 }
@@ -266,12 +233,62 @@ QStringList mysk::need4block(QString getstr){
     if(pt){return pt->need4block();}
     return QStringList();
 }
+/*
 QStringList mysk::trans4design(){
     QStringList strlist;
     foreach(mydo *ip,dolist){
-        strlist<<name+"::"+ip->trans();
+        strlist<<ip->trans();
     }
     return strlist;
+}
+*/
+void mysk::dotrans(QString getstr){
+    qWarning()<<"dotrans"<<name<<getstr;
+    QString tstr=getstr;
+    tstr.replace("\\|","\\\\");
+    QStringList strlist=tstr.split("|");
+    strlist.replaceInStrings("\\\\","|");
+    QString geteventstr=strlist.first();
+    QString getblockstr;
+    if(eventstrlist().contains(strlist.at(1))){getblockstr=strlist.at(1);}
+    else{
+        int index1=strlist.at(1).split("->").first().toInt();
+        int index2=strlist.at(1).split("->").last().toInt();
+        getblockstr=getsys()->dolist.at(index1)->getBlockName(index2);
+    }
+    QString getfunstr=strlist.at(2);
+    QList<myobj *> getobjlist;
+    QStringList tstrlist;
+    tstrlist.clear();
+    tstrlist=strlist.at(3).split(",");
+    if(strlist.at(3)==""){tstrlist.clear();}
+    for(int i=0;i<tstrlist.length();i++){
+        myobj *pobj=NULL;
+        if(tstrlist.at(i).contains("->")){
+            int index1=tstrlist.at(i).split("->").first().toInt();
+            int index2=tstrlist.at(i).split("->").last().toInt();
+            pobj=getsys()->dolist.at(index1)->getObj(index2);
+        }
+        else{
+            pobj=findObjByName(tstrlist.at(i),geteventstr);
+            if(!pobj){
+                pobj=new myobj(getsys());
+                pobj->name=tstrlist.at(i);
+                int gettype=myobj::str2type(myfun::need(getfunstr).at(i));
+                if(!myobj::b4input(gettype)){qWarning()<<"dotrans_b4input"<<gettype;}
+                pobj->type=gettype;
+                pobj->isVerified=true;
+                //pobj->isDynamic=false;
+            }
+        }
+        if(!pobj){qWarning()<<"dotrans_pobj"<<name<<getstr;}
+        getobjlist<<pobj;
+    }
+    QStringList getrtrmlist;
+    getrtrmlist<<strlist.at(4).split(",");
+    QStringList getblrmlist;
+    if(strlist.length()>=6){getblrmlist<<strlist.at(5).split(",");}
+    addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist,true);
 }
 mysys *mysk::getsys(){
     return static_cast<mysys *>(parent());

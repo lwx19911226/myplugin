@@ -90,9 +90,7 @@ public:
     QList<myblock *> blocklist;
     QList<myobj *> avlobjlist;
     //QList<myobj *> usdobjlist;
-    QList<mydo *> dolist;
-    QStringList undostrlist;
-    QList<mydo *> dolist_r;
+
     static int globalint;
     virtual int getType(){return Skill;}
     void setOwner(mygeneral *getp);
@@ -118,7 +116,8 @@ public:
     virtual void iniObj(){}    
     virtual QStringList trans()=0;
     QStringList trans4avlobjlist(QString getstr="");
-    QStringList trans4design();
+    //QStringList trans4design();
+    void dotrans(QString getstr);
     virtual QStringList funtaglist(QString getstr){qWarning()<<"funtaglist:"<<getstr;return QStringList();}
     virtual QStringList eventstrlist()=0;
     mysys *getsys();

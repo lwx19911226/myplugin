@@ -1,10 +1,11 @@
 #include "mydo.h"
 #include "mysk.h"
-mysk *mydo::getsk0(){return static_cast<mysk *>(parent());}
+#include "mysys.h"
+mysys *mydo::getsys(){return psktgt->getsys();}
 QString mydo::trans4block(QString getblockstr){
     QList<mydo *> prevlist;
     getprevlist(prevlist);
-    if(getsk0()->eventstrlist().contains(getblockstr)){return getblockstr;}
+    if(psktgt->eventstrlist().contains(getblockstr)){return getblockstr;}
     else{
         for(int i=0;i<prevlist.length();i++){
             myfunction *pt=static_cast<myfunction *>(prevlist.at(i)->blocklist.first());
@@ -54,7 +55,7 @@ QString mydo::trans4obj(myobj *getp){
             //prevlist.at(i)->objlist.indexOf(getp)
             return QString("%1->%2").arg(i).arg(prevlist.at(i)->objlist.indexOf(getp));
         }
-    }
+    }    
     return getp->name;
 }
 
@@ -85,7 +86,7 @@ QString mydo::trans(){
     strlist<<tstrlist.join(",");
     strlist.replaceInStrings(QRegExp("\\|"),QString("\\|"));
     str+=strlist.join("|");
-    return str;
+    return psktgt->name+"::"+str;
     /*
     str+=type2trans(type)+":";
     if(type==Sentence){
@@ -146,14 +147,19 @@ QString mydo::trans(){
 }
 void mydo::getprevlist(QList<mydo *> &list){
     if(!list.isEmpty()){qWarning()<<"getprevlist";}
-    //mytrs *pf=static_cast<mytrs *>(parent());
-    if(!getsk0()->dolist.isEmpty()&&getsk0()->dolist.contains(this)&&getsk0()->dolist.first()!=this){
-        list<<getsk0()->dolist.mid(0,getsk0()->dolist.indexOf(this));
+    if(!getsys()->dolist.isEmpty()&&getsys()->dolist.contains(this)&&getsys()->dolist.first()!=this){
+        list<<getsys()->dolist.mid(0,getsys()->dolist.indexOf(this));
     }
 }
+/*
 void mydo::dotrans(mysk *psk0, QString gettrans){
     qWarning()<<"dotrans"<<psk0->name<<gettrans;
     QString tstr=gettrans;
+    if(tstr.contains("::")){
+        QString skname=tstr.mid(0,tstr.indexOf("::"));
+        if(psk0->name!=skname){qWarning()<<"dotrans_skname";return;}
+        tstr=tstr.mid(tstr.indexOf("::")+2);
+    }
     tstr.replace("\\|","\\\\");
     QStringList strlist=tstr.split("|");
     strlist.replaceInStrings("\\\\","|");
@@ -198,119 +204,8 @@ void mydo::dotrans(mysk *psk0, QString gettrans){
     QStringList getblrmlist;
     if(strlist.length()>=6){getblrmlist<<strlist.at(5).split(",");}
     psk0->addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist,true);
-    /*
-    if(gettrans.startsWith(type2trans(Sentence)+":")){
-        QString tstr=gettrans.mid(type2trans(Sentence).length()+1);
-        tstr.replace("\\|","\\\\");
-        QStringList strlist=tstr.split("|");
-        strlist.replaceInStrings("\\\\","|");
-        QString geteventstr=strlist.first();
-        QString getblockstr;
-        if(myevent::isEvent(strlist.at(1))){getblockstr=strlist.at(1);}
-        else{
-            int index1=strlist.at(1).split("->").first().toInt();
-            int index2=strlist.at(1).split("->").last().toInt();
-            getblockstr=psk0->dolist.at(index1)->getBlockName(index2);
-        }
-        QString getfunstr=strlist.at(2);
-        QList<myobj *> getobjlist;
-        QStringList tstrlist;
-        tstrlist.clear();
-        tstrlist=strlist.at(3).split(",");
-        if(strlist.at(3)==""){tstrlist.clear();}
-        for(int i=0;i<tstrlist.length();i++){
-            if(tstrlist.at(i).contains("->")){
-                int index1=tstrlist.at(i).split("->").first().toInt();
-                int index2=tstrlist.at(i).split("->").last().toInt();
-                getobjlist<<psk0->dolist.at(index1)->getObj(index2);
-            }
-            else{
-                myobj *pobj=psk0->findObjByName(tstrlist.at(i),geteventstr);
-                if(!pobj){
-                    pobj=new myobj(psk0->parent());
-                    pobj->name=tstrlist.at(i);
-                    if(myfun::need(getfunstr).at(i)==""){qWarning()<<"0227here1?";}
-                    pobj->type=myobj::str2type(myfun::need(getfunstr).at(i));
-                    pobj->isDynamic=false;
-                }
-                getobjlist<<pobj;
-            }
-        }
-        QStringList getrtrmlist;
-        getrtrmlist<<strlist.at(4).split(",");
-        QStringList getblrmlist;
-        if(strlist.length()>=6){getblrmlist<<strlist.at(5).split(",");}
-        psk0->addOpr(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist);
-        //qWarning()<<geteventstr<<getblockstr<<getfunstr<<getobjlist.length()<<getrtrmlist<<getblrmlist;
-
-    }
-    else if(gettrans.startsWith(type2trans(Condition)+":")){
-        QString tstr=gettrans.mid(type2trans(Condition).length()+1);
-        tstr.replace("\\|","\\\\");
-        QStringList strlist=tstr.split("|");
-        strlist.replaceInStrings("\\\\","|");
-        QString geteventstr=strlist.first();
-        QString getblockstr;
-        if(myevent::isEvent(strlist.at(1))){getblockstr=strlist.at(1);}
-        else{
-            int index1=strlist.at(1).split("->").first().toInt();
-            int index2=strlist.at(1).split("->").last().toInt();
-            getblockstr=psk0->dolist.at(index1)->getBlockName(index2);
-        }
-        QList<myobj *> getobjlist;
-        QStringList tstrlist;
-        tstrlist.clear();
-        tstrlist=strlist.at(2).split(",");
-        for(int i=0;i<tstrlist.length();i++){
-            if(tstrlist.at(i).contains("->")){
-                int index1=tstrlist.at(i).split("->").first().toInt();
-                int index2=tstrlist.at(i).split("->").last().toInt();
-                getobjlist<<psk0->dolist.at(index1)->getObj(index2);
-            }
-            else{
-                myobj *pobj=psk0->findObjByName(tstrlist.at(i),geteventstr);
-                if(!pobj){
-                    pobj=new myobj(psk0->parent());
-                    pobj->name=tstrlist.at(i);
-                    pobj->type=getobjlist.first()->type;
-                    pobj->isDynamic=false;
-                }
-                getobjlist<<pobj;
-            }
-        }
-        QString getrm=strlist.at(3);
-        psk0->addCondition(geteventstr,getblockstr,getobjlist,getrm);
-    }
-    else if(gettrans.startsWith(type2trans(Foreach)+":")){
-        QString tstr=gettrans.mid(type2trans(Foreach).length()+1);
-        tstr.replace("\\|","\\\\");
-        QStringList strlist=tstr.split("|");
-        strlist.replaceInStrings("\\\\","|");
-        QString geteventstr=strlist.first();
-        QString getblockstr;
-        if(myevent::isEvent(strlist.at(1))){getblockstr=strlist.at(1);}
-        else{
-            int index1=strlist.at(1).split("->").first().toInt();
-            int index2=strlist.at(1).split("->").last().toInt();
-            getblockstr=psk0->dolist.at(index1)->getBlockName(index2);
-        }
-        myobj *pobj;
-        if(strlist.at(2).contains("->")){
-            int index1=strlist.at(2).split("->").first().toInt();
-            int index2=strlist.at(2).split("->").last().toInt();
-            pobj=psk0->dolist.at(index1)->getObj(index2);
-        }
-        else{
-            pobj=psk0->findObjByName(strlist.at(2),geteventstr);
-            if(!pobj){
-                qWarning()<<"dotrans foreach:"<<strlist.at(2);
-            }
-        }
-        QString getrm=strlist.at(3);
-        psk0->addForeach(geteventstr,getblockstr,pobj,getrm);
-    }
-    */
 }
+*/
 QString mydo::getBlockName(int index){
     myfunction *pt=static_cast<myfunction *>(blocklist.first());
     QStringList tstrlist;

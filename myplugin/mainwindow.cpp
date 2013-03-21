@@ -79,11 +79,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *p_pushbutton_add=new QPushButton(ui->centralWidget);
     p_pushbutton_add->setText(tr("Skill_Add"));
     QObject::connect(p_pushbutton_add,SIGNAL(clicked()),this,SLOT(myadd()));
-    QPushButton *p_pushbutton_undo=new QPushButton(ui->centralWidget);
+    p_pushbutton_undo=new QPushButton(ui->centralWidget);
     p_pushbutton_undo->setText(tr("Skill_Undo"));
+    p_pushbutton_undo->setEnabled(false);
     QObject::connect(p_pushbutton_undo,SIGNAL(clicked()),this,SLOT(myundo()));
-    QPushButton *p_pushbutton_redo=new QPushButton(ui->centralWidget);
+    p_pushbutton_redo=new QPushButton(ui->centralWidget);
     p_pushbutton_redo->setText(tr("Skill_Redo"));
+    p_pushbutton_redo->setEnabled(false);
     QObject::connect(p_pushbutton_redo,SIGNAL(clicked()),this,SLOT(myredo()));
     QPushButton *p_pushbutton_import=new QPushButton(ui->centralWidget);
     p_pushbutton_import->setText(tr("Import"));
@@ -431,6 +433,8 @@ void MainWindow::myrfr(){
     if(psys->pg0){
         //p_label_gname->setText(psys->pg0->name+" | "+psys->pg0->translation);
     }
+    p_pushbutton_undo->setEnabled(!psys->dolist.isEmpty());
+    p_pushbutton_redo->setEnabled(!psys->undostrlist.isEmpty());
     b4rfr=true;
     mytext();
     qWarning()<<"130315:rfr";
@@ -558,12 +562,12 @@ void MainWindow::myadd(){
     p_inputwidget->show();
 }
 void MainWindow::myundo(){
-    if(!psys->psk0){return;}
-    psys->psk0->undo();
+    //if(!psys->psk0){return;}
+    psys->undo();
 }
 void MainWindow::myredo(){
-    if(!psys->psk0){return;}
-    psys->psk0->redo();
+    //if(!psys->psk0){return;}
+    psys->redo();
 }
 void MainWindow::mynew(){
     if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mygeneral::tabstr()){psys->newGeneral("");}
