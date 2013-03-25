@@ -2,6 +2,7 @@
 #define MYOBJ_H
 
 #include <QObject>
+#include <QMetaEnum>
 #include <QString>
 #include <QList>
 #include <QStringList>
@@ -13,17 +14,48 @@
 #include <QtGlobal>
 #include <QDebug>
 
+
 class myobj : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(objType)
+    Q_ENUMS(iniFormat)
 public:
     explicit myobj(QObject *parent = 0):QObject(parent){
         blockstr="";noDeclaration=false;isVerified=false;isGlobal=false;
         //isDynamic=true;
     }
-    enum objType{All=0,Myplayer=1,Mysplayer=2,Mycard=3,Mybool=4,Mylist=5,Mysplayerlist=6,Mycardlist=7,Mynumlist=8,Mynum=9,Mystr=10,Mystrc=11};
-    enum {Parts=4};
+    enum objType{all=0,myplayer=1,mysplayer=2,mycard=3,mybool=4,mylist=5,mysplayerlist=6,mycardlist=7,mynumlist=8,mynum=9,mystr=10,mystrc=11};
     enum iniFormat{Name=0,Type=1,Remark=2,Extra=3};
+    static QString enumstr(const QMetaObject &mob,QByteArray getname,int getint){
+        return tr(mob.enumerator(mob.indexOfEnumerator(getname)).valueToKey(getint));
+    }
+    static int enumint(const QMetaObject &mob,QByteArray getname,QString getstr,int defaultint=-1){
+        QMetaEnum myenum=mob.enumerator(mob.indexOfEnumerator(getname));
+        for(int i=0;i<myenum.keyCount();i++){
+            if(getstr==tr(myenum.key(i))){return myenum.value(i);}
+        }
+        qWarning()<<"enumint"<<getname<<getstr;
+        return defaultint;
+    }
+    static QStringList enumstrlist(const QMetaObject &mob,QByteArray getname){
+        QStringList strlist;
+        QMetaEnum myenum=mob.enumerator(mob.indexOfEnumerator(getname));
+        for(int i=0;i<myenum.keyCount();i++){
+            strlist<<enumstr(mob,getname,myenum.value(i));
+        }
+        return strlist;
+    }
+    static bool enumcontains(const QMetaObject &mob,QByteArray getname,QString getstr){
+        return enumstrlist(mob,getname).contains(getstr);
+    }
+    static bool enumcontains(const QMetaObject &mob,QByteArray getname,int getint){
+        return enumcontains(mob,getname,enumstr(mob,getname,getint));
+    }
+    static int enumcnt(const QMetaObject &mob,QByteArray getname){
+        return mob.enumerator(mob.indexOfEnumerator(getname)).keyCount();
+    }
+
     QString name;
     int type;
     QString remark;
@@ -40,25 +72,10 @@ public:
     }
     virtual bool matchBlock(QString getstr){
         return (blockstr=="") or (blockstr==getstr);
-    }
-    static QString type2str(int gettype){
-        switch(gettype){
-        case Myplayer:return "myplayer";
-        case Mysplayer:return "mysplayer";
-        case Mycard:return "mycard";
-        case Mybool:return "mybool";
-        case Mylist:return "mylist";
-        case Mysplayerlist:return "mysplayerlist";
-        case Mycardlist:return "mycardlist";
-        case Mynumlist:return "mynumlist";
-        case Mynum:return "mynum";
-        case Mystr:return "mystr";
-        case Mystrc:return "mystrc";
-        case All:return "all";
-        default:return "";
-        }
-    }
+    }    
+    static QString type2str(int gettype){return enumstr(staticMetaObject,"objType",gettype);}
     static int str2type(QString getstr){
+        /*
         if(getstr.startsWith(type2str(Mylist))){return Mylist;}
         if(getstr.startsWith(type2str(Mysplayerlist))){return Mysplayerlist;}
         if(getstr.startsWith(type2str(Mycardlist))){return Mycardlist;}
@@ -73,10 +90,19 @@ public:
         if(getstr.startsWith(type2str(All))){return All;}
         qWarning()<<"OBJstr2type:"<<getstr;
         return All;
+        */
+        QMetaEnum myenum=staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("objType"));
+        QString str="";
+        int ii=-1;
+        for(int i=0;i<myenum.keyCount();i++){
+            QString tstr(myenum.key(i));
+            if(getstr.startsWith(tstr)&&(tstr.length()>str.length())){str=tstr;ii=i;}
+        }
+        return myenum.value(ii);
     }
     static bool b4input(int &gettype){
-        if(gettype==Mystr){gettype=Mystrc;}
-        return isSubtype(Mynum,gettype)||isSubtype(Mystr,gettype);
+        if(gettype==mystr){gettype=mystrc;}
+        return isSubtype(mynum,gettype)||isSubtype(mystr,gettype);
     }
     /*
     static bool b4vrstr(int gettype){
@@ -87,17 +113,17 @@ public:
     }
     */
     static bool isSubtype(int gettype0,int gettype){
-        if(gettype0==All){return true;}
-        if(gettype0==Mylist){
-            if(gettype==Mysplayerlist){return true;}
-            if(gettype==Mycardlist){return true;}
-            if(gettype==Mynumlist){return true;}
+        if(gettype0==all){return true;}
+        if(gettype0==mylist){
+            if(gettype==mysplayerlist){return true;}
+            if(gettype==mycardlist){return true;}
+            if(gettype==mynumlist){return true;}
         }
-        if(gettype0==Myplayer){
-            if(gettype==Mysplayer){return true;}
+        if(gettype0==myplayer){
+            if(gettype==mysplayer){return true;}
         }
-        if(gettype0==Mystr){
-            if(gettype==Mystrc){return true;}
+        if(gettype0==mystr){
+            if(gettype==mystrc){return true;}
         }
         return (gettype0==gettype);
     }
@@ -131,7 +157,7 @@ public:
     static QString objname_nullification(){return "nullification";}
 
     QString trans(){
-        if(type==Mystrc){return QString("\"%1\"").arg(name);}
+        if(type==mystrc){return QString("\"%1\"").arg(name);}
         return name;
     }
     static void myini();

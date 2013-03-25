@@ -97,10 +97,10 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     if(pp->type+1==myinputitem::func_Block){
         pp->newChild(QVariant(">BLOCK:"),false,true);
         QString geteventstr=pp->getstr();
-        QStringList list;
-        list=getsys()->psk0->need4block(geteventstr);
-        if(list.isEmpty()){list.append(geteventstr);}
-        foreach(QString stri,list){
+        //QStringList list;
+        //list=getsys()->psk0->need4block(geteventstr);
+        //if(list.isEmpty()){list.append(geteventstr);}
+        foreach(QString stri,getsys()->psk0->blockstrlist(geteventstr)){
             pp->newChild(QVariant(stri),true);
         }
     }
@@ -148,7 +148,7 @@ bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int 
         QString getstr=strlist.at(pi->type-myinputitem::func_Obj);
         int gettype=myobj::str2type(getstr);
         if(!myobj::b4input(gettype)){return false;}
-        if(gettype==myobj::Mynum){
+        if(gettype==myobj::mynum){
             bool b;
             value.toString().toInt(&b);
             if(!b){return false;}

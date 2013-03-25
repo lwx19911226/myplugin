@@ -19,7 +19,7 @@ void myobj::myini(){
             if(str==""){continue;}
             if(str.startsWith("//")){continue;}
             if(str.startsWith(">>")){myconsttaglist<<str.mid(2);continue;}
-            if(str.startsWith(">")&&(str.count("|")==Parts-1)){myconstlist<<str.mid(1);continue;}
+            if(str.startsWith(">")&&(str.count("|")==enumcnt(staticMetaObject,"iniFormat")-1)){myconstlist<<str.mid(1);continue;}
             qWarning()<<"myconstini:"<<str<<",";
         }
         fin.close();

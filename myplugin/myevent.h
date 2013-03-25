@@ -7,16 +7,11 @@
 class myevent : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(iniFormat)
 public:
     explicit myevent(QObject *parent = 0);
-    enum {Parts=6};
     enum iniFormat{Name=0,Data_Type=1,Data_Name=2,Data_Remark=3,Data_Trans=4,Remark=5};
-    QString name;
-    QString remark;
     static QString trans(QString geteventstr){return "sgs."+geteventstr;}
-    bool operator ==(const myevent &get){
-        return name==get.name;
-    }
     static QStringList myeventlist;
     static void myini();
     static QStringList geteventstrlist();

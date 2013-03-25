@@ -8,7 +8,8 @@ int mysk::str2property(QString getstr,int gettype){
     default:return str2property(getstr);
     }
 }
-void mysk::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap){
+void mysk::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
+    if(b4remark){}
     strmap.insert(property2str(Name),name);
     strmap.insert(property2str(Translation),translation);
     strmap.insert(property2str(Owner),owner?owner->name:mygeneral::nullname());
@@ -20,7 +21,8 @@ void mysk::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QString
         strmap.insertMulti(property2str(Words),stri);
     }
 }
-void mysk::propertymap_set(QMap<QString, QString> &strmap){
+void mysk::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
+    if(b4remark){}
     if(strmap.contains(property2str(Name))){setName(strmap.value(property2str(Name)));}
     if(strmap.contains(property2str(Translation))){translation=strmap.value(property2str(Translation));}
     if(strmap.contains(property2str(Owner))){
@@ -77,7 +79,7 @@ void mysk::propertystr_set(QStringList getstrlist, bool front){
             }
         }
     }
-    propertymap_set(strmap);
+    propertymap_set(strmap,false);
 }
 bool mysk::propertystr_dvd(QString getstr, QStringList &frlist, QStringList &midlist, QStringList &bklist){
     QStringList strlist=getstr.split("|");
@@ -168,13 +170,7 @@ void mysk::addFunction(QString geteventstr, QString getblockstr,
     //pfunc->inilist<<QVariant(geteventstr)<<QVariant(getblockstr);
     pfunc->myini(geteventstr,getblockstr,getrtrmlist,getblrmlist);
     avlobjlist<<pfunc->rtobjlist;
-    myblock *pt=findBlockByName(geteventstr);
-    if(!pt){
-        pt=new myblock(this);
-        pt->name=geteventstr;
-        blocklist<<pt;
-    }
-    pt->addBlock(pfunc,getblockstr);
+    iniBlock(geteventstr)->addBlock(pfunc,getblockstr);
 
     mydo *pdo=new mydo(this);
     pdo->psktgt=this;
@@ -186,13 +182,22 @@ void mysk::addFunction(QString geteventstr, QString getblockstr,
     //addusdobjlist(getobjlist);
     sig_update();
 }
+myblock *mysk::iniBlock(QString getstr){
+    if(!eventstrlist().contains(getstr)){qWarning()<<"iniblock"<<getstr;return NULL;}
+    myblock *pt=findBlockByName(getstr);
+    if(pt){return pt;}
+    pt=new myblock(this);
+    pt->name=getstr;
+    blocklist<<pt;
+    return pt;
+}
 
 bool mysk::removeObj(myobj *getp){
     return avlobjlist.removeOne(getp);
 }
 myobj *mysk::findObjByName(QString getname, QString getstr){
     QList<myobj *> tlist;
-    getavlobjlist(myobj::All,tlist,getstr,true);
+    getavlobjlist(myobj::all,tlist,getstr,true);
     foreach(myobj *ip,tlist){
         if(ip->name==getname){return ip;}
     }
@@ -228,10 +233,12 @@ QString mysk::findRemarkByName_block(QString getname){
     else{qWarning()<<getname;}
     return tstr;
 }
-QStringList mysk::need4block(QString getstr){
+QStringList mysk::blockstrlist(QString getstr){
     myblock *pt=findBlockByName(getstr);
     if(pt){return pt->need4block();}
-    return QStringList();
+    QStringList strlist;
+    if(eventstrlist().contains(getstr)){strlist<<getstr;}
+    return strlist;
 }
 /*
 QStringList mysk::trans4design(){
@@ -335,14 +342,14 @@ QStringList mytrs::trans(){
 QString mytrs::findRemarkByName_event(QString getname){
     return myevent::findRemarkByName(getname);
 }
-void mytrs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap){
-    mysk::propertymap_get(strmap,strlistmap);
+void mytrs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
+    mysk::propertymap_get(strmap,strlistmap,b4remark);
     strmap.insert(property2str(Subtype),subtype2str(subtype));
-    strlistmap.insert(property2str(Subtype),typestrlist());
+    strlistmap.insert(property2str(Subtype),subtypestrlist());
 }
-void mytrs::propertymap_set(QMap<QString, QString> &strmap){    
-    if(strmap.contains(property2str(Subtype))){subtype=str2type(strmap.value(property2str(Subtype)));}
-    mysk::propertymap_set(strmap);
+void mytrs::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
+    if(strmap.contains(property2str(Subtype))){subtype=str2subtype(strmap.value(property2str(Subtype)));}
+    mysk::propertymap_set(strmap,b4remark);
 }
 QString mytrs::propertystr_get(){
     QStringList strlist;
@@ -357,7 +364,7 @@ void mytrs::propertystr_set(QString getstr){
     if(midlist.length()!=1){qWarning()<<"propertystr_set:1"<<getstr;return;}
     QMap<QString,QString> strmap;
     strmap.insert(property2str(Subtype),midlist.first());
-    propertymap_set(strmap);
+    propertymap_set(strmap,false);
     mysk::propertystr_set(frlist,true);
     mysk::propertystr_set(bklist,false);
 }
@@ -376,7 +383,7 @@ QStringList myvs::trans(){
         strlist<<"end,";
     }
     strlist<<"view_as=function(self,cards)";
-    strlist<<"if #cards~="+QString::number(vsn)+" then return nil end";
+    if(vsn<10){strlist<<"if #cards~="+QString::number(vsn)+" then return nil end";}
     strlist<<QString("local a_card=sgs.Sanguosha:cloneCard(\"%1\",sgs.Card_SuitToBeDecided,0)").arg(objname_viewas);
     strlist<<"for var=1,#cards,1 do a_card:addSubcard(cards[var]) end";
     strlist<<"a_card:setSkillName(self:objectName())";
@@ -415,6 +422,9 @@ void myvs::iniObj(){
     avlobjlist<<vfobjlist<<epobjlist<<erobjlist;
     myobj::newConst(avlobjlist,"",parent());
 }
+myblock *myvs::iniBlock(QString getstr){
+    return mysk::iniBlock(getstr);
+}
 
 QString myvs::findRemarkByName_event(QString getname){
     if(getname==vsbtype2str(ViewFilter)){return getname;}
@@ -422,13 +432,19 @@ QString myvs::findRemarkByName_event(QString getname){
     if(getname==vsbtype2str(EnabledAtResponse)){return getname;}
     return QString();
 }
-void myvs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap){
-    mysk::propertymap_get(strmap,strlistmap);
+void myvs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
+    mysk::propertymap_get(strmap,strlistmap,b4remark);
     strmap.insert(property2str(CardsNum),QString::number(vsn));
-    strmap.insert(property2str(CardViewAs),myobj::name2remark(objname_viewas));
-    strlistmap.insert(property2str(CardViewAs),myobj::getconstrmlist_tag("ob"));
+    if(b4remark){
+        strmap.insert(property2str(CardViewAs),myobj::name2remark(objname_viewas));
+        strlistmap.insert(property2str(CardViewAs),myobj::getconstrmlist_tag("ob"));
+    }
+    else{
+        strmap.insert(property2str(CardViewAs),objname_viewas);
+        strlistmap.insert(property2str(CardViewAs),myobj::getconstlist_tag("ob"));
+    }
 }
-void myvs::propertymap_set(QMap<QString, QString> &strmap){    
+void myvs::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
     if(strmap.contains(property2str(CardsNum))){
         bool b;
         int getn=strmap.value(property2str(CardsNum)).toInt(&b);
@@ -436,10 +452,29 @@ void myvs::propertymap_set(QMap<QString, QString> &strmap){
     }
     if(strmap.contains(property2str(CardViewAs))){
         QString getstr=strmap.value(property2str(CardViewAs));
-        QString getname=myobj::remark2name(getstr);
-        objname_viewas=getname;
+        if(b4remark){objname_viewas=myobj::remark2name(getstr);}
+        else{objname_viewas=getstr;}
     }
-    mysk::propertymap_set(strmap);
+    mysk::propertymap_set(strmap,b4remark);
+}
+QString myvs::propertystr_get(){
+    QStringList strlist;
+    strlist<<mysk::propertystr_get(true);
+    strlist<<QString::number(vsn);
+    strlist<<objname_viewas;
+    strlist<<mysk::propertystr_get(false);
+    return strlist.join("|");
+}
+void myvs::propertystr_set(QString getstr){
+    QStringList frlist,bklist,midlist;
+    if(!propertystr_dvd(getstr,frlist,midlist,bklist)){qWarning()<<"propertystr_set:0"<<getstr;return;}
+    if(midlist.length()!=2){qWarning()<<"propertystr_set:2"<<getstr;return;}
+    QMap<QString,QString> strmap;
+    strmap.insert(property2str(CardsNum),midlist.at(0));
+    strmap.insert(property2str(CardViewAs),midlist.at(1));
+    propertymap_set(strmap,false);
+    mysk::propertystr_set(frlist,true);
+    mysk::propertystr_set(bklist,false);
 }
 
 /*

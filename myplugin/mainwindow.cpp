@@ -264,7 +264,7 @@ void MainWindow::itemsel(){
             else{}
         }
     }
-    if(mysk::str2type(p_tabwidget1->tabText(p_tabwidget1->currentIndex()))!=-1){
+    if(mysk::typestrlist().contains(p_tabwidget1->tabText(p_tabwidget1->currentIndex()))){
         itemsel_sk(static_cast<QTableWidget *>(p_tabwidget1->currentWidget()));
     }
     myrfr();
@@ -290,7 +290,7 @@ void MainWindow::itemchanged_g(QTableWidgetItem *getp){
     b4rfr=false;getp->setText("");b4rfr=true;
     QMap<QString,QString> strmap;
     strmap.insert(getp->tableWidget()->horizontalHeaderItem(getp->column())->text(),gettext);
-    psys->pg0->propertymap_set(strmap);    
+    psys->pg0->propertymap_set(strmap,true);
     //QString hstr=p_tablewidget_g->horizontalHeaderItem(getp->column())->text();
     //if(mygeneral::str2property(hstr)==mygeneral::Name){psys->pg0->name=getp->text();}
     //if(mygeneral::str2property(hstr)==mygeneral::Translation){psys->pg0->translation=getp->text();}
@@ -316,7 +316,7 @@ void MainWindow::itemchanged_sk(QTableWidgetItem *getp){
             if(gettext!=""){strmap.insertMulti(hhstr,gettext);}
         }
     }
-    psys->psk0->propertymap_set(strmap);
+    psys->psk0->propertymap_set(strmap,true);
     /*
     if(mytrs::str2property(hstr)==mytrs::Name){psys->psk0->name=getp->text();}
     if(mytrs::str2property(hstr)==mytrs::Translation){psys->psk0->translation=getp->text();}
@@ -361,7 +361,7 @@ void MainWindow::itemchanged_cbb_sk(QComboBox *pcbb){
         else{
             QMap<QString,QString> strmap;
             strmap.insert(ptw->horizontalHeaderItem(jj)->text(),pcbb->currentText());
-            psk->propertymap_set(strmap);
+            psk->propertymap_set(strmap,true);
         }
     }
 }
@@ -374,7 +374,7 @@ void MainWindow::itemchanged_cbb_g(QComboBox *pcbb){
         else{
             QMap<QString,QString> strmap;
             strmap.insert(ptw->horizontalHeaderItem(jj)->text(),pcbb->currentText());
-            pg->propertymap_set(strmap);
+            pg->propertymap_set(strmap,true);
         }
     }
 }
@@ -395,7 +395,7 @@ void MainWindow::myrfr(){
     foreach(mygeneral *ip,psys->glist){
         strmap.clear();
         strlistmap.clear();
-        ip->propertymap_get(strmap,strlistmap);
+        ip->propertymap_get(strmap,strlistmap,true);
         int getrow=myrfr_tablewidget_getrow(str2tw_tab(mygeneral::tabstr()),ip->name);
         myrfr_tablewidget_property(str2tw_tab(mygeneral::tabstr()),getrow,strmap,strlistmap);
         //myrfr_g(ip,myrfr_tablewidget_getrow(p_tablewidget_g,ip->name));
@@ -408,7 +408,7 @@ void MainWindow::myrfr(){
     foreach(mysk *ip,trslist){
         strmap.clear();
         strlistmap.clear();
-        ip->propertymap_get(strmap,strlistmap);
+        ip->propertymap_get(strmap,strlistmap,true);
         int getrow=myrfr_tablewidget_getrow(str2tw_tab(mysk::type2str(mysk::TriggerSkill)),ip->name);
         myrfr_tablewidget_property(str2tw_tab(mysk::type2str(mysk::TriggerSkill)),getrow,strmap,strlistmap);
         //myrfr_trs(pt,myrfr_tablewidget_getrow(p_tablewidget_trs,pt->name));
@@ -421,7 +421,7 @@ void MainWindow::myrfr(){
     foreach(mysk *ip,vslist){
         strmap.clear();
         strlistmap.clear();
-        ip->propertymap_get(strmap,strlistmap);
+        ip->propertymap_get(strmap,strlistmap,true);
         int getrow=myrfr_tablewidget_getrow(str2tw_tab(mysk::type2str(mysk::ViewAsSkill)),ip->name);
         myrfr_tablewidget_property(str2tw_tab(mysk::type2str(mysk::ViewAsSkill)),getrow,strmap,strlistmap);
     }
@@ -458,11 +458,11 @@ int MainWindow::myrfr_tablewidget_getrow(QTableWidget *ptw, QString getstr){
 void MainWindow::myrfr_tablewidget_str(QTableWidget *ptw,int getrow, int getcol, QString getstr){
     while(ptw->columnCount()<=getcol){
         ptw->insertColumn(ptw->columnCount());
-        if(mysk::str2type(tw2str_tab(ptw))!=-1){
+        if(mysk::typestrlist().contains(tw2str_tab(ptw))){
             ptw->setHorizontalHeaderItem(ptw->columnCount()-1,new QTableWidgetItem(mysk::property2str(mysk::Words)));
         }
     }
-    if(mysk::str2type(tw2str_tab(ptw))!=-1){
+    if(mysk::typestrlist().contains(tw2str_tab(ptw))){
         if(ptw->columnCount()-1==getcol){
             ptw->insertColumn(ptw->columnCount());
             ptw->setHorizontalHeaderItem(ptw->columnCount()-1,new QTableWidgetItem(mysk::property2str(mysk::Words)));
@@ -571,7 +571,7 @@ void MainWindow::myredo(){
 }
 void MainWindow::mynew(){
     if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mygeneral::tabstr()){psys->newGeneral("");}
-    psys->newSkill("",mysk::str2type(p_tabwidget1->tabText(p_tabwidget1->currentIndex())));
+    else{psys->newSkill("",mysk::str2type(p_tabwidget1->tabText(p_tabwidget1->currentIndex())));}
     //if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mysk::type2str(mysk::TriggerSkill)){psys->newTrs("");}
     //if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mysk::type2str(mysk::ViewAsSkill)){psys->newVs("");}
 }
@@ -579,7 +579,7 @@ void MainWindow::mydel(){
     if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mygeneral::tabstr()){
         if(psys->pg0){psys->delGeneral(psys->pg0);}
     }
-    if(mysk::str2type(p_tabwidget1->tabText(p_tabwidget1->currentIndex()))!=-1){
+    if(mysk::typestrlist().contains(p_tabwidget1->tabText(p_tabwidget1->currentIndex()))){
         if(psys->psk0){psys->delSkill(psys->psk0);}
     }
 }

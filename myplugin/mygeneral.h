@@ -7,42 +7,15 @@ class mysys;
 class mygeneral : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(generalProperty)
+    Q_ENUMS(kingdomType)
 public:
     explicit mygeneral(QObject *parent = 0):QObject(parent){sex=true;}
     static QString tabstr(){return tr("General");}
     enum generalProperty{Name=0,Translation=1,Kingdom=2,Sex=3,HP=4,Title=5,Word=6,CV=7};
-    static QString property2str(int getproperty){
-        switch(getproperty){
-        case Name:return tr("Name");
-        case Translation:return tr("Translation");
-        case Kingdom:return tr("Kingdom");
-        case Sex:return tr("Sex");
-        case HP:return tr("HP");
-        case Title:return tr("Title");
-        case Word:return tr("Word");
-        case CV:return tr("CV");
-        default:qWarning()<<"property2str:"<<getproperty;return QString();
-        }
-    }
-    static int str2property(QString getstr){
-        if(getstr==property2str(Name)){return Name;}
-        if(getstr==property2str(Translation)){return Translation;}
-        if(getstr==property2str(Kingdom)){return Kingdom;}
-        if(getstr==property2str(Sex)){return Sex;}
-        if(getstr==property2str(HP)){return HP;}
-        if(getstr==property2str(Title)){return Title;}
-        if(getstr==property2str(Word)){return Word;}
-        if(getstr==property2str(CV)){return CV;}
-        qWarning()<<"str2property:"<<getstr;
-        return 0;
-    }
-    static QStringList propertystrlist(){
-        QStringList strlist;
-        strlist<<property2str(Name)<<property2str(Translation)
-              <<property2str(Kingdom)<<property2str(Sex)<<property2str(HP)
-                <<property2str(Title)<<property2str(Word)<<property2str(CV);
-        return strlist;
-    }
+    static QString property2str(int getproperty){return myobj::enumstr(staticMetaObject,"generalProperty",getproperty);}
+    static int str2property(QString getstr){return myobj::enumint(staticMetaObject,"generalProperty",getstr);}
+    static QStringList propertystrlist(){return myobj::enumstrlist(staticMetaObject,"generalProperty");}
     static QString property2prefix(int getproperty){
         switch(getproperty){
         case Title:return "#";
@@ -53,7 +26,7 @@ public:
     }
     static QString nullname(){return tr("NULL");}
     QString name;
-    enum kingdomType{kingdom_Default=0,kingdom_Wei=1,kingdom_Shu=2,kingdom_Wu=3,kingdom_Qun=4,kingdom_God=5};
+    enum kingdomType{god=0,wei=1,shu=2,wu=3,qun=4};
     int kingdom;
     int hp;
     bool sex;
@@ -63,30 +36,9 @@ public:
     QString cv;
     QList<mysk *> sklist;
     static int globalint;
-    static QString kingdom2str(int getkingdom){
-        switch(getkingdom){
-        case kingdom_Wei:return "wei";
-        case kingdom_Shu:return "shu";
-        case kingdom_Wu:return "wu";
-        case kingdom_Qun:return "qun";
-        case kingdom_God:return "god";
-        case kingdom_Default:return "god";
-        default:return "god";
-        }
-    }
-    static QStringList kingdomstrlist(){
-        QStringList strlist;
-        strlist<<kingdom2str(kingdom_Wei)<<kingdom2str(kingdom_Shu)<<kingdom2str(kingdom_Wu)<<kingdom2str(kingdom_Qun)<<kingdom2str(kingdom_God);
-        return strlist;
-    }
-    static int str2kingdom(QString getstr){
-        if(getstr==kingdom2str(kingdom_Wei)){return kingdom_Wei;}
-        if(getstr==kingdom2str(kingdom_Shu)){return kingdom_Shu;}
-        if(getstr==kingdom2str(kingdom_Wu)){return kingdom_Wu;}
-        if(getstr==kingdom2str(kingdom_Qun)){return kingdom_Qun;}
-        if(getstr==kingdom2str(kingdom_God)){return kingdom_God;}
-        return kingdom_God;
-    }
+    static QString kingdom2str(int getkingdom){return myobj::enumstr(staticMetaObject,"kingdomType",getkingdom);}
+    static QStringList kingdomstrlist(){return myobj::enumstrlist(staticMetaObject,"kingdomType");}
+    static int str2kingdom(QString getstr){return myobj::enumint(staticMetaObject,"kingdomType",getstr,god);}
     static QString sex2str(bool getsex){
         return (getsex?"m":"f");
     }
@@ -107,8 +59,8 @@ public:
     mysys *getsys();
     void setName(QString getname);
     void setDefaultName();
-    void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap);
-    void propertymap_set(QMap<QString,QString> &strmap);
+    void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap,bool b4remark);
+    void propertymap_set(QMap<QString,QString> &strmap,bool b4remark);
     QString propertystr_get();
     void propertystr_set(QString getstr);
 signals:

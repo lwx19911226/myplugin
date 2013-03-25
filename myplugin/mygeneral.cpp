@@ -15,7 +15,8 @@ void mygeneral::setName(QString getname){
     }
     name=getname;
 }
-void mygeneral::propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap){
+void mygeneral::propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap,bool b4remark){
+    if(b4remark){}
     strmap.insert(property2str(Name),name);
     strmap.insert(property2str(Translation),translation);
     strmap.insert(property2str(Kingdom),kingdom2str(kingdom));
@@ -27,7 +28,8 @@ void mygeneral::propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStri
     strmap.insert(property2str(Word),word);
     strmap.insert(property2str(CV),cv);
 }
-void mygeneral::propertymap_set(QMap<QString,QString> &strmap){
+void mygeneral::propertymap_set(QMap<QString,QString> &strmap,bool b4remark){
+    if(b4remark){}
     if(strmap.contains(property2str(Name))){setName(strmap.value(property2str(Name)));}
     if(strmap.contains(property2str(Translation))){translation=strmap.value(property2str(Translation));}
     if(strmap.contains(property2str(Kingdom))){kingdom=str2kingdom(strmap.value(property2str(Kingdom)));}
@@ -74,5 +76,5 @@ void mygeneral::propertystr_set(QString getstr){
             strmap.insert(property2str(CV),strlist.at(i).mid(property2prefix(CV).length()));
         }
     }
-    propertymap_set(strmap);
+    propertymap_set(strmap,false);
 }

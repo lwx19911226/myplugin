@@ -7,9 +7,9 @@ class myblock;
 class myfun : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(iniFormat)
 public:
     explicit myfun(QObject *parent = 0);
-    enum {Parts=6};
     enum iniFormat{Name=0,In_Type=1,Out_Type=2,Trans=3,Remark=4,Tag=5};
     //QString name;
     //QList<myobj *> objlist;

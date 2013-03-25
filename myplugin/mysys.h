@@ -27,7 +27,7 @@ public:
 
     void getsklist(QList<mysk *> &rsklist,int gettype);
     void getavlobjlist_global(QList<myobj *> &list);    
-    mygeneral *newGeneral(QString getname,int getkingdom=mygeneral::kingdom_God,int gethp=4,bool getsex=true);
+    mygeneral *newGeneral(QString getname,int getkingdom=mygeneral::god,int gethp=4,bool getsex=true);
     mysk *newSkill(QString getname,int gettype);
     mytrs *newTrs(QString getname);
     myvs *newVs(QString getname);

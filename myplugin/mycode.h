@@ -36,7 +36,7 @@ class myblock : public QObject
     Q_OBJECT
 public:
     explicit myblock(QObject *parent = 0):QObject(parent){upperLayer=NULL;}
-    enum blockType{Block=1,Function=2,Opr=3};
+    enum blockType{Block=1,Function=2};
     virtual int getType(){return Block;}
     static int globalint;
     QList<myblock *> blocklist;
