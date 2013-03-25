@@ -34,7 +34,7 @@ void myfun::myini(){
         if(str==""){continue;}
         if(str.startsWith("//")){continue;}
         if(str.startsWith(">>")){myfuntaglist<<str.mid(2);continue;}
-        if(str.startsWith(">")&&str.count("|")==myobj::enumcnt(staticMetaObject,"iniFormat")-1){myfunlist<<str.mid(1);continue;}
+        if(str.startsWith(">")&&str.count("|")==myobj::enumcnt(&staticMetaObject,"iniFormat")-1){myfunlist<<str.mid(1);continue;}
         qWarning()<<"myfunini:"<<str<<",";
     }
     fin.close();

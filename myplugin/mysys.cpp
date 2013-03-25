@@ -146,12 +146,36 @@ mygeneral *mysys::newGeneral(QString getname, int getkingdom, int gethp, bool ge
     sig_update();
     return pg0;
 }
-mysk *mysys::newSkill(QString getname, int gettype){
-    if(gettype==mysk::TriggerSkill){return newTrs(getname);}
-    if(gettype==mysk::ViewAsSkill){return newVs(getname);}
-    qWarning()<<"newskill"<<getname<<gettype;
-    return NULL;
+mysk *mysys::newsk(int gettype){
+    qRegisterMetaType<mytrs>("mytrs");
+    qRegisterMetaType<myvs>("myvs");
+    qRegisterMetaType<mydts>("mydts");
+    qRegisterMetaType<myfts>("myfts");
+    qRegisterMetaType<mytms>("mytms");
+    foreach(QString stri,mysk::typeclasslist()){
+        if(QMetaType::type(stri.toUtf8())==0){qWarning()<<"newsk"<<stri;}
+    }
+    mysk *psk=NULL;
+    int id=QMetaType::type(mysk::type2class(gettype).toUtf8());
+    if(id!=0){
+        psk=static_cast<mysk *>(QMetaType::construct(id));
+        psk->setParent(this);
+    }
+    return psk;
 }
+mysk *mysys::newSkill(QString getname, int gettype){
+    //if(gettype==mysk::TriggerSkill){return newTrs(getname);}
+    //if(gettype==mysk::ViewAsSkill){return newVs(getname);}
+    mysk *psk=newsk(gettype);
+    if(!psk){qWarning()<<"newskill"<<getname<<gettype;}
+    psk0=psk;
+    psk0->setName(getname);
+    psk0->iniObj();
+    sklist.append(psk0);
+    sig_update();
+    return psk0;
+}
+/*
 mytrs *mysys::newTrs(QString getname){
     mytrs *ptrs=new mytrs(this);    
     ptrs->setName(getname);
@@ -170,7 +194,7 @@ myvs *mysys::newVs(QString getname){
     sig_update();
     return pvs;
 }
-
+*/
 mygeneral *mysys::findGeneralByName(QString getname){
     if(getname==mygeneral::nullname()){return NULL;}
     foreach(mygeneral *ip,glist){

@@ -13,9 +13,9 @@ public:
     explicit mygeneral(QObject *parent = 0):QObject(parent){sex=true;}
     static QString tabstr(){return tr("General");}
     enum generalProperty{Name=0,Translation=1,Kingdom=2,Sex=3,HP=4,Title=5,Word=6,CV=7};
-    static QString property2str(int getproperty){return myobj::enumstr(staticMetaObject,"generalProperty",getproperty);}
-    static int str2property(QString getstr){return myobj::enumint(staticMetaObject,"generalProperty",getstr);}
-    static QStringList propertystrlist(){return myobj::enumstrlist(staticMetaObject,"generalProperty");}
+    static QString property2str(int getproperty){return myobj::enumstr(&staticMetaObject,"generalProperty",getproperty);}
+    static int str2property(QString getstr){return myobj::enumint(&staticMetaObject,"generalProperty",getstr);}
+    static QStringList propertystrlist(){return myobj::enumstrlist(&staticMetaObject,"generalProperty");}
     static QString property2prefix(int getproperty){
         switch(getproperty){
         case Title:return "#";
@@ -36,9 +36,9 @@ public:
     QString cv;
     QList<mysk *> sklist;
     static int globalint;
-    static QString kingdom2str(int getkingdom){return myobj::enumstr(staticMetaObject,"kingdomType",getkingdom);}
-    static QStringList kingdomstrlist(){return myobj::enumstrlist(staticMetaObject,"kingdomType");}
-    static int str2kingdom(QString getstr){return myobj::enumint(staticMetaObject,"kingdomType",getstr,god);}
+    static QString kingdom2str(int getkingdom){return myobj::enumstr(&staticMetaObject,"kingdomType",getkingdom);}
+    static QStringList kingdomstrlist(){return myobj::enumstrlist(&staticMetaObject,"kingdomType");}
+    static int str2kingdom(QString getstr){return myobj::enumint(&staticMetaObject,"kingdomType",getstr,god);}
     static QString sex2str(bool getsex){
         return (getsex?"m":"f");
     }

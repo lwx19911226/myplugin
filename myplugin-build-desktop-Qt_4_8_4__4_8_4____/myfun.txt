@@ -32,7 +32,8 @@
 //block
 >ifTrue|mybool||if %1 then;%block;else;%block;end|如果参数1为真，则执行代码段1，否则执行代码段2|block
 >ifEqualNum|mynum,mynum||if %1==%2 then;%block;else;%block;end|如果数1与数2相等，则执行代码段1，否则执行代码段2|block
->eachPlayer|mysplayerlist~|mysplayer~|local eachPlayer%%=sgs.SPlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
+>eachPlayer|myplayerlist~|myplayer~|local eachPlayer%%=sgs.PlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
+>eachSPlayer|mysplayerlist~|mysplayer~|local eachPlayer%%=sgs.SPlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
 >eachNum|mynumlist~|mynum~|local eachNum%%=sgs.IntList();for _,eachNum%%_i in sgs.qlist(%1) do eachNum%%:append(eachNum%%_i) end;for _,%2 in sgs.qlist(eachNum%%) do;%block;end|对数字列表（参数1）中每一个数字（返回值1）执行代码段1的操作|block,list
 //>eachCard|mycardlist|mycard|local eachCard%%=sgs.CardList();for _,eachCard%%_i in sgs.qlist(%1) do eachCard%%:append(eachCard%%_i) end;for _,%2 in sgs.qlist(eachCard%%) do;%block;end|对牌列表（参数1）中每一张牌（返回值1）执行代码段1的操作|block,list,cd
 >repeatx|mynum~|mynum~|for %2=1,%1,1 do;%block;end|重复X（参数1）次执行代码段1的操作，计数值（返回值1）从1递增至X|block,list

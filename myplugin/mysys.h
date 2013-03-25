@@ -29,8 +29,9 @@ public:
     void getavlobjlist_global(QList<myobj *> &list);    
     mygeneral *newGeneral(QString getname,int getkingdom=mygeneral::god,int gethp=4,bool getsex=true);
     mysk *newSkill(QString getname,int gettype);
-    mytrs *newTrs(QString getname);
-    myvs *newVs(QString getname);
+    mysk *newsk(int gettype);
+    //mytrs *newTrs(QString getname);
+    //myvs *newVs(QString getname);
     bool delGeneral(mygeneral *getp);
     bool delSkill(mysk *getp);
     mygeneral *findGeneralByName(QString getname);

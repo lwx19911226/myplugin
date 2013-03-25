@@ -25,7 +25,7 @@ void myevent::myini(){
         str=cin.readLine();
         if(str==""){continue;}
         if(str.startsWith("//")){continue;}
-        if(str.startsWith(">")&&(str.count("|")==myobj::enumcnt(staticMetaObject,"iniFormat")-1)){myeventlist.append(str.mid(1));continue;}
+        if(str.startsWith(">")&&(str.count("|")==myobj::enumcnt(&staticMetaObject,"iniFormat")-1)){myeventlist.append(str.mid(1));continue;}
         qWarning()<<"myeventini:"<<str<<",";
     }
     fin.close();

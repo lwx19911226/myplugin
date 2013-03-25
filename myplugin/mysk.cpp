@@ -1,6 +1,7 @@
 #include "mysk.h"
 #include "mysys.h"
 int mysk::globalint=0;
+/*
 int mysk::str2property(QString getstr,int gettype){
     switch(gettype){
     case TriggerSkill:return mytrs::str2property(getstr);
@@ -8,6 +9,7 @@ int mysk::str2property(QString getstr,int gettype){
     default:return str2property(getstr);
     }
 }
+*/
 void mysk::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
     if(b4remark){}
     strmap.insert(property2str(Name),name);
@@ -113,6 +115,29 @@ void mysk::setOwner(mygeneral *getp){
     owner=getp;
     if(getp&&!getp->sklist.contains(this)){getp->sklist.append(this);}
     sig_update();
+}
+QStringList mysk::eventstrlist(){
+    QString tstr_type=type2abb(getType())+"bType";
+    return myobj::enumstrlist(metaObject(),tstr_type.toUtf8());
+}
+QString mysk::bstr2abb(QString getstr){
+    QString tstr_type=type2abb(getType())+"bType";
+    QString tstr_abb=type2abb(getType())+"bAbb";
+    if(myobj::enumcontains(metaObject(),tstr_type.toUtf8(),getstr)){
+        return myobj::enumstr(metaObject(),tstr_abb.toUtf8(),myobj::enumint(metaObject(),tstr_type.toUtf8(),getstr));
+    }
+    else{return QString();}
+}
+void mysk::iniObj(){
+    foreach(QString stri,eventstrlist()){
+        QString abb=bstr2abb(stri);
+        if(abb==""){continue;}
+        QList<myobj *> tobjlist;
+        myobj::newConst(tobjlist,abb,parent(),true);
+        foreach(myobj *ip,tobjlist){ip->blockstr=stri;}
+        avlobjlist<<tobjlist;
+    }
+    myobj::newConst(avlobjlist,"",parent());
 }
 void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr,bool b4nil){
     QList<myobj *> tlist;
@@ -375,10 +400,10 @@ QStringList myvs::trans(){
     strlist<<QString("name=\"%1\",").arg(name);
     strlist<<QString("n=%1,").arg(vsn);
     myblock *pt;
-    pt=findBlockByName(vsbtype2str(ViewFilter));
+    pt=findBlockByName(myobj::enumstr(metaObject(),"vsbType",ViewFilter));
     if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"view_filter=function(self,selected,to_select)";
-        strlist<<mycode::myindent(trans4avlobjlist(vsbtype2str(ViewFilter)));
+        strlist<<mycode::myindent(trans4avlobjlist(myobj::enumstr(metaObject(),"vsbType",ViewFilter)));
         strlist<<pt->trans();
         strlist<<"end,";
     }
@@ -389,17 +414,17 @@ QStringList myvs::trans(){
     strlist<<"a_card:setSkillName(self:objectName())";
     strlist<<"return a_card";
     strlist<<"end,";
-    pt=findBlockByName(vsbtype2str(EnabledAtPlay));
+    pt=findBlockByName(myobj::enumstr(metaObject(),"vsbType",EnabledAtPlay));
     if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"enabled_at_play=function(self,player)";
-        strlist<<mycode::myindent(trans4avlobjlist(vsbtype2str(EnabledAtPlay)));
+        strlist<<mycode::myindent(trans4avlobjlist(myobj::enumstr(metaObject(),"vsbType",EnabledAtPlay)));
         strlist<<pt->trans();
         strlist<<"end,";
     }
-    pt=findBlockByName(vsbtype2str(EnabledAtResponse));
+    pt=findBlockByName(myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse));
     if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"enabled_at_response=function(self,player,pattern)";
-        strlist<<mycode::myindent(trans4avlobjlist(vsbtype2str(EnabledAtResponse)));
+        strlist<<mycode::myindent(trans4avlobjlist(myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse)));
         strlist<<pt->trans();
         strlist<<"end,";
     }
@@ -411,25 +436,15 @@ QStringList myvs::trans(){
     strlist<<"}";
     return strlist;
 }
-void myvs::iniObj(){
-    QList<myobj *> vfobjlist,epobjlist,erobjlist;
-    myobj::newConst(vfobjlist,"vs_vf",parent(),true);
-    foreach(myobj *ip,vfobjlist){ip->blockstr=vsbtype2str(ViewFilter);}
-    myobj::newConst(epobjlist,"vs_ep",parent(),true);
-    foreach(myobj *ip,epobjlist){ip->blockstr=vsbtype2str(EnabledAtPlay);}
-    myobj::newConst(erobjlist,"vs_er",parent(),true);
-    foreach(myobj *ip,erobjlist){ip->blockstr=vsbtype2str(EnabledAtResponse);}
-    avlobjlist<<vfobjlist<<epobjlist<<erobjlist;
-    myobj::newConst(avlobjlist,"",parent());
-}
+
 myblock *myvs::iniBlock(QString getstr){
     return mysk::iniBlock(getstr);
 }
 
 QString myvs::findRemarkByName_event(QString getname){
-    if(getname==vsbtype2str(ViewFilter)){return getname;}
-    if(getname==vsbtype2str(EnabledAtPlay)){return getname;}
-    if(getname==vsbtype2str(EnabledAtResponse)){return getname;}
+    if(getname==myobj::enumstr(metaObject(),"vsbType",ViewFilter)){return getname;}
+    if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtPlay)){return getname;}
+    if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse)){return getname;}
     return QString();
 }
 void myvs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
@@ -475,6 +490,50 @@ void myvs::propertystr_set(QString getstr){
     propertymap_set(strmap,false);
     mysk::propertystr_set(frlist,true);
     mysk::propertystr_set(bklist,false);
+}
+
+QStringList mydts::trans(){
+    QStringList strlist;
+    strlist<<name+"=sgs.CreateDistanceSkill{";
+    strlist<<QString("name=\"%1\",").arg(name);
+    strlist<<"correct_func=function(self,from,to)";
+    QString bname=myobj::enumstr(metaObject(),"dtsbType",CorrectFunc);
+    myblock *pt=findBlockByName(bname);
+    if(pt&&!pt->blocklist.isEmpty()){
+        strlist<<mycode::myindent(trans4avlobjlist(bname));
+        strlist<<pt->trans();
+    }
+    strlist<<"return 0";
+    strlist<<"end,";
+    strlist<<"}";
+    return strlist;
+}
+
+QStringList myfts::trans(){
+    QStringList strlist;
+    strlist<<name+"=sgs.CreateFilterSkill{";
+    strlist<<QString("name=\"%1\",").arg(name);
+    strlist<<"view_filter=function(self,to_select)";
+    QString bname=myobj::enumstr(metaObject(),"ftsbType",ViewFilter);
+    myblock *pt=findBlockByName(bname);
+    if(pt&&!pt->blocklist.isEmpty()){
+        QStringList tstrlist;
+        tstrlist<<"local room=sgs.Sanguosha:currentRoom()";
+        tstrlist<<trans4avlobjlist(bname);
+        strlist<<mycode::myindent(tstrlist);
+        strlist<<pt->trans();
+    }
+    strlist<<"return false";
+    strlist<<"end,";
+    strlist<<"view_as=function(self,originalCard)";
+    strlist<<QString("local filtered=sgs.Sanguosha:cloneCard(\"%1\",sgs.Card_SuitToBeDecided,0)").arg(objname_viewas);
+    strlist<<"filtered:setSkillName(self:objectName())";
+    strlist<<"local card=sgs.Sanguosha:getWrappedCard(originalCard:getId())";
+    strlist<<"card:takeOver(filtered)";
+    strlist<<"return card";
+    strlist<<"end,";
+    strlist<<"}";
+    return strlist;
 }
 
 /*

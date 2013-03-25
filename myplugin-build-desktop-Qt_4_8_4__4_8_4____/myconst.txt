@@ -28,6 +28,12 @@
 >sgs.Self|myplayer|视为技拥有者|bl:vs_er
 >to_select|mycard|视为技将选的一张牌|bl:vs_vf
 >#selected|mynum|视为技已选牌数|bl:vs_vf
+>from|myplayer|距离技距离计算起始角色|bl:dts_cf
+>players|myplayerlist|全部角色列表|bl:dts_cf
+>to|myplayer|距离技距离计算终止角色|bl:dts_cf
+>to_select|mycard|锁定视为技所判断的牌|bl:fts_vf
+>place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf
+>selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:fts_vf
 >true|mybool|TRUE|
 >false|mybool|FALSE|
 >nil|all|不存在|
