@@ -59,7 +59,7 @@ public:
     mysys *getsys();
     void setName(QString getname);
     void setDefaultName();
-    void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap,bool b4remark);
+    void propertymap_get(QMap<QString,QString> &strmap,bool b4remark);
     void propertymap_set(QMap<QString,QString> &strmap,bool b4remark);
     QString propertystr_get();
     void propertystr_set(QString getstr);

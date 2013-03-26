@@ -34,7 +34,7 @@ public:
     static int enumint(const QMetaObject *mob,QByteArray getname,QString getstr,int defaultint=-1){
         QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
         for(int i=0;i<myenum.keyCount();i++){
-            if(getstr==tr(myenum.key(i))){return myenum.value(i);}
+            if((getstr==myenum.key(i))||(getstr==tr(myenum.key(i)))){return myenum.value(i);}
         }
         qWarning()<<"enumint"<<getname<<getstr;
         return defaultint;
@@ -54,7 +54,7 @@ public:
         }
     }
     static bool enumcontains(const QMetaObject *mob,QByteArray getname,QString getstr){
-        return enumstrlist(mob,getname).contains(getstr);
+        return enumstrlist(mob,getname).contains(getstr)||enumstrlist(mob,getname).contains(tr(getstr.toUtf8()));
     }
     static bool enumcontains(const QMetaObject *mob,QByteArray getname,int getint){
         return enumcontains(mob,getname,enumstr(mob,getname,getint));

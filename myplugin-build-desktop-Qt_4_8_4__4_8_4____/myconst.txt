@@ -29,7 +29,7 @@
 >to_select|mycard|视为技将选的一张牌|bl:vs_vf
 >#selected|mynum|视为技已选牌数|bl:vs_vf
 >from|myplayer|距离技距离计算起始角色|bl:dts_cf
->players|myplayerlist|全部角色列表|bl:dts_cf
+>players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:dts_cf
 >to|myplayer|距离技距离计算终止角色|bl:dts_cf
 >to_select|mycard|锁定视为技所判断的牌|bl:fts_vf
 >place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf

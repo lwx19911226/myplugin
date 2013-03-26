@@ -1,32 +1,74 @@
 #include "mysk.h"
 #include "mysys.h"
 int mysk::globalint=0;
-/*
-int mysk::str2property(QString getstr,int gettype){
-    switch(gettype){
-    case TriggerSkill:return mytrs::str2property(getstr);
-    case ViewAsSkill:return myvs::str2property(getstr);
-    default:return str2property(getstr);
-    }
+void str2first(QStringList &strlist,QString str){
+    strlist.removeOne(str);
+    strlist.prepend(str);
 }
-*/
-void mysk::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
+QString mysk::getOwnerProperty(){
+    QStringList strlist=getsys()->getgstrlist();
+    strlist.prepend(mygeneral::nullname());
+    QString str=owner?owner->name:mygeneral::nullname();
+    str2first(strlist,str);
+    return strlist.join("|");
+}
+void mysk::setOwnerProperty(QString getstr){setOwner(getsys()->findGeneralByName(getstr));}
+
+void mysk::propertymap_get(QMap<QString, QString> &strmap,bool b4remark){
     if(b4remark){}
-    strmap.insert(property2str(Name),name);
-    strmap.insert(property2str(Translation),translation);
+    for(int i=mysk::metaObject()->propertyOffset();i<metaObject()->propertyCount();i++){
+        QString tstr(metaObject()->property(i).name());
+        if(!tstr.endsWith("Property")){
+            if(!tstr.endsWith("PropertyRemark")){qWarning()<<"propertymap_get"<<tstr;}
+            continue;
+        }
+        int tgti=i;
+        if(b4remark){
+            int geti=metaObject()->indexOfProperty(QString(tstr+"Remark").toUtf8());
+            if(geti!=-1){tgti=geti;}
+        }
+        tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
+        QString vstr=metaObject()->property(tgti).read(this).toString();
+        if(vstr.contains(",,")){
+            foreach(QString stri,vstr.split(",,")){strmap.insertMulti(tstr,stri);}
+        }
+        else{strmap.insert(tstr,vstr);}
+    }
+/*
+    strmap.insert(property2str(Name),property("NameProperty").toString());
+    strmap.insert(property2str(Translation),property("TranslationProperty").toString());
     strmap.insert(property2str(Owner),owner?owner->name:mygeneral::nullname());
     QStringList gstrlist=getsys()->getgstrlist();
     gstrlist.prepend(mygeneral::nullname());
-    strlistmap.insert(property2str(Owner),gstrlist);
+    //strlistmap.insert(property2str(Owner),gstrlist);
     strmap.insert(property2str(Description),description);
     foreach(QString stri,wordslist){
         strmap.insertMulti(property2str(Words),stri);
     }
+    */
 }
 void mysk::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
     if(b4remark){}
-    if(strmap.contains(property2str(Name))){setName(strmap.value(property2str(Name)));}
-    if(strmap.contains(property2str(Translation))){translation=strmap.value(property2str(Translation));}
+    for(int i=mysk::metaObject()->propertyOffset();i<metaObject()->propertyCount();i++){
+        QString tstr(metaObject()->property(i).name());
+        if(!tstr.endsWith("Property")){
+            if(!tstr.endsWith("PropertyRemark")){qWarning()<<"propertymap_set"<<tstr;}
+            continue;
+        }
+        int tgti=i;
+        if(b4remark){
+            int geti=metaObject()->indexOfProperty(QString(tstr+"Remark").toUtf8());
+            if(geti!=-1){tgti=geti;}
+        }
+        tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
+        if(strmap.contains(tstr)){metaObject()->property(tgti).write(this,QVariant(strmap.value(tstr)));}
+    }
+    getsys()->sig_update();
+    /*
+    if(strmap.contains(property2str(Name))){setProperty("NameProperty",QVariant(strmap.value(property2str(Name))));}
+        //setName(strmap.value(property2str(Name)));}
+    if(strmap.contains(property2str(Translation))){setProperty("TranslationProperty",QVariant(strmap.value(property2str(Translation))));}
+        //translation=strmap.value(property2str(Translation));}
     if(strmap.contains(property2str(Owner))){
         setOwner(getsys()->findGeneralByName(strmap.value(property2str(Owner))));
     }
@@ -35,8 +77,77 @@ void mysk::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
         wordslist.clear();
         wordslist.append(strmap.values(property2str(Words)));
     }
-    getsys()->sig_update();
+    */
 }
+
+QString mysk::propertystr_get(){
+    QStringList strlist,strlist_bk;
+    strlist<<type2abb(getType());
+    for(int i=mysk::metaObject()->propertyOffset();i<mysk::metaObject()->propertyCount();i++){
+        QString tstr(metaObject()->property(i).name());
+        if(!tstr.endsWith("Property")){
+            if(!tstr.endsWith("PropertyRemark")){qWarning()<<"propertymap_set"<<tstr;}
+            continue;
+        }
+        tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
+        int getproperty=str2property(tstr);
+        QString vstr=metaObject()->property(i).read(this).toString();
+        if(vstr.contains("|")){vstr=vstr.split("|").first();}
+        QStringList tstrlist=mycode::mymdf(vstr.split(",,"),property2prefix(getproperty));
+        if(getproperty<Description){strlist<<tstrlist;}
+        else{strlist_bk<<tstrlist;}
+    }
+    for(int i=metaObject()->propertyOffset();i<metaObject()->propertyCount();i++){
+        QString tstr(metaObject()->property(i).name());
+        if(!tstr.endsWith("Property")){
+            if(!tstr.endsWith("PropertyRemark")){qWarning()<<"propertymap_set"<<tstr;}
+            continue;
+        }
+        tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
+        int getproperty=str2property(tstr);
+        QString vstr=metaObject()->property(i).read(this).toString();
+        if(vstr.contains("|")){vstr=vstr.split("|").first();}
+        strlist<<mycode::mymdf(vstr.split(",,"),property2prefix(getproperty));
+    }
+    strlist<<strlist_bk;
+    return strlist.join("|");
+}
+
+void mysk::propertystr_set(QString getstr){
+    QString getabb;
+    QStringList frlist,midlist,bklist;
+    if(!propertystr_dvd(getstr,getabb,frlist,midlist,bklist)){qWarning()<<"propertystr_set:"<<getstr;return;}
+    QList<int> tgtilist0,tgtilist1;
+    for(int i=mysk::metaObject()->propertyOffset();i<mysk::metaObject()->propertyCount();i++){
+        QString tstr(metaObject()->property(i).name());
+        if(!tstr.endsWith("Property")){
+            if(!tstr.endsWith("PropertyRemark")){qWarning()<<"propertymap_set"<<tstr;}
+            continue;
+        }
+        //tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
+        tgtilist0<<i;
+    }
+    for(int i=metaObject()->propertyOffset();i<metaObject()->propertyCount();i++){
+        QString tstr(metaObject()->property(i).name());
+        if(!tstr.endsWith("Property")){
+            if(!tstr.endsWith("PropertyRemark")){qWarning()<<"propertymap_set"<<tstr;}
+            continue;
+        }
+        //tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
+        tgtilist1<<i;
+    }
+    for(int pi=0;pi<frlist.length();pi++){metaObject()->property(tgtilist0.at(pi)).write(this,QVariant(frlist.at(pi).mid(property2prefix(pi).length())));}
+    for(int pi=0;pi<midlist.length();pi++){metaObject()->property(tgtilist1.at(pi)).write(this,QVariant(midlist.at(pi).mid(property2prefix(pi).length())));}
+    QStringList tstrlist;
+    foreach(QString stri,bklist){
+        if(stri.startsWith(property2prefix(Description))){metaObject()->property(tgtilist0.at(Description)).write(this,QVariant(stri.mid(property2prefix(Description).length())));}
+        if(stri.startsWith(property2prefix(Words))){
+            tstrlist<<stri.mid(property2prefix(Words).length());
+        }
+    }
+    metaObject()->property(tgtilist0.at(Words)).write(this,QVariant(tstrlist.join(",,")));
+}
+/*
 QString mysk::propertystr_get(){
     QStringList strlist;
     strlist<<propertystr_get(true)<<propertystr_get(false);
@@ -72,25 +183,30 @@ void mysk::propertystr_set(QStringList getstrlist, bool front){
     }
     else{
         if(getstrlist.isEmpty()){qWarning()<<"propertystr_setbk";}
+        QStringList wdslist;
         foreach(QString stri,getstrlist){
             if(stri.startsWith(property2prefix(Description))){
                 strmap.insert(property2str(Description),stri.mid(property2prefix(Description).length()));
             }
             if(stri.startsWith(property2prefix(Words))){
-                strmap.insertMulti(property2str(Words),stri.mid(property2prefix(Words).length()));
+                wdslist<<stri.mid(property2prefix(Words).length());
+                //strmap.insertMulti(property2str(Words),stri.mid(property2prefix(Words).length()));
             }
         }
+        strmap.insert(property2str(Words),wdslist.join(",,"));
     }
     propertymap_set(strmap,false);
 }
-bool mysk::propertystr_dvd(QString getstr, QStringList &frlist, QStringList &midlist, QStringList &bklist){
+*/
+bool mysk::propertystr_dvd(QString getstr,QString &getabb,QStringList &frlist, QStringList &midlist, QStringList &bklist){
     QStringList strlist=getstr.split("|");
+    getabb=strlist.takeFirst();
     int i1,i2;
     for(i2=strlist.length()-1;i2>=0;i2--){
         bklist.prepend(strlist.at(i2));
-        if(strlist.at(i2).startsWith(":")){break;}
+        if(strlist.at(i2).startsWith(property2prefix(Description))){break;}
     }
-    for(i1=0;i1<=3;i1++){
+    for(i1=0;i1<Description;i1++){
         frlist<<strlist.at(i1);
     }
     for(int i=i1;i<i2;i++){
@@ -117,24 +233,26 @@ void mysk::setOwner(mygeneral *getp){
     sig_update();
 }
 QStringList mysk::eventstrlist(){
-    QString tstr_type=type2abb(getType())+"bType";
-    return myobj::enumstrlist(metaObject(),tstr_type.toUtf8());
+    return myobj::enumstrlist(metaObject(),enumname_btype(getType()).toUtf8());
 }
+/*
 QString mysk::bstr2abb(QString getstr){
-    QString tstr_type=type2abb(getType())+"bType";
-    QString tstr_abb=type2abb(getType())+"bAbb";
-    if(myobj::enumcontains(metaObject(),tstr_type.toUtf8(),getstr)){
-        return myobj::enumstr(metaObject(),tstr_abb.toUtf8(),myobj::enumint(metaObject(),tstr_type.toUtf8(),getstr));
+    if(myobj::enumcontains(metaObject(),enumname_btype(getType()).toUtf8(),getstr)){
+        return myobj::enumstr(metaObject(),enumname_babb(getType()).toUtf8(),myobj::enumint(metaObject(),enumname_btype(getType()).toUtf8(),getstr));
     }
     else{return QString();}
 }
+*/
 void mysk::iniObj(){
-    foreach(QString stri,eventstrlist()){
-        QString abb=bstr2abb(stri);
+    QList<int> list;
+    QString btype=enumname_btype(getType());
+    myobj::enumintlist(metaObject(),btype.toUtf8(),list);
+    foreach(int geti,list){
+        QString abb=myobj::enumstr(metaObject(),enumname_babb(getType()).toUtf8(),geti);
         if(abb==""){continue;}
         QList<myobj *> tobjlist;
         myobj::newConst(tobjlist,abb,parent(),true);
-        foreach(myobj *ip,tobjlist){ip->blockstr=stri;}
+        foreach(myobj *ip,tobjlist){ip->blockstr=myobj::enumstr(metaObject(),btype.toUtf8(),geti);}
         avlobjlist<<tobjlist;
     }
     myobj::newConst(avlobjlist,"",parent());
@@ -367,8 +485,16 @@ QStringList mytrs::trans(){
 QString mytrs::findRemarkByName_event(QString getname){
     return myevent::findRemarkByName(getname);
 }
+QString mytrs::getSubtypeProperty(){
+    QStringList strlist=subtypestrlist();
+    QString str=subtype2str(subtype);
+    str2first(strlist,str);
+    return strlist.join("|");
+}
+void mytrs::setSubtypeProperty(QString getstr){subtype=str2subtype(getstr);}
+/*
 void mytrs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
-    mysk::propertymap_get(strmap,strlistmap,b4remark);
+    mysk::propertymap_get(strmap,b4remark);
     strmap.insert(property2str(Subtype),subtype2str(subtype));
     strlistmap.insert(property2str(Subtype),subtypestrlist());
 }
@@ -376,6 +502,7 @@ void mytrs::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
     if(strmap.contains(property2str(Subtype))){subtype=str2subtype(strmap.value(property2str(Subtype)));}
     mysk::propertymap_set(strmap,b4remark);
 }
+
 QString mytrs::propertystr_get(){
     QStringList strlist;
     strlist<<mysk::propertystr_get(true);
@@ -393,7 +520,7 @@ void mytrs::propertystr_set(QString getstr){
     mysk::propertystr_set(frlist,true);
     mysk::propertystr_set(bklist,false);
 }
-
+*/
 QStringList myvs::trans(){
     QStringList strlist;
     strlist<<name+"=sgs.CreateViewAsSkill{";
@@ -447,8 +574,28 @@ QString myvs::findRemarkByName_event(QString getname){
     if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse)){return getname;}
     return QString();
 }
+
+QString myvs::getCardsNumProperty(){return QString::number(vsn);}
+void myvs::setCardsNumProperty(QString getstr){
+    bool b;
+    int getn=getstr.toInt(&b);
+    if(b){vsn=getn;}
+}
+QString myvs::getCardViewAsProperty(){
+    QStringList strlist=myobj::getconstlist_tag("ob");
+    str2first(strlist,objname_viewas);
+    return strlist.join("|");
+}
+void myvs::setCardViewAsProperty(QString getstr){objname_viewas=getstr;}
+QString myvs::getCardViewAsPropertyRemark(){
+    QStringList strlist=myobj::getconstrmlist_tag("ob");
+    str2first(strlist,myobj::name2remark(objname_viewas));
+    return strlist.join("|");
+}
+void myvs::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
+/*
 void myvs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
-    mysk::propertymap_get(strmap,strlistmap,b4remark);
+    mysk::propertymap_get(strmap,b4remark);
     strmap.insert(property2str(CardsNum),QString::number(vsn));
     if(b4remark){
         strmap.insert(property2str(CardViewAs),myobj::name2remark(objname_viewas));
@@ -472,6 +619,7 @@ void myvs::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
     }
     mysk::propertymap_set(strmap,b4remark);
 }
+
 QString myvs::propertystr_get(){
     QStringList strlist;
     strlist<<mysk::propertystr_get(true);
@@ -491,7 +639,7 @@ void myvs::propertystr_set(QString getstr){
     mysk::propertystr_set(frlist,true);
     mysk::propertystr_set(bklist,false);
 }
-
+*/
 QStringList mydts::trans(){
     QStringList strlist;
     strlist<<name+"=sgs.CreateDistanceSkill{";
@@ -535,7 +683,58 @@ QStringList myfts::trans(){
     strlist<<"}";
     return strlist;
 }
+QString myfts::getCardViewAsProperty(){
+    QStringList strlist=myobj::getconstlist_tag("ob");
+    str2first(strlist,objname_viewas);
+    return strlist.join("|");
+}
+void myfts::setCardViewAsProperty(QString getstr){objname_viewas=getstr;}
+QString myfts::getCardViewAsPropertyRemark(){
+    QStringList strlist=myobj::getconstrmlist_tag("ob");
+    str2first(strlist,myobj::name2remark(objname_viewas));
+    return strlist.join("|");
+}
+void myfts::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
 
+/*
+void myfts::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
+    mysk::propertymap_get(strmap,b4remark);
+    if(b4remark){
+        strmap.insert(property2str(CardViewAs),myobj::name2remark(objname_viewas));
+        strlistmap.insert(property2str(CardViewAs),myobj::getconstrmlist_tag("ob"));
+    }
+    else{
+        strmap.insert(property2str(CardViewAs),objname_viewas);
+        strlistmap.insert(property2str(CardViewAs),myobj::getconstlist_tag("ob"));
+    }
+}
+void myfts::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
+    if(strmap.contains(property2str(CardViewAs))){
+        QString getstr=strmap.value(property2str(CardViewAs));
+        if(b4remark){objname_viewas=myobj::remark2name(getstr);}
+        else{objname_viewas=getstr;}
+    }
+    mysk::propertymap_set(strmap,b4remark);
+}
+
+QString myfts::propertystr_get(){
+    QStringList strlist;
+    strlist<<mysk::propertystr_get(true);
+    strlist<<objname_viewas;
+    strlist<<mysk::propertystr_get(false);
+    return strlist.join("|");
+}
+void myfts::propertystr_set(QString getstr){
+    QStringList frlist,bklist,midlist;
+    if(!propertystr_dvd(getstr,frlist,midlist,bklist)){qWarning()<<"propertystr_set:0"<<getstr;return;}
+    if(midlist.length()!=1){qWarning()<<"propertystr_set:1"<<getstr;return;}
+    QMap<QString,QString> strmap;
+    strmap.insert(property2str(CardViewAs),midlist.at(0));
+    propertymap_set(strmap,false);
+    mysk::propertystr_set(frlist,true);
+    mysk::propertystr_set(bklist,false);
+}
+*/
 /*
 void mytrs::addFunction(QString geteventstr,QString getblockstr,
                    QString getfunstr ,QList<myobj *> &getobjlist,

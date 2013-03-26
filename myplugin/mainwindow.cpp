@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //QObject::connect(p_tablewidget_g,SIGNAL(cellChanged(int,int)),this,SLOT(cellchanged_g(int,int)));
 
     p_tabwidget1=new QTabWidget(ui->centralWidget);
-    p_tabwidget1->setTabPosition(QTabWidget::West);
+    //p_tabwidget1->setTabPosition(QTabWidget::West);
     p_tabwidget1->addTab(p_tablewidget_g,mygeneral::tabstr());
     //p_tabwidget1->addTab(p_tablewidget_trs,mysk::type2str(mysk::TriggerSkill));
     //p_tabwidget1->addTab(p_tablewidget_vs,mysk::type2str(mysk::ViewAsSkill));
@@ -290,7 +290,7 @@ void MainWindow::itemchanged_g(QTableWidgetItem *getp){
     if(!psys->pg0){return;}
     qWarning()<<"itemchanged_g:"<<getp->row()<<getp->column()<<getp->text();
     QString gettext=getp->text();
-    b4rfr=false;getp->setText("");b4rfr=true;
+    if(getp->column()>0){b4rfr=false;getp->setText("");b4rfr=true;}
     QMap<QString,QString> strmap;
     strmap.insert(getp->tableWidget()->horizontalHeaderItem(getp->column())->text(),gettext);
     psys->pg0->propertymap_set(strmap,true);
@@ -308,6 +308,7 @@ void MainWindow::itemchanged_sk(QTableWidgetItem *getp){
     qWarning()<<"itemchanged_sk:"<<getp->row()<<getp->column()<<getp->text();
     QString hstr=getp->tableWidget()->horizontalHeaderItem(getp->column())->text();
     QMap<QString,QString> strmap;
+    QStringList strlist;
     int ii;
     for(ii=getp->column();ii>=0;ii--){
         QString hhstr=getp->tableWidget()->horizontalHeaderItem(ii)->text();
@@ -315,10 +316,11 @@ void MainWindow::itemchanged_sk(QTableWidgetItem *getp){
         QTableWidgetItem *getpp=getp->tableWidget()->item(getp->row(),ii);
         if(getpp){
             QString gettext=getpp->text();
-            b4rfr=false;getpp->setText("");b4rfr=true;
-            if(gettext!=""){strmap.insertMulti(hhstr,gettext);}
+            if(getpp->column()>0){b4rfr=false;getpp->setText("");b4rfr=true;}
+            if(gettext!=""){strlist<<gettext;}
         }
     }
+    strmap.insert(hstr,strlist.join(",,"));
     psys->psk0->propertymap_set(strmap,true);
     /*
     if(mytrs::str2property(hstr)==mytrs::Name){psys->psk0->name=getp->text();}
@@ -393,14 +395,12 @@ void MainWindow::myrfr(){
     p_lineedit_packagename->setText(psys->packagename);
     p_lineedit_packagetrans->setText(psys->package_trans);
     QMap<QString,QString> strmap;
-    QMap<QString,QStringList> strlistmap;
     myrfr_tablewidget_removerow(str2tw_tab(mygeneral::tabstr()),psys->getgstrlist());
     foreach(mygeneral *ip,psys->glist){
         strmap.clear();
-        strlistmap.clear();
-        ip->propertymap_get(strmap,strlistmap,true);
+        ip->propertymap_get(strmap,true);
         int getrow=myrfr_tablewidget_getrow(str2tw_tab(mygeneral::tabstr()),ip->name);
-        myrfr_tablewidget_property(str2tw_tab(mygeneral::tabstr()),getrow,strmap,strlistmap);
+        myrfr_tablewidget_property(str2tw_tab(mygeneral::tabstr()),getrow,strmap);
         //myrfr_g(ip,myrfr_tablewidget_getrow(p_tablewidget_g,ip->name));
     }
     str2tw_tab(mygeneral::tabstr())->resizeColumnsToContents();
@@ -412,10 +412,9 @@ void MainWindow::myrfr(){
         psys->getsklist(sklist,gettype);
         foreach(mysk *ip,sklist){
             strmap.clear();
-            strlistmap.clear();
-            ip->propertymap_get(strmap,strlistmap,true);
+            ip->propertymap_get(strmap,true);
             int getrow=myrfr_tablewidget_getrow(str2tw_tab(mysk::type2str(gettype)),ip->name);
-            myrfr_tablewidget_property(str2tw_tab(mysk::type2str(gettype)),getrow,strmap,strlistmap);
+            myrfr_tablewidget_property(str2tw_tab(mysk::type2str(gettype)),getrow,strmap);
         }
         str2tw_tab(mysk::type2str(gettype))->resizeColumnsToContents();
     }
@@ -490,17 +489,15 @@ void MainWindow::myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow, int getcol,
         QObject::connect(pt,SIGNAL(currentIndexChanged(QString)),this,SLOT(itemchanged_cbb()));
     }
 }
-void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap){
+void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<QString, QString> &strmap){
     for(int i=0;i<ptw->columnCount();i++){
         if(i>=strmap.values().length()){return;}
         QString hstr=ptw->horizontalHeaderItem(i)->text();
         if(strmap.contains(hstr)){
-            if(strlistmap.contains(hstr)){
-                myrfr_tablewidget_cbb(ptw,getrow,i,strmap.value(hstr),strlistmap.value(hstr));
-                continue;
-            }
             if(strmap.count(hstr)==1){
-                myrfr_tablewidget_str(ptw,getrow,i,strmap.value(hstr));
+                QString getstr=strmap.value(hstr);
+                if(getstr.contains("|")){myrfr_tablewidget_cbb(ptw,getrow,i,getstr.split("|").first(),getstr.split("|"));}
+                else{myrfr_tablewidget_str(ptw,getrow,i,getstr);}
                 continue;
             }
             int ii;

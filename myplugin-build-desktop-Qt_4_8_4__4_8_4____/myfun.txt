@@ -33,7 +33,7 @@
 >ifTrue|mybool||if %1 then;%block;else;%block;end|如果参数1为真，则执行代码段1，否则执行代码段2|block
 >ifEqualNum|mynum,mynum||if %1==%2 then;%block;else;%block;end|如果数1与数2相等，则执行代码段1，否则执行代码段2|block
 >eachPlayer|myplayerlist~|myplayer~|local eachPlayer%%=sgs.PlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
->eachSPlayer|mysplayerlist~|mysplayer~|local eachPlayer%%=sgs.SPlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
+>eachSPlayer|mysplayerlist~|mysplayer~|local eachPlayer%%=sgs.SPlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl,room$
 >eachNum|mynumlist~|mynum~|local eachNum%%=sgs.IntList();for _,eachNum%%_i in sgs.qlist(%1) do eachNum%%:append(eachNum%%_i) end;for _,%2 in sgs.qlist(eachNum%%) do;%block;end|对数字列表（参数1）中每一个数字（返回值1）执行代码段1的操作|block,list
 //>eachCard|mycardlist|mycard|local eachCard%%=sgs.CardList();for _,eachCard%%_i in sgs.qlist(%1) do eachCard%%:append(eachCard%%_i) end;for _,%2 in sgs.qlist(eachCard%%) do;%block;end|对牌列表（参数1）中每一张牌（返回值1）执行代码段1的操作|block,list,cd
 >repeatx|mynum~|mynum~|for %2=1,%1,1 do;%block;end|重复X（参数1）次执行代码段1的操作，计数值（返回值1）从1递增至X|block,list
@@ -67,10 +67,10 @@
 >getCardPlace|mycard~|mynum~|<1:>%2=room:getCardPlace(%1:getEffectiveId())|牌（参数1）的位置（返回值1）|cd,room$
 
 //action
->drawCards|mysplayer~,mynum~||<1:>%1:drawCards(%2)|角色（参数1）摸X（参数2）张牌|pl
->obtainCard|mysplayer~,mycard~,mybool||<1:><2:>%1:obtainCard(%2,%3)|角色（参数1）获得一张牌（参数2），是否明牌（参数3）|pl,cd
+>drawCards|mysplayer~,mynum~||<1:>%1:drawCards(%2)|角色（参数1）摸X（参数2）张牌|pl.room$
+>obtainCard|mysplayer~,mycard~,mybool||<1:><2:>%1:obtainCard(%2,%3)|角色（参数1）获得一张牌（参数2），是否明牌（参数3）|pl,cd,room$
 >throwCard|mycard~,mysplayer||<1:>room:throwCard(%1,%2)|弃置角色（参数2）的一张牌（参数1）|pl,cd,room$
->turnOver|mysplayer~||<1:>%1:turnOver()|角色（参数1）翻面|pl
+>turnOver|mysplayer~||<1:>%1:turnOver()|角色（参数1）翻面|pl,room$
 >loseHp|mysplayer~,mynum~||<1:>room:loseHp(%1,%2)|角色（参数1）失去X（参数2）点体力|pl,room$
 >loseMaxHp|mysplayer~,mynum~||<1:>room:loseMaxHp(%1,%2)|角色（参数1）失去X（参数2）点体力上限|pl,room$
 >detachSkillFromPlayer|mysplayer~,mystr~||<1:>room:detachSkillFromPlayer(%1,%2)|角色（参数1）失去技能，技能名（参数2）|pl,sk,room$
@@ -99,7 +99,7 @@
 >flagOn|mysplayer~|mystrc$~|<1:>room:setPlayerFlag(%1,%2)|为角色（参数1）添加flag（返回值1）直至回合结束|pl,data,room$
 >flagOff|mysplayer~,mystr~||<1:>room:setPlayerFlag(%1,"-"..%2)|为角色（参数1）除去flag（参数2）|pl,data,room$
 >hasFlag|myplayer~,mystr~|mybool~|<1:>%3=%1:hasFlag(%2)|角色（参数1）是否（返回值1）具有flag（参数2）|pl,data
->wakeMark|mysplayer~||<1:>if %1:getMark("@waked")==0 then %1:gainMark("@waked") end|令角色（参数1）获得觉醒标记|pl,data
+>wakeMark|mysplayer~||<1:>if %1:getMark("@waked")==0 then %1:gainMark("@waked") end|令角色（参数1）获得觉醒标记|pl,data,room$
 >markOn|mysplayer~,mynum~,mybool~|mystrc$~|<1:>local mark%%="";if %3 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%4,%2)|角色（参数1）标记（返回值1）初始化为X（参数2），标记是否可见（参数3）|pl,data,room$
 >getMark|myplayer~,mystr~,mybool~|mynum~|<1:>local mark%%="";if %3 then mark%%="@" end;%4=%1:getMark(mark%%..%2)|角色（参数1）当前标记（参数2）数（返回值1），标记是否可见（参数3）|pl,data
 >setMark|mysplayer~,mystr~,mynum~,mybool~||<1:>local mark%%="";if %4 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%2,%3)|设置角色（参数1）标记（参数2）数为X（参数3），标记是否可见（参数4）|pl,data,room$
@@ -115,11 +115,11 @@
 
 //list
 >listlength|mylist~|mynum~|%2=%1:length()|列表（参数1）长度（返回值1）|list
->splayerlistappend|mysplayerlist~,mysplayer~||<2:>%1:append(%2)|角色列表（参数1）末尾添加角色（参数2）|pl,list
+>splayerlistappend|mysplayerlist~,mysplayer~||<2:>%1:append(%2)|角色列表（参数1）末尾添加角色（参数2）|pl,list,room$
 >numlistcontains|mynumlist~,mynum~|mybool~|%3=%1:contains(%2)|数字列表（参数1）是否（返回值1）包含数字（参数2）|list
 >getOtherPlayers|mysplayer~|mysplayerlist~|<1:>%2=room:getOtherPlayers(%1)|除角色（参数1）外，其余角色列表（返回值1）|pl,list,room$
 >getAlivePlayers||mysplayerlist~|%1=room:getAlivePlayers()|存活角色列表（返回值1）|pl,list,room$
->splayerlist0||mysplayerlist~|%1=sgs.SPlayerList()|空角色列表（返回值1）|pl,list
+>splayerlist0||mysplayerlist~|%1=sgs.SPlayerList()|空角色列表（返回值1）|pl,list,room$
 >numlist0||mynumlist~|%1=sgs.IntList()|空数字列表（返回值1）|list
 //>numlistx|mynum|mynumlist|%2=sgs.IntList();for var%%=1,%1,1 do %2:append(var%%) end|数字1至X（参数1）列表（返回值1）|
 
@@ -128,4 +128,4 @@
 >patternMatch|mystr~|mybool~|%2=string.find(pattern,%1)|模式是否（返回值1）包含对象名（参数1），比如【南蛮入侵】模式包含【杀】对象名slash|pattern$
 
 //debug
->playerSpeak|mysplayer~||<1:>%1:speak(self:objectName()..","..%1:objectName()..","..%1:getSeat())|令角色（参数1）说出技能名角色名和座位，可用于调试程序是否执行|pl,debug
+>playerSpeak|mysplayer~||<1:>%1:speak(self:objectName()..","..%1:objectName()..","..%1:getSeat())|令角色（参数1）说出技能名角色名和座位，可用于调试程序是否执行|pl,debug,room$

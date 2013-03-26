@@ -69,7 +69,7 @@ public:
     void myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow,int getcol,QString getstr,QStringList list4new);
     void myrfr_tablewidget_removerow(QTableWidget *ptw,QStringList getstrlist);
     int myrfr_tablewidget_getrow(QTableWidget *ptw,QString getstr);
-    void myrfr_tablewidget_property(QTableWidget *ptw,int getrow,QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap);
+    void myrfr_tablewidget_property(QTableWidget *ptw,int getrow,QMap<QString,QString> &strmap);
     void mytext();
     void myexport_design(QString);
     void itemsel_sk(QTableWidget *ptw);

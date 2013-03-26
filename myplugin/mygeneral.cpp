@@ -15,14 +15,19 @@ void mygeneral::setName(QString getname){
     }
     name=getname;
 }
-void mygeneral::propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap,bool b4remark){
+void mygeneral::propertymap_get(QMap<QString,QString> &strmap,bool b4remark){
     if(b4remark){}
     strmap.insert(property2str(Name),name);
     strmap.insert(property2str(Translation),translation);
-    strmap.insert(property2str(Kingdom),kingdom2str(kingdom));
-    strlistmap.insert(property2str(Kingdom),kingdomstrlist());
-    strmap.insert(property2str(Sex),sex2str(sex));
-    strlistmap.insert(property2str(Sex),sexstrlist());
+    QStringList strlist;
+    strlist=kingdomstrlist();
+    strlist.removeOne(kingdom2str(kingdom));
+    strlist.prepend(kingdom2str(kingdom));
+    strmap.insert(property2str(Kingdom),strlist.join("|"));
+    strlist=sexstrlist();
+    strlist.removeOne(sex2str(sex));
+    strlist.prepend(sex2str(sex));
+    strmap.insert(property2str(Sex),strlist.join("|"));
     strmap.insert(property2str(HP),QString::number(hp));
     strmap.insert(property2str(Title),title);
     strmap.insert(property2str(Word),word);
