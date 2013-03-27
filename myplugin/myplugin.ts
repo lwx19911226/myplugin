@@ -24,52 +24,57 @@
         <translation>扩展包名翻译（CN）：</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="71"/>
+        <location filename="mainwindow.cpp" line="73"/>
         <source>Current Skill:</source>
         <translation>当前技能：</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="74"/>
+        <location filename="mainwindow.cpp" line="76"/>
         <source>New</source>
         <translation>新建武将或技能</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="77"/>
+        <location filename="mainwindow.cpp" line="79"/>
         <source>Delete</source>
         <translation>删除武将或技能</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="80"/>
+        <location filename="mainwindow.cpp" line="82"/>
         <source>Skill_Add</source>
         <translation>添加行为</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="83"/>
+        <location filename="mainwindow.cpp" line="85"/>
         <source>Skill_Undo</source>
         <translation>撤销行为</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="87"/>
+        <location filename="mainwindow.cpp" line="89"/>
         <source>Skill_Redo</source>
         <translation>恢复行为</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="91"/>
+        <location filename="mainwindow.cpp" line="93"/>
+        <source>Pattern Generator</source>
+        <translation>模式生成小助手</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="96"/>
         <source>Import</source>
         <translation>导入设计文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="94"/>
+        <location filename="mainwindow.cpp" line="99"/>
         <source>Export</source>
         <translation>导出LUA及设计文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="114"/>
+        <location filename="mainwindow.cpp" line="120"/>
         <source>Full</source>
         <translation>完整显示</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="115"/>
+        <location filename="mainwindow.cpp" line="121"/>
         <source>Current Skill</source>
         <translation>当前技能部分</translation>
     </message>
@@ -98,40 +103,35 @@
         <location filename="myinputwidget.cpp" line="64"/>
         <source>Skill_Add</source>
         <translation>添加行为</translation>
-    </message>
+    </message>    
     <message>
-        <location filename="myinputwidget.cpp" line="66"/>
-        <source>Pattern Generator</source>
-        <translation>模式生成小助手</translation>
-    </message>
-    <message>
-        <location filename="myinputwidget.cpp" line="165"/>
+        <location filename="myinputwidget.cpp" line="162"/>
         <source>Remarks :</source>
         <translation>标注：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="181"/>
+        <location filename="myinputwidget.cpp" line="178"/>
         <source>Remarks for return values : </source>
         <translation>请输入标注（返回值）：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="192"/>
+        <location filename="myinputwidget.cpp" line="189"/>
         <source>Remarks for blocks : </source>
         <translation>请输入标注（代码段）：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="212"/>
-        <location filename="myinputwidget.cpp" line="223"/>
+        <location filename="myinputwidget.cpp" line="209"/>
+        <location filename="myinputwidget.cpp" line="220"/>
         <source>ALL</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="224"/>
+        <location filename="myinputwidget.cpp" line="221"/>
         <source>Const</source>
         <translation>常量</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="225"/>
+        <location filename="myinputwidget.cpp" line="222"/>
         <source>Variable</source>
         <translation>变量</translation>
     </message>
@@ -153,6 +153,18 @@
     <message>
         <source>FilterSkill</source>
         <translation>锁定视为技</translation>
+    </message>
+	<message>
+        <source>ProhibitSkill</source>
+        <translation>禁止技</translation>
+    </message>
+	<message>
+        <source>MaxCardsSkill</source>
+        <translation>额外手牌上限技</translation>
+    </message>
+	<message>
+        <source>TargetModSkill</source>
+        <translation>目标技</translation>
     </message>
     <message>
         <source>Name</source>
@@ -205,6 +217,19 @@
     <message>
         <source>CardViewAs</source>
         <translation>视为牌</translation>
+    </message>
+	<message>
+        <source>Pattern</source>
+        <translation>模式</translation>
+    </message>
+</context>
+<context>
+    <name>myvs</name>
+    <message>
+        <location filename="mysk.cpp" line="624"/>
+        <location filename="mysk.cpp" line="630"/>
+        <source>SkillCard</source>
+        <translation>技能牌</translation>
     </message>
 </context>
 </TS>

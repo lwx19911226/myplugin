@@ -31,6 +31,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include "mysys.h"
+#include "myptgwidget.h"
 //#include "myinputwidget.h"
 
 namespace Ui {
@@ -85,6 +86,7 @@ private slots:
     void myadd();
     void myundo();
     void myredo();
+    void myptg();
     void mynew();
     void mydel();
     void myrfr();

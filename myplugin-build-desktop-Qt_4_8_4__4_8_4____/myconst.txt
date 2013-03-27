@@ -23,17 +23,43 @@
 
 >selfplayer|mysplayer|此技能拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:trs
 >player|mysplayer|此时机触发者|bl:trs
+>defaultReturn|mybool|触发技默认返回值|tr:local %1=false,,bl:trs
 >sgs.Self|myplayer|视为技拥有者|bl:vs_vf
->sgs.Self|myplayer|视为技拥有者|bl:vs_ep
->sgs.Self|myplayer|视为技拥有者|bl:vs_er
 >to_select|mycard|视为技将选的一张牌|bl:vs_vf
 >#selected|mynum|视为技已选牌数|bl:vs_vf
+>defaultReturn|mybool|视为技判断选牌默认返回值|tr:local %1=false,,bl:vs_vf
+>sgs.Self|myplayer|视为技拥有者|bl:vs_ep
+>defaultReturn|mybool|视为技判断出牌阶段是否允许使用默认返回值|tr:local %1=false,,bl:vs_ep
+>sgs.Self|myplayer|视为技拥有者|bl:vs_er
+>defaultReturn|mybool|视为技判断响应时是否允许使用默认返回值|tr:local %1=false,,bl:vs_er
+>selfcard|mycard|视为技技能牌|tr:local selfcard=self,,bl:vs_pf
+>to_select|myplayer|视为技将选的一名角色|bl:vs_pf
+>#targets|mynum|视为技已选角色数|bl:vs_pf
+>sgs.Self|myplayer|视为技拥有者|bl:vs_pf
+>defaultReturn|mybool|视为技判断选角色默认返回值|tr:local %1=false,,bl:vs_pf
+>selfcard|mycard|视为技技能牌|tr:local selfcard=self,,bl:vs_scu
+>selfplayer|mysplayer|视为技拥有者|tr:local selfplayer=source,,bl:vs_scu
+>#targets|mynum|视为技已选角色数|bl:vs_scu
 >from|myplayer|距离技距离计算起始角色|bl:dts_cf
 >players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:dts_cf
 >to|myplayer|距离技距离计算终止角色|bl:dts_cf
+>defaultReturn|mynum|距离技默认返回值|tr:local %1=0,,bl:dts_cf
 >to_select|mycard|锁定视为技所判断的牌|bl:fts_vf
 >place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf
 >selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:fts_vf
+>defaultReturn|mybool|锁定视为技默认返回值|tr:local %1=false,,bl:fts_vf
+>from|myplayer||bl:prs_ip
+>to|myplayer||bl:prs_ip
+>card|mycard||bl:prs_ip
+>defaultReturn|mybool|禁止技默认返回值|tr:local %1=false,,bl:prs_ip
+>target|myplayer|额外手牌上限技目标|bl:mcs_ef
+>defaultReturn|mynum|额外手牌上限技默认返回值|tr:local %1=0,,bl:mcs_ef
+>from|myplayer|目标技额外目标使用者|bl:tms_et
+>defaultReturn|mynum|目标技额外目标默认返回值|tr:local %1=0,,bl:tms_et
+>from|myplayer|目标技额外使用次数使用者|bl:tms_r
+>defaultReturn|mynum|目标技额外使用次数默认返回值|tr:local %1=0,,bl:tms_r
+>from|myplayer|目标技额外使用距离使用者|bl:tms_dl
+>defaultReturn|mynum|目标技额外使用距离默认返回值|tr:local %1=0,,bl:tms_dl
 >true|mybool|TRUE|
 >false|mybool|FALSE|
 >nil|all|不存在|
@@ -87,9 +113,9 @@
 >peach|mystrc|模式（任意一张桃），也表示对象名【桃】|pt,,ob
 >peach+analeptic|mystrc|任意一张桃或酒|pt
 >nullification|mystrc|模式（任意一张无懈），也表示对象名【无懈可击】|pt,,ob
-//classname
->BasicCard|mystrc|类名【基本牌】|cl
->TrickCard|mystrc|类名【锦囊牌】|cl
->EquipCard|mystrc|类名【装备牌】|cl
->Slash|mystrc|类名【杀】|cl
->Duel|mystrc|类名【决斗】|cl
+
+>BasicCard|mystrc|模式（任意一张基本牌），也表示类名【基本牌】|cl,,pt
+>TrickCard|mystrc|模式（任意一张锦囊牌），也表示类名【锦囊牌】|cl,,pt
+>EquipCard|mystrc|模式（任意一张装备牌），也表示类名【装备牌】|cl,,pt
+>Slash|mystrc|模式（任意一张杀），也表示类名【杀】|cl,,pt
+>Duel|mystrc|模式（任意一张决斗），也表示类名【决斗】|cl,,pt

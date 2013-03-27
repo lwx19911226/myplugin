@@ -25,9 +25,9 @@
 
 
 //
->onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(self:objectName()) then return false end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
->onlyExist|myplayer+mycard||if not %1 then return false end|仅当角色或牌（参数1）存在时才发动|rt
->ifActivation|mysplayer~||<1:>if not room:askForSkillInvoke(%1,self:objectName(),data) then return false end|仅当角色（参数1）选择发动才发动|rt,ask,room$
+>onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(self:objectName()) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
+>onlyExist|myplayer+mycard||if not %1 then return defaultReturn end|仅当角色或牌（参数1）存在时才发动|rt
+>ifActivation|mysplayer~||<1:>if not room:askForSkillInvoke(%1,self:objectName(),data) then return defaultReturn end|仅当角色（参数1）选择发动才发动|rt,ask,room$
 
 //block
 >ifTrue|mybool||if %1 then;%block;else;%block;end|如果参数1为真，则执行代码段1，否则执行代码段2|block
@@ -40,8 +40,10 @@
 
 //
 //>exist|myplayer+mycard|mybool|%2=(%1~=nil)|判断角色或牌（参数1）是否存在（返回值1）
->ifReturn|mybool,mybool||if %1 then return %2 end|如果参数1为真，停止技能结算，如果参数2为真，表示无效（比如使用无效、伤害无效等）|rt
->ifnotReturn|mybool,mybool||if not %1 then return %2 end|如果参数1为假，停止技能结算，如果参数2为真，表示无效（比如使用无效、伤害无效等）|rt
+>ifReturn|mybool,mybool||if %1 then return %2 end|如果参数1为真，停止技能结算，如果参数2为真，表示无效（比如使用无效、伤害无效等）|rt,rtb$
+>ifnotReturn|mybool,mybool||if not %1 then return %2 end|如果参数1为假，停止技能结算，如果参数2为真，表示无效（比如使用无效、伤害无效等）|rt,rtb$
+>ifReturnNum|mybool,mynum||if %1 then return %2 end|如果参数1为真，停止技能结算，参数2为结算结果|rt,rtn$
+>ifnotReturnNum|mybool,mynum||if not %1 then return %2 end|如果参数1为假，停止技能结算，参数2为结算结果|rt,rtn$
 
 //player property
 >getHp|myplayer~|mynum~|<1:>%2=%1:getHp()|角色（参数1）当前体力值（返回值1）|pl

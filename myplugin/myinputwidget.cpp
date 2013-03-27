@@ -63,11 +63,11 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
 
     QPushButton *p_pushbutton_add=new QPushButton(tr("Skill_Add"),this);
     QObject::connect(p_pushbutton_add,SIGNAL(clicked()),this,SLOT(myadd()));
-    QPushButton *p_pushbutton_ptg=new QPushButton(tr("Pattern Generator"),this);
-    QObject::connect(p_pushbutton_ptg,SIGNAL(clicked()),this,SLOT(myptg()));
+    //QPushButton *p_pushbutton_ptg=new QPushButton(tr("Pattern Generator"),this);
+    //QObject::connect(p_pushbutton_ptg,SIGNAL(clicked()),this,SLOT(myptg()));
     QHBoxLayout *p_hboxlayout2=new QHBoxLayout;
     p_hboxlayout2->addWidget(p_pushbutton_add);
-    p_hboxlayout2->addWidget(p_pushbutton_ptg);
+    //p_hboxlayout2->addWidget(p_pushbutton_ptg);
 
     p_vboxlayout2->addLayout(p_hboxlayout2);
     setLayout(p_vboxlayout2);
@@ -124,10 +124,7 @@ void myinputwidget::myadd(){
     pmain->myexport_design("tmp4design.txt");
     close();
 }
-void myinputwidget::myptg(){
-    myptgwidget *p_ptgwidget=new myptgwidget;
-    p_ptgwidget->show();
-}
+
 QString myinputwidget::getRemark(myinputitem *pi){
     int i=pi->type;
     if(i==myinputitem::func_Event){

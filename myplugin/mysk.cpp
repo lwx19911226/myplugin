@@ -5,6 +5,8 @@ void str2first(QStringList &strlist,QString str){
     strlist.removeOne(str);
     strlist.prepend(str);
 }
+
+
 QString mysk::getOwnerProperty(){
     QStringList strlist=getsys()->getgstrlist();
     strlist.prepend(mygeneral::nullname());
@@ -92,7 +94,9 @@ QString mysk::propertystr_get(){
         tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
         int getproperty=str2property(tstr);
         QString vstr=metaObject()->property(i).read(this).toString();
-        if(vstr.contains("|")){vstr=vstr.split("|").first();}
+        QString vtstr=vstr;
+        vtstr.replace("\\|","\\\\");
+        if(vtstr.contains("|")){vstr=vtstr.split("|").first().replace("\\\\","\\|");}
         QStringList tstrlist=mycode::mymdf(vstr.split(",,"),property2prefix(getproperty));
         if(getproperty<Description){strlist<<tstrlist;}
         else{strlist_bk<<tstrlist;}
@@ -106,7 +110,9 @@ QString mysk::propertystr_get(){
         tstr=property2str(str2property(tstr.mid(0,tstr.length()-8)));
         int getproperty=str2property(tstr);
         QString vstr=metaObject()->property(i).read(this).toString();
-        if(vstr.contains("|")){vstr=vstr.split("|").first();}
+        QString vtstr=vstr;
+        vtstr.replace("\\|","\\\\");
+        if(vtstr.contains("|")){vstr=vtstr.split("|").first().replace("\\\\","\\|");}
         strlist<<mycode::mymdf(vstr.split(",,"),property2prefix(getproperty));
     }
     strlist<<strlist_bk;
@@ -199,7 +205,7 @@ void mysk::propertystr_set(QStringList getstrlist, bool front){
 }
 */
 bool mysk::propertystr_dvd(QString getstr,QString &getabb,QStringList &frlist, QStringList &midlist, QStringList &bklist){
-    QStringList strlist=getstr.split("|");
+    QStringList strlist=mycode::mysplit(getstr,true);
     getabb=strlist.takeFirst();
     int i1,i2;
     for(i2=strlist.length()-1;i2>=0;i2--){
@@ -394,10 +400,11 @@ QStringList mysk::trans4design(){
 */
 void mysk::dotrans(QString getstr){
     qWarning()<<"dotrans"<<name<<getstr;
-    QString tstr=getstr;
-    tstr.replace("\\|","\\\\");
-    QStringList strlist=tstr.split("|");
-    strlist.replaceInStrings("\\\\","|");
+    //QString tstr=getstr;
+    //tstr.replace("\\|","\\\\");
+    //QStringList strlist=tstr.split("|");
+    //strlist.replaceInStrings("\\\\","|");
+    QStringList strlist=mycode::mysplit(getstr);
     QString geteventstr=strlist.first();
     QString getblockstr;
     if(eventstrlist().contains(strlist.at(1))){getblockstr=strlist.at(1);}
@@ -523,10 +530,36 @@ void mytrs::propertystr_set(QString getstr){
 */
 QStringList myvs::trans(){
     QStringList strlist;
+    myblock *pt;
+    QString bname;
+    if(objname_viewas=="SkillCard"){
+        strlist<<name+"_card=sgs.CreateSkillCard{";
+        strlist<<QString("name=\"%1\",").arg(name);
+        strlist<<"target_fixed=false,";
+        strlist<<"will_throw=false,";
+        bname=myobj::enumstr(metaObject(),"vsbType",PlayerFilter);
+        pt=findBlockByName(bname);
+        if(pt&&!pt->blocklist.isEmpty()){
+            strlist<<"filter=function(self,targets,to_select)";
+            strlist<<mycode::myindent(trans4avlobjlist(bname));
+            strlist<<pt->trans();
+            strlist<<"end,";
+        }
+        else{}
+        bname=myobj::enumstr(metaObject(),"vsbType",SkillCardUse);
+        pt=findBlockByName(bname);
+        if(pt&&!pt->blocklist.isEmpty()){
+            strlist<<"on_use=function(self,room,source,targets)";
+            strlist<<mycode::myindent(trans4avlobjlist(bname));
+            strlist<<pt->trans();
+            strlist<<"end,";
+        }
+        else{}
+        strlist<<"}";
+    }
     strlist<<name+"=sgs.CreateViewAsSkill{";
     strlist<<QString("name=\"%1\",").arg(name);
-    strlist<<QString("n=%1,").arg(vsn);
-    myblock *pt;
+    strlist<<QString("n=%1,").arg(vsn);    
     pt=findBlockByName(myobj::enumstr(metaObject(),"vsbType",ViewFilter));
     if(pt&&!pt->blocklist.isEmpty()){
         strlist<<"view_filter=function(self,selected,to_select)";
@@ -536,7 +569,10 @@ QStringList myvs::trans(){
     }
     strlist<<"view_as=function(self,cards)";
     if(vsn<10){strlist<<"if #cards~="+QString::number(vsn)+" then return nil end";}
-    strlist<<QString("local a_card=sgs.Sanguosha:cloneCard(\"%1\",sgs.Card_SuitToBeDecided,0)").arg(objname_viewas);
+    QString tstr;
+    if(objname_viewas=="SkillCard"){tstr=QString("local a_card=%1_card:clone()").arg(name);}
+    else{tstr=QString("local a_card=sgs.Sanguosha:cloneCard(\"%1\",sgs.Card_SuitToBeDecided,0)").arg(objname_viewas);}
+    strlist<<tstr;
     strlist<<"for var=1,#cards,1 do a_card:addSubcard(cards[var]) end";
     strlist<<"a_card:setSkillName(self:objectName())";
     strlist<<"return a_card";
@@ -568,13 +604,6 @@ myblock *myvs::iniBlock(QString getstr){
     return mysk::iniBlock(getstr);
 }
 
-QString myvs::findRemarkByName_event(QString getname){
-    if(getname==myobj::enumstr(metaObject(),"vsbType",ViewFilter)){return getname;}
-    if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtPlay)){return getname;}
-    if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse)){return getname;}
-    return QString();
-}
-
 QString myvs::getCardsNumProperty(){return QString::number(vsn);}
 void myvs::setCardsNumProperty(QString getstr){
     bool b;
@@ -583,16 +612,24 @@ void myvs::setCardsNumProperty(QString getstr){
 }
 QString myvs::getCardViewAsProperty(){
     QStringList strlist=myobj::getconstlist_tag("ob");
+    strlist.prepend("SkillCard");
     str2first(strlist,objname_viewas);
     return strlist.join("|");
 }
 void myvs::setCardViewAsProperty(QString getstr){objname_viewas=getstr;}
 QString myvs::getCardViewAsPropertyRemark(){
     QStringList strlist=myobj::getconstrmlist_tag("ob");
-    str2first(strlist,myobj::name2remark(objname_viewas));
+    strlist.prepend(tr("SkillCard"));
+    QString tstr;
+    if(objname_viewas=="SkillCard"){tstr=tr("SkillCard");}
+    else{tstr=myobj::name2remark(objname_viewas);}
+    str2first(strlist,tstr);
     return strlist.join("|");
 }
-void myvs::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
+void myvs::setCardViewAsPropertyRemark(QString getstr){
+    if(getstr==tr("SkillCard")){objname_viewas="SkillCard";}
+    else{objname_viewas=myobj::remark2name(getstr);}
+}
 /*
 void myvs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
     mysk::propertymap_get(strmap,b4remark);
@@ -695,6 +732,104 @@ QString myfts::getCardViewAsPropertyRemark(){
     return strlist.join("|");
 }
 void myfts::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
+
+QStringList myprs::trans(){
+    QStringList strlist;
+    strlist<<name+"=sgs.CreateProhibitSkill{";
+    strlist<<QString("name=\"%1\",").arg(name);
+    strlist<<"is_prohibited=function(self,from,to,card)";
+    QString bname=myobj::enumstr(metaObject(),"prsbType",IsProhibited);
+    myblock *pt=findBlockByName(bname);
+    if(pt&&!pt->blocklist.isEmpty()){
+        strlist<<mycode::myindent(trans4avlobjlist(bname));
+        strlist<<pt->trans();
+    }
+    else{strlist<<"return false";}
+    strlist<<"end,";
+    strlist<<"}";
+    return strlist;
+}
+
+QStringList mymcs::trans(){
+    QStringList strlist;
+    strlist<<name+"=sgs.CreateMaxCardsSkill{";
+    strlist<<QString("name=\"%1\",").arg(name);
+    strlist<<"extra_func=function(self,target)";
+    QString bname=myobj::enumstr(metaObject(),"mcsbType",ExtraFunc);
+    myblock *pt=findBlockByName(bname);
+    if(pt&&!pt->blocklist.isEmpty()){
+        strlist<<mycode::myindent(trans4avlobjlist(bname));
+        strlist<<pt->trans();
+    }
+    else{strlist<<"return 0";}
+    strlist<<"end,";
+    strlist<<"}";
+    return strlist;
+}
+
+QStringList mytms::trans(){
+    QStringList strlist;
+    strlist<<name+"=sgs.CreateTargetModSkill{";
+    strlist<<QString("name=\"%1\",").arg(name);
+    strlist<<QString("pattern=\"%1\",").arg(pattern);
+    myblock *pt;
+    pt=findBlockByName(myobj::enumstr(metaObject(),"tmsbType",ExtraTarget));
+    if(pt&&!pt->blocklist.isEmpty()){
+        strlist<<"extra_target_func=function(self,player)";
+        strlist<<mycode::myindent(trans4avlobjlist(myobj::enumstr(metaObject(),"tmsbType",ExtraTarget)));
+        strlist<<pt->trans();
+        strlist<<"end,";
+    }
+    pt=findBlockByName(myobj::enumstr(metaObject(),"tmsbType",DistanceLimit));
+    if(pt&&!pt->blocklist.isEmpty()){
+        strlist<<"distance_limit_func=function(self,player)";
+        strlist<<mycode::myindent(trans4avlobjlist(myobj::enumstr(metaObject(),"tmsbType",DistanceLimit)));
+        strlist<<pt->trans();
+        strlist<<"end,";
+    }
+    pt=findBlockByName(myobj::enumstr(metaObject(),"tmsbType",Residue));
+    if(pt&&!pt->blocklist.isEmpty()){
+        strlist<<"residue_func=function(self,player)";
+        strlist<<mycode::myindent(trans4avlobjlist(myobj::enumstr(metaObject(),"tmsbType",Residue)));
+        strlist<<pt->trans();
+        strlist<<"end,";
+    }
+    strlist<<"}";
+    return strlist;
+}
+
+QString mytms::getPatternProperty(){
+    QString tstr=pattern;
+    tstr.replace("|","\\|");
+    QStringList tstrlist=myobj::getconstlist_tag("pt");
+    tstrlist.removeOne(tstr);
+    tstrlist.prepend("");
+    tstrlist.prepend(tstr);
+    return tstrlist.join("|");
+    //return pattern;
+}
+void mytms::setPatternProperty(QString getstr){
+    QString tstr=getstr;
+    pattern=tstr.replace("\\|","|");
+}
+QString mytms::getPatternPropertyRemark(){
+    QString tstr=pattern;
+    tstr.replace("|","\\|");
+    QString trm=myobj::name2remark(tstr);
+    if(trm!=""){tstr=trm;}
+    QStringList tstrlist=myobj::getconstrmlist_tag("pt");
+    tstrlist.removeOne(tstr);
+    tstrlist.prepend("");
+    tstrlist.prepend(tstr);
+    return tstrlist.join("|");
+}
+void mytms::setPatternPropertyRemark(QString getstr){
+    QString tstr=getstr;
+    tstr.replace("\\|","|");
+    QString tname=myobj::remark2name(tstr);
+    if(tname!=""){tstr=tname;}
+    pattern=tstr;
+}
 
 /*
 void myfts::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){

@@ -151,6 +151,8 @@ mysk *mysys::newsk(int gettype){
     qRegisterMetaType<myvs>("myvs");
     qRegisterMetaType<mydts>("mydts");
     qRegisterMetaType<myfts>("myfts");
+    qRegisterMetaType<myprs>("myprs");
+    qRegisterMetaType<mymcs>("mymcs");
     qRegisterMetaType<mytms>("mytms");
     foreach(QString stri,mysk::typeclasslist()){
         if(QMetaType::type(stri.toUtf8())==0){qWarning()<<"newsk"<<stri;}

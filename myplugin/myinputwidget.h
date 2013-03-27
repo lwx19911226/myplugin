@@ -15,7 +15,7 @@
 #include <QVBoxLayout>
 #include <QFormLayout>
 //#include "myinputmodel.h"
-#include "myptgwidget.h"
+
 
 class myinputitem;
 class myinputmodel;
@@ -47,7 +47,7 @@ signals:
     
 public slots:
     void myadd();
-    void myptg();
+    //void myptg();
     //void changeType(QString);
     void changeColumnView();
     void changeFilter();

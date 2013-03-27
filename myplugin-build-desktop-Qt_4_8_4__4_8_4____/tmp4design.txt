@@ -11,11 +11,13 @@
 >>>trs|luaganglie|¸ÕÁÒ|luaxhd|NotFrequent|:ÂôÑª¸Õ|$¾¹¸ÒÉ£ÎÒ
 >>>trs|luatuxi|Í»Ï®|luazhl|NotFrequent|:·ÅÆúÃþÅÆ£¬ÍµÅÆ|$Ã»Ïëµ½8|$ÄÃÀ´8
 >>>trs|lualuoyi|ÂãÒÂ|luaxch|NotFrequent|:ÆÆ£¬É±£¬¾ö¶·|$ÆÆ
->>>trs|luatiandu|Ìì¶Ê|luagj|Frequent|:ÊÕÅÐ¶¨
+>>>trs|luatiandu|Ìì¶Ê|luagj|Frequent|:ÊÕÅÐ¶¨|$
 >>>trs|lualuoshen|ÂåÉñ|luazhj|Frequent|:ÂåÅÆ|$Æ®Æ®Ùâ
->>>trs|sk0||NULL|NotFrequent|:
+>>>trs|sk0||NULL|NotFrequent|:|$
 >>>vs|sk1|tmptr|luacc|2|nullification|:|$haha
->>>dts|sk2||NULL|:
+>>>dts|sk2||NULL|:|$
+>>>fts|sk3||NULL|slash|:|$
+>>>tms|sk4||NULL|.\|.\|3,4|:|$
 >>>>luajianxiong::Damaged|Damaged|onlySkillOwner|player||
 >>>>luajianxiong::Damaged|Damaged|getCardPlace|damage.card|ÉËº¦ÅÆµÄÎ»ÖÃ|
 >>>>luajianxiong::Damaged|Damaged|ifEqualNum|1->0,sgs.Player_PlaceTable||ÉËº¦ÅÆÎ»ÓÚÃæ°å,ÉËº¦ÅÆ²»Î»ÓÚÃæ°å
@@ -66,3 +68,4 @@
 >>>>sk1::EnabledAtResponse|EnabledAtResponse|getMark|sgs.Self,42->0,true||
 >>>>sk1::ViewFilter|ViewFilter|getMark|sgs.Self,42->0,true||
 >>>>sk2::CorrectFunc|CorrectFunc|eachPlayer|players||
+>>>>sk4::ExtraTarget|ExtraTarget|ifTrue|true||,

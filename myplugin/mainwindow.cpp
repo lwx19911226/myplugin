@@ -89,6 +89,9 @@ MainWindow::MainWindow(QWidget *parent) :
     p_pushbutton_redo->setText(tr("Skill_Redo"));
     p_pushbutton_redo->setEnabled(false);
     QObject::connect(p_pushbutton_redo,SIGNAL(clicked()),this,SLOT(myredo()));
+    QPushButton *p_pushbutton_ptg=new QPushButton(ui->centralWidget);
+    p_pushbutton_ptg->setText(tr("Pattern Generator"));
+    QObject::connect(p_pushbutton_ptg,SIGNAL(clicked()),this,SLOT(myptg()));
     QPushButton *p_pushbutton_import=new QPushButton(ui->centralWidget);
     p_pushbutton_import->setText(tr("Import"));
     QObject::connect(p_pushbutton_import,SIGNAL(clicked()),this,SLOT(myimport()));
@@ -101,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     p_hboxlayout2->addWidget(p_pushbutton_add);
     p_hboxlayout2->addWidget(p_pushbutton_undo);
     p_hboxlayout2->addWidget(p_pushbutton_redo);
+    p_hboxlayout2->addWidget(p_pushbutton_ptg);
     p_hboxlayout2->addWidget(p_pushbutton_import);
     p_hboxlayout2->addWidget(p_pushbutton_export);
 
@@ -112,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent) :
     p_textedit_current->setLineWrapMode(QTextEdit::NoWrap);
     //mytext();
     p_tabwidget2=new QTabWidget(ui->centralWidget);
-    p_tabwidget2->setTabPosition(QTabWidget::West);
+    //p_tabwidget2->setTabPosition(QTabWidget::West);
     p_tabwidget2->addTab(p_textedit_all,tr("Full"));
     p_tabwidget2->addTab(p_textedit_current,tr("Current Skill"));
 
@@ -472,6 +476,8 @@ void MainWindow::myrfr_tablewidget_str(QTableWidget *ptw,int getrow, int getcol,
 }
 void MainWindow::myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow, int getcol, QString getstr,QStringList list4new){
     while(ptw->columnCount()<=getcol){ptw->insertColumn(ptw->columnCount());}
+    bool b4edit=false;
+    if((list4new.length()>1)&&(list4new.at(1)=="")){b4edit=true;list4new.removeOne("");}
     if(ptw->cellWidget(getrow,getcol)){
         QComboBox *pt=static_cast<QComboBox *>(ptw->cellWidget(getrow,getcol));
         while(pt->count()>0){pt->removeItem(0);}
@@ -482,11 +488,12 @@ void MainWindow::myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow, int getcol,
     }
     else{
         QComboBox *pt=new QComboBox(ptw);
-        //pt->setEditable(true);
+        pt->setEditable(b4edit);
         pt->addItems(list4new);
         ptw->setCellWidget(getrow,getcol,pt);
         pt->setCurrentIndex(pt->findText(getstr));
         QObject::connect(pt,SIGNAL(currentIndexChanged(QString)),this,SLOT(itemchanged_cbb()));
+        QObject::connect(pt,SIGNAL(editTextChanged(QString)),this,SLOT(itemchanged_cbb()));
     }
 }
 void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<QString, QString> &strmap){
@@ -496,8 +503,9 @@ void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<
         if(strmap.contains(hstr)){
             if(strmap.count(hstr)==1){
                 QString getstr=strmap.value(hstr);
-                if(getstr.contains("|")){myrfr_tablewidget_cbb(ptw,getrow,i,getstr.split("|").first(),getstr.split("|"));}
-                else{myrfr_tablewidget_str(ptw,getrow,i,getstr);}
+                QStringList tstrlist=mycode::mysplit(getstr);
+                if(tstrlist.length()>1){myrfr_tablewidget_cbb(ptw,getrow,i,tstrlist.first(),tstrlist);}
+                else{myrfr_tablewidget_str(ptw,getrow,i,tstrlist.first());}
                 continue;
             }
             int ii;
@@ -574,7 +582,10 @@ void MainWindow::mydel(){
         if(psys->psk0){psys->delSkill(psys->psk0);}
     }
 }
-
+void MainWindow::myptg(){
+    myptgwidget *p_ptgwidget=new myptgwidget;
+    p_ptgwidget->show();
+}
 void MainWindow::changePackageName(){
     psys->packagename=p_lineedit_packagename->text();
     psys->sig_update();
