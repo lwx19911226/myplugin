@@ -7,6 +7,7 @@
 #include <QString>
 #include <QList>
 #include <QStringList>
+#include <QStringListIterator>
 #include <QTextStream>
 #include <QFile>
 #include <QTextCodec>
@@ -73,6 +74,7 @@ public:
     bool isGlobal;
     static QStringList myconstlist;
     static QStringList myconsttaglist;
+    static QStringList myconstskstrlist;
 
     virtual bool matchType(int gettype){        
         return isSubtype(gettype,type) or (name=="nil");
@@ -171,6 +173,8 @@ public:
         return name;
     }
     static void myini();
+    static void myini_lang();
+    static void myini_cl();
     static bool isConst(QString getstr);
     static QStringList transConst(QString getstr);
     static void newConst(QList<myobj *> &list,QString getbl,QObject *getpf,bool only=false);

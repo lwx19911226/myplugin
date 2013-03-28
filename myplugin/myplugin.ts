@@ -222,6 +222,30 @@
         <source>Pattern</source>
         <translation>模式</translation>
     </message>
+	<message>
+        <source>Object Name</source>
+        <translation>对象名</translation>
+    </message>
+	<message>
+        <source>Class Name</source>
+        <translation>类名</translation>
+    </message>
+	<message>
+        <source>, </source>
+        <translation>，</translation>
+    </message>
+	<message>
+        <source>Pattern for any </source>
+        <translation>模式任意一张</translation>
+    </message>
+	<message>
+        <source>[</source>
+        <translation>【</translation>
+    </message>
+	<message>
+        <source>]</source>
+        <translation>】</translation>
+    </message>	
 </context>
 <context>
     <name>myvs</name>

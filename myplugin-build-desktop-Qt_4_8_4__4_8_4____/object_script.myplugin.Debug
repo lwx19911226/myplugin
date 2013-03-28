@@ -13,6 +13,7 @@ INPUT(
 ./debug\mygeneral.o
 ./debug\myptgwidget.o
 ./debug\mysk.o
+./debug\mysknwidget.o
 ./debug\moc_mainwindow.o
 ./debug\moc_mysys.o
 ./debug\moc_myobj.o
@@ -26,4 +27,5 @@ INPUT(
 ./debug\moc_mygeneral.o
 ./debug\moc_myptgwidget.o
 ./debug\moc_mysk.o
+./debug\moc_mysknwidget.o
 );

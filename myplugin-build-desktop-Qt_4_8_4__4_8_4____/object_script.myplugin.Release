@@ -13,6 +13,7 @@ INPUT(
 ./release\mygeneral.o
 ./release\myptgwidget.o
 ./release\mysk.o
+./release\mysknwidget.o
 ./release\moc_mainwindow.o
 ./release\moc_mysys.o
 ./release\moc_myobj.o
@@ -26,4 +27,5 @@ INPUT(
 ./release\moc_mygeneral.o
 ./release\moc_myptgwidget.o
 ./release\moc_mysk.o
+./release\moc_mysknwidget.o
 );

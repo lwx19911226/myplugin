@@ -3,7 +3,7 @@
 myptgwidget::myptgwidget(QWidget *parent) :
     QWidget(parent)
 {
-    setWindowTitle("myplugin_pattern");
+    setWindowTitle(tr("Pattern Generator"));
     QStringList cllist=myobj::getconstlist_tag("cl");
     QStringList suitlist=myobj::getconstlist_tag("suit");
     p_tablewidget=new QTableWidget(this);

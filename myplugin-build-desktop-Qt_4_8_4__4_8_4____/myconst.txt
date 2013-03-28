@@ -48,9 +48,9 @@
 >place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf
 >selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:fts_vf
 >defaultReturn|mybool|锁定视为技默认返回值|tr:local %1=false,,bl:fts_vf
->from|myplayer||bl:prs_ip
->to|myplayer||bl:prs_ip
->card|mycard||bl:prs_ip
+>from|myplayer|禁止技目标牌使用者|bl:prs_ip
+>to|myplayer|禁止技目标牌使用对象|bl:prs_ip
+>card|mycard|禁止技目标牌|bl:prs_ip
 >defaultReturn|mybool|禁止技默认返回值|tr:local %1=false,,bl:prs_ip
 >target|myplayer|额外手牌上限技目标|bl:mcs_ef
 >defaultReturn|mynum|额外手牌上限技默认返回值|tr:local %1=0,,bl:mcs_ef
@@ -117,5 +117,5 @@
 >BasicCard|mystrc|模式（任意一张基本牌），也表示类名【基本牌】|cl,,pt
 >TrickCard|mystrc|模式（任意一张锦囊牌），也表示类名【锦囊牌】|cl,,pt
 >EquipCard|mystrc|模式（任意一张装备牌），也表示类名【装备牌】|cl,,pt
->Slash|mystrc|模式（任意一张杀），也表示类名【杀】|cl,,pt
->Duel|mystrc|模式（任意一张决斗），也表示类名【决斗】|cl,,pt
+//>Slash|mystrc|模式（任意一张杀），也表示类名【杀】|cl,,pt
+//>Duel|mystrc|模式（任意一张决斗），也表示类名【决斗】|cl,,pt

@@ -128,6 +128,8 @@
 //
 >selectedCard|mynum~|mycard|%2=selected[%1]|视为技已选择子卡中第X（参数1）张卡（返回值1），X从1开始，比如【乱击】第2张子卡须与已选择第1张子卡花色相同|cd,selected$
 >patternMatch|mystr~|mybool~|%2=string.find(pattern,%1)|模式是否（返回值1）包含对象名（参数1），比如【南蛮入侵】模式包含【杀】对象名slash|pattern$
+>selectedPlayer|mynum~|myplayer|%2=targets[%1]|视为技技能牌已选择角色中第X（参数1）名角色（返回值1），X从1开始|pl,targets$
+>targetPlayer|mynum~|mysplayer|%2=targets[%1]|视为技技能牌角色目标中第X（参数1）名角色（返回值1），X从1开始|pl,targets$,room$
 
 //debug
 >playerSpeak|mysplayer~||<1:>%1:speak(self:objectName()..","..%1:objectName()..","..%1:getSeat())|令角色（参数1）说出技能名角色名和座位，可用于调试程序是否执行|pl,debug,room$

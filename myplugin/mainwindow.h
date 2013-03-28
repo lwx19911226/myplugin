@@ -28,6 +28,9 @@
 #include <QScrollBar>
 #include <QLineEdit>
 #include <QFileSystemModel>
+#include <QProcess>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QMessageBox>
 #include <QDebug>
 #include "mysys.h"
@@ -87,6 +90,9 @@ private slots:
     void myundo();
     void myredo();
     void myptg();
+    void myskn();
+    void myreadme();
+    void mysgs();
     void mynew();
     void mydel();
     void myrfr();

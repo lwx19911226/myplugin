@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "myinputwidget.h"
+#include "mysknwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -88,10 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
     p_pushbutton_redo=new QPushButton(ui->centralWidget);
     p_pushbutton_redo->setText(tr("Skill_Redo"));
     p_pushbutton_redo->setEnabled(false);
-    QObject::connect(p_pushbutton_redo,SIGNAL(clicked()),this,SLOT(myredo()));
-    QPushButton *p_pushbutton_ptg=new QPushButton(ui->centralWidget);
-    p_pushbutton_ptg->setText(tr("Pattern Generator"));
-    QObject::connect(p_pushbutton_ptg,SIGNAL(clicked()),this,SLOT(myptg()));
+    QObject::connect(p_pushbutton_redo,SIGNAL(clicked()),this,SLOT(myredo()));    
     QPushButton *p_pushbutton_import=new QPushButton(ui->centralWidget);
     p_pushbutton_import->setText(tr("Import"));
     QObject::connect(p_pushbutton_import,SIGNAL(clicked()),this,SLOT(myimport()));
@@ -104,9 +102,26 @@ MainWindow::MainWindow(QWidget *parent) :
     p_hboxlayout2->addWidget(p_pushbutton_add);
     p_hboxlayout2->addWidget(p_pushbutton_undo);
     p_hboxlayout2->addWidget(p_pushbutton_redo);
-    p_hboxlayout2->addWidget(p_pushbutton_ptg);
     p_hboxlayout2->addWidget(p_pushbutton_import);
     p_hboxlayout2->addWidget(p_pushbutton_export);
+
+    QPushButton *p_pushbutton_ptg=new QPushButton(ui->centralWidget);
+    p_pushbutton_ptg->setText(tr("Pattern Generator"));
+    QObject::connect(p_pushbutton_ptg,SIGNAL(clicked()),this,SLOT(myptg()));
+    QPushButton *p_pushbutton_skn=new QPushButton(ui->centralWidget);
+    p_pushbutton_skn->setText(tr("Skill Name List"));
+    QObject::connect(p_pushbutton_skn,SIGNAL(clicked()),this,SLOT(myskn()));
+    QPushButton *p_pushbutton_readme=new QPushButton(ui->centralWidget);
+    p_pushbutton_readme->setText(tr("Readme"));
+    QObject::connect(p_pushbutton_readme,SIGNAL(clicked()),this,SLOT(myreadme()));
+    QPushButton *p_pushbutton_sgs=new QPushButton(ui->centralWidget);
+    p_pushbutton_sgs->setText(tr("QSanguosha"));
+    QObject::connect(p_pushbutton_sgs,SIGNAL(clicked()),this,SLOT(mysgs()));
+    QHBoxLayout *p_hboxlayout3=new QHBoxLayout;
+    p_hboxlayout3->addWidget(p_pushbutton_ptg);
+    p_hboxlayout3->addWidget(p_pushbutton_skn);
+    p_hboxlayout3->addWidget(p_pushbutton_readme);
+    p_hboxlayout3->addWidget(p_pushbutton_sgs);
 
     p_textedit_all=new QTextEdit;
     p_textedit_all->setReadOnly(true);
@@ -126,6 +141,7 @@ MainWindow::MainWindow(QWidget *parent) :
     p_vboxlayout->addWidget(p_tabwidget1);
     p_vboxlayout->addLayout(p_formlayout1);
     p_vboxlayout->addLayout(p_hboxlayout2);
+    p_vboxlayout->addLayout(p_hboxlayout3);
 
     QWidget *p_widget1=new QWidget(ui->centralWidget);
     p_widget1->setLayout(p_vboxlayout);
@@ -586,6 +602,24 @@ void MainWindow::myptg(){
     myptgwidget *p_ptgwidget=new myptgwidget;
     p_ptgwidget->show();
 }
+void MainWindow::myskn(){
+    mysknwidget *p_sknwidget=new mysknwidget(this);
+    p_sknwidget->show();
+}
+void MainWindow::myreadme(){
+    QDesktopServices ds;
+    ds.openUrl(QUrl("readme.txt"));
+    //QProcess::startDetached("readme.txt");
+}
+void MainWindow::mysgs(){
+    //QDesktopServices ds;
+    //ds.openUrl(QUrl("../QSanguosha.exe"));
+    QString tstr=QDir::currentPath();
+    QDir::setCurrent("..");
+    QProcess::startDetached("QSanguosha.exe");
+    QDir::setCurrent(tstr);
+}
+
 void MainWindow::changePackageName(){
     psys->packagename=p_lineedit_packagename->text();
     psys->sig_update();
