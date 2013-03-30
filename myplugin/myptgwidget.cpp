@@ -11,7 +11,7 @@ myptgwidget::myptgwidget(QWidget *parent) :
     p_tablewidget->setRowCount(rowmax);
     p_tablewidget->setColumnCount(4);
     QStringList headerlist;
-    headerlist<<"Class"<<"Suit"<<"Number"<<"Place";
+    headerlist<<tr("Class")<<tr("Suit")<<tr("Number")<<tr("Place");
     p_tablewidget->setHorizontalHeaderLabels(headerlist);
 
     for(int i=0;i<cllist.length();i++){
@@ -28,14 +28,14 @@ myptgwidget::myptgwidget(QWidget *parent) :
     p_tablewidget->setSelectionMode(QAbstractItemView::MultiSelection);
     p_tablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    p_checkbox_judge=new QCheckBox("Judge",this);
-    p_checkbox_or=new QCheckBox("Or",this);
+    p_checkbox_judge=new QCheckBox(tr("Judge"),this);
+    p_checkbox_or=new QCheckBox(tr("Or"),this);
     QObject::connect(p_checkbox_judge,SIGNAL(clicked(bool)),p_checkbox_or,SLOT(setHidden(bool)));
-    QPushButton *p_pushbutton_generate=new QPushButton("Generate",this);
+    QPushButton *p_pushbutton_generate=new QPushButton(tr("Generate"),this);
     QObject::connect(p_pushbutton_generate,SIGNAL(clicked()),this,SLOT(mygenerate()));
-    QPushButton *p_pushbutton_copy=new QPushButton("Copy",this);
+    QPushButton *p_pushbutton_copy=new QPushButton(tr("Copy"),this);
     QObject::connect(p_pushbutton_copy,SIGNAL(clicked()),this,SLOT(mycopy()));
-    QPushButton *p_pushbutton_del=new QPushButton("Delete",this);
+    QPushButton *p_pushbutton_del=new QPushButton(tr("Delete"),this);
     QObject::connect(p_pushbutton_del,SIGNAL(clicked()),this,SLOT(mydel()));
     QHBoxLayout *p_hboxlayout=new QHBoxLayout;
     p_hboxlayout->addWidget(p_checkbox_judge);
@@ -47,7 +47,7 @@ myptgwidget::myptgwidget(QWidget *parent) :
     p_lineedit=new QLineEdit(this);
     p_lineedit->setReadOnly(true);
     QFormLayout *p_formlayout=new QFormLayout;
-    p_formlayout->addRow("Result:",p_lineedit);
+    p_formlayout->addRow(tr("Result:"),p_lineedit);
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout(this);
     p_vboxlayout->addWidget(p_tablewidget);

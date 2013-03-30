@@ -4,11 +4,13 @@
 #include <QMainWindow>
 #include <QApplication>
 #include <QClipboard>
+#include <QDesktopWidget>
 #include <QDir>
 #include <QTime>
 #include <QModelIndex>
 #include <QColumnView>
 #include <QTreeView>
+#include <QTreeWidget>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QTableWidget>
@@ -57,6 +59,7 @@ public:
     QStringList textlist_all,textlist_current;
     QLineEdit *p_lineedit_packagename,*p_lineedit_packagetrans;
     QTabWidget *p_tabwidget1,*p_tabwidget2;
+    QTreeWidget *p_treewidget;
     //QTableWidget *p_tablewidget_g,*p_tablewidget_trs,*p_tablewidget_vs;
     QLabel *p_label_skname;
     QPushButton *p_pushbutton_undo,*p_pushbutton_redo;
@@ -74,7 +77,9 @@ public:
     void myrfr_tablewidget_removerow(QTableWidget *ptw,QStringList getstrlist);
     int myrfr_tablewidget_getrow(QTableWidget *ptw,QString getstr);
     void myrfr_tablewidget_property(QTableWidget *ptw,int getrow,QMap<QString,QString> &strmap);
-    void mytext();
+    void mytext_all();
+    void mytext_current();
+    void mytree();
     void myexport_design(QString);
     void itemsel_sk(QTableWidget *ptw);
     void itemchanged_cbb_sk(QComboBox *pcbb);

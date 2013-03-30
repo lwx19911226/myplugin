@@ -25,6 +25,11 @@ void myobj::myini(){
         fin.close();
         myini_lang();
         myini_cl();
+        QStringList tstrlist;
+        tstrlist<<tr("TriggerSkill")<<tr("ViewAsSkill")<<tr("DistanceSkill")<<tr("FilterSkill")<<tr("ProhibitSkill")
+               <<tr("MaxCardsSkill")<<tr("TargetModSkill")<<tr("Name")<<tr("Translation")<<tr("Kingdom")<<tr("Sex")
+              <<tr("HP")<<tr("Title")<<tr("Word")<<tr("Owner")<<tr("Description")<<tr("Words")<<tr("Subtype")<<tr("CardsNum")
+             <<tr("CardViewAs")<<tr("Pattern")<<tr("Block")<<tr("Function");
     }
 }
 void myobj::myini_lang(){
@@ -217,3 +222,4 @@ bool myobj::matchTag(QString getname, QString gettag){
     }
     return true;
 }
+

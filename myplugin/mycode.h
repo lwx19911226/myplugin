@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QTreeWidgetItem>
 #include "myfun.h"
 #include "myevent.h"
 
@@ -41,6 +42,7 @@ class myfunction;
 class myblock : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(blockType)
 public:
     explicit myblock(QObject *parent = 0):QObject(parent){upperLayer=NULL;}
     enum blockType{Block=1,Function=2};
@@ -51,18 +53,20 @@ public:
     QString name;
     QString remark;
     //QList<QVariant> inilist;
-    virtual void addBlock(myblock *);
+    void addBlock(myblock *);
     virtual void addBlock(myblock *,QString);
     //virtual void addStc(myfunction *);
-    virtual bool matchName(QString getstr);
+    bool matchName(QString getstr);
     virtual QStringList trans();
     virtual QStringList need4block();
-    virtual myblock *findBlockByName(QString getname);
+    myblock *findBlockByName(QString getname);
     virtual myfunction *findFuncByObj(myobj *);
-    virtual bool removeBlock(myblock *getp);
+    bool removeBlock(myblock *getp);
     //virtual bool insertBlock(myblock *getp);
-    virtual int getLayer();
+    QTreeWidgetItem *mytreeitem();
+    int getLayer();
     QString getEvent();
+    virtual QString getRemark();
     myblock *getTopBlock();
     mysk *getsk0();
     virtual void myshow(){qWarning()<<name<<getLayer()<<blocklist.length();for(int i=0;i<blocklist.length();i++){blocklist.at(i)->myshow();}}
@@ -83,6 +87,9 @@ public:
     QStringList need4block();
     void addBlock(myblock *, QString);
     myfunction *findFuncByObj(myobj *);
+    QString getRemark();
+    static QString str4parameter(){return tr("Parameter");}
+    static QString str4returnvalue(){return tr("Return value");}
     void myshow(){qWarning()<<funname;}
 };
 /*

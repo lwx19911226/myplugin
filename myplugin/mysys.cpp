@@ -132,7 +132,7 @@ void mysys::getsklist(QList<mysk *> &rsklist,int gettype){
 void mysys::getavlobjlist_global(QList<myobj *> &list){
     foreach(mysk *ip,sklist){
         foreach(myobj *pobj,ip->avlobjlist){
-            if(pobj->isGlobal){list<<pobj;}
+            if(pobj->isGlobal){list.prepend(pobj);}
         }
     }
 }
@@ -242,6 +242,14 @@ bool mysys::delSkill(mysk *getp){
     sig_update();
     return true;
 }
+myfunction *mysys::findFuncByObj(myobj *getp){
+    //myfunction *pr=NULL;
+    foreach(mydo *ip,dolist){
+        if(ip->objlist.contains(getp)){return static_cast<myfunction *>(ip->blocklist.first());}
+    }
+    return NULL;
+}
+
 
 QStringList mysys::trans(){
     //QString str="";

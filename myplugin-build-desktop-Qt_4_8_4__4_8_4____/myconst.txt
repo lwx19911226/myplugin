@@ -21,8 +21,8 @@
 >>place|牌的位置
 >>nature|伤害属性
 
->selfplayer|mysplayer|此技能拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:trs
->player|mysplayer|此时机触发者|bl:trs
+>selfplayer|mysplayer|触发技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:trs
+>player|mysplayer|触发技时机触发者|bl:trs
 >defaultReturn|mybool|触发技默认返回值|tr:local %1=false,,bl:trs
 >sgs.Self|myplayer|视为技拥有者|bl:vs_vf
 >to_select|mycard|视为技将选的一张牌|bl:vs_vf
@@ -46,7 +46,7 @@
 >defaultReturn|mynum|距离技默认返回值|tr:local %1=0,,bl:dts_cf
 >to_select|mycard|锁定视为技所判断的牌|bl:fts_vf
 >place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf
->selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(self:objectName()),,bl:fts_vf
+>selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:fts_vf
 >defaultReturn|mybool|锁定视为技默认返回值|tr:local %1=false,,bl:fts_vf
 >from|myplayer|禁止技目标牌使用者|bl:prs_ip
 >to|myplayer|禁止技目标牌使用对象|bl:prs_ip

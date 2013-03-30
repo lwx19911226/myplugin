@@ -25,7 +25,7 @@ void myinputmodel::myini(){
     rootitem->mydata=QVariant("root");
     rootitem->type=myinputitem::func_Start;
 
-    rootitem0->newChild(QVariant(">EVENT:"));
+    rootitem0->newChild(QVariant(">"+tr("EVENT")+tr(": ")));
     if(getsk0()){
         foreach(QString stri,getsk0()->eventstrlist()){
             rootitem0->newChild(QVariant(stri),true);
@@ -95,7 +95,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     myinputitem *pp=getItem0(parent);
     myinputitem *p=getItem(parent);
     if(pp->type+1==myinputitem::func_Block){
-        pp->newChild(QVariant(">BLOCK:"),false,true);
+        pp->newChild(QVariant(">"+tr("BLOCK")+tr(": ")),false,true);
         QString geteventstr=pp->getstr();
         //QStringList list;
         //list=getsys()->psk0->need4block(geteventstr);
@@ -106,7 +106,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     }
     else if(pp->type+1==myinputitem::func_Fun){
         QString geteventstr=pp->getParent(myinputitem::func_Event)->getstr();
-        pp->newChild(QVariant(">FUNCTION:"),false,true);
+        pp->newChild(QVariant(">"+tr("FUNCTION")+tr(": ")),false,true);
         foreach(QString stri,myfun::getfunstrlist(getsys()->psk0->funtaglist(geteventstr))){
             pp->newChild(QVariant(stri),!myfun::need(stri).isEmpty());
         }
@@ -120,8 +120,8 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
         if(!strlist.isEmpty()){
             QList<myobj *> objlist;
             int geti=pp->type+1-myinputitem::func_Obj;
-            QString gettypestr=strlist.at(geti);
-            pp->newChild(QVariant(">OBJECT("+gettypestr+"):"),false,true);
+            QString gettypestr=myobj::gettypestr(strlist.at(geti));
+            pp->newChild(QVariant(">"+tr("OBJECT")+"("+gettypestr+")"+tr(": ")),false,true);
             foreach(QString stri,gettypestr.split("+")){
                 getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr,!myfun::notnil(getfunstr,geti));
             }
@@ -160,46 +160,6 @@ bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int 
         return true;
     }
     return false;
-    /*
-    if(getType()==mydo::Sentence){
-        if(pi->type-myinputitem::func_Obj<0){return false;}
-        //if(!pi->getParent(myinputitem::stc_Fun)){return false;}
-        QStringList strlist;
-        strlist=myfun::need(pi->getParent(myinputitem::func_Fun)->getstr());
-        if(!strlist.isEmpty()){
-            QString getstr=strlist.at(pi->type-myinputitem::func_Obj);
-            if(!myobj::b4input(getstr)){return false;}
-            if(myobj::str2type(getstr)==myobj::Mynum){
-                bool b;
-                value.toString().toInt(&b);
-                if(!b){return false;}
-            }
-            pi0->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1);
-            pi->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1);
-            QModelIndex it=createIndex(pi->pf->pchlist.length()-1,0,pi->pf->pchlist.last());
-            emit dataChanged(it,it);
-            return true;
-        }
-    }
-    else if(getType()==mydo::Condition){
-        if(pi->type-myinputitem::condition_Obj<0){return false;}
-        QString geteventstr=pi->getParent(myinputitem::condition_Event)->getstr();
-        myobj *pobj=getsys()->psk0->findObjByName(pi->getParent(myinputitem::condition_Obj0)->getstr(),geteventstr);
-        if(!pobj){return false;}
-        if(myobj::b4input(pobj->type)){
-            if(pobj->type==myobj::Mynum){
-                bool b;
-                value.toString().toInt(&b);
-                if(!b){return false;}
-            }
-            pi0->pf->newChild(value,true);
-            pi->pf->newChild(value,true);
-            QModelIndex it=createIndex(pi->pf->pchlist.length()-1,0,pi->pf->pchlist.last());
-            emit dataChanged(it,it);
-            return true;
-        }
-    }
-    */
 }
 
 Qt::ItemFlags myinputmodel::flags(const QModelIndex &index) const{

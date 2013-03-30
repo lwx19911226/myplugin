@@ -38,21 +38,24 @@ public:
     static QString enumname_babb(int gettype){return type2abb(gettype)+"bAbb";}
     static QString enumname_btype(int gettype){return type2abb(gettype)+"bType";}
     virtual QString property2str(int getproperty){
-        if(myobj::enumcontains(metaObject(),enumname_property(getType()).toUtf8(),getproperty)){
-            return myobj::enumstr(metaObject(),enumname_property(getType()).toUtf8(),getproperty);
+        const QMetaObject *mob=metaObject();
+        if(myobj::enumcontains(mob,enumname_property(getType()).toUtf8(),getproperty)){
+            return myobj::enumstr(mob,enumname_property(getType()).toUtf8(),getproperty);
         }
-        else{return myobj::enumstr(metaObject(),"skProperty",getproperty);}
+        else{return myobj::enumstr(mob,"skProperty",getproperty);}
     }
     virtual int str2property(QString getstr){
-        if(myobj::enumcontains(metaObject(),enumname_property(getType()).toUtf8(),getstr)){
-            return myobj::enumint(metaObject(),enumname_property(getType()).toUtf8(),getstr);
+        const QMetaObject *mob=metaObject();
+        if(myobj::enumcontains(mob,enumname_property(getType()).toUtf8(),getstr)){
+            return myobj::enumint(mob,enumname_property(getType()).toUtf8(),getstr);
         }
-        else{return myobj::enumint(metaObject(),"skProperty",getstr);}
+        else{return myobj::enumint(mob,"skProperty",getstr);}
     }
     virtual QStringList propertystrlist(bool b4tab=false){
-        QStringList strlist=myobj::enumstrlist(metaObject(),"skProperty");
+        const QMetaObject *mob=metaObject();
+        QStringList strlist=myobj::enumstrlist(mob,"skProperty");
         if(b4tab){strlist<<property2str(Words);}
-        foreach(QString stri,myobj::enumstrlist(metaObject(),enumname_property(getType()).toUtf8())){
+        foreach(QString stri,myobj::enumstrlist(mob,enumname_property(getType()).toUtf8())){
             strlist.insert(strlist.indexOf(property2str(Description)),stri);
         }
         return strlist;
@@ -106,10 +109,11 @@ public:
     void redo();
     bool removeObj(myobj *getp);    
     myobj *findObjByName(QString getname,QString getstr);
-    myblock *findBlockByName(QString);
-    myfunction *findFuncByObj(myobj *);
-    virtual QString findRemarkByName_event(QString getname)=0;
+    myblock *findBlockByName(QString);    
+    virtual QString findRemarkByName_event(QString getname){return getname;}
     QString findRemarkByName_block(QString getname);
+    QString findRemarkByName_obj(QString getname,QString getstr,bool b4func);
+    QString findRemarkByName_obj(myobj *tgtobj,myfunction *pfunc, bool b4func);
     //virtual void rfrObj(){}
     virtual void iniObj();
     virtual myblock *iniBlock(QString getstr);
@@ -122,6 +126,7 @@ public:
     virtual QStringList blockstrlist(QString getstr);
     mysys *getsys();
     void sig_update();
+    static QString default4skname(){return "local selfskname=self:objectName()";}
     void myshow(){foreach(myblock *ip,blocklist){ip->myshow();}}
 };
 
@@ -187,12 +192,13 @@ public:
     enum vsbType{ViewFilter=0,EnabledAtPlay=1,EnabledAtResponse=2,PlayerFilter=3,SkillCardUse=4};
     enum vsbAbb{vs_vf=ViewFilter,vs_ep=EnabledAtPlay,vs_er=EnabledAtResponse,vs_pf=PlayerFilter,vs_scu=SkillCardUse};
     QStringList funtaglist(QString getstr){
+        const QMetaObject *mob=metaObject();
         QStringList strlist;
-        if(getstr==myobj::enumstr(metaObject(),"vsbType",ViewFilter)){strlist<<"selected$"<<"rtb$";}
-        if(getstr==myobj::enumstr(metaObject(),"vsbType",EnabledAtPlay)){strlist<<"rtb$";}
-        if(getstr==myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse)){strlist<<"pattern$"<<"rtb$";}
-        if(getstr==myobj::enumstr(metaObject(),"vsbType",PlayerFilter)){strlist<<"rtb$"<<"targets$";}
-        if(getstr==myobj::enumstr(metaObject(),"vsbType",SkillCardUse)){strlist<<"rtb$"<<"targets$"<<"room$";}
+        if(getstr==myobj::enumstr(mob,"vsbType",ViewFilter)){strlist<<"selected$"<<"rtb$";}
+        if(getstr==myobj::enumstr(mob,"vsbType",EnabledAtPlay)){strlist<<"rtb$";}
+        if(getstr==myobj::enumstr(mob,"vsbType",EnabledAtResponse)){strlist<<"pattern$"<<"rtb$";}
+        if(getstr==myobj::enumstr(mob,"vsbType",PlayerFilter)){strlist<<"rtb$"<<"targets$";}
+        if(getstr==myobj::enumstr(mob,"vsbType",SkillCardUse)){strlist<<"rtb$"<<"targets$"<<"room$";}
         return strlist;
     }
 
@@ -206,12 +212,34 @@ public:
     void setCardViewAsPropertyRemark(QString getstr);
     myblock *iniBlock(QString getstr);
     QString findRemarkByName_event(QString getname){
-        if(getname==myobj::enumstr(metaObject(),"vsbType",ViewFilter)){return getname;}
-        if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtPlay)){return getname;}
-        if(getname==myobj::enumstr(metaObject(),"vsbType",EnabledAtResponse)){return getname;}
-        if(getname==myobj::enumstr(metaObject(),"vsbType",PlayerFilter)){return getname;}
-        if(getname==myobj::enumstr(metaObject(),"vsbType",SkillCardUse)){return getname;}
-        return QString();
+        const QMetaObject *mob=metaObject();
+        if(getname==myobj::enumstr(mob,"vsbType",ViewFilter)){
+            return tr("We use this function to check which card can be selected. ")
+                    +tr("Return true means the card to select is selectable. ")
+                    +tr("For example, we can only choose a red card when we use Wusheng; ")
+                    +tr("we can only choose a spade handcard when we use Luanji and select a spade handcard before.");
+        }
+        if(getname==myobj::enumstr(mob,"vsbType",EnabledAtPlay)){
+            return tr("We use this function to check if the skill can be used in Phase Play. ")
+                    +tr("Return true means the skill is usable. ")
+                    +tr("For example, before we use Fanjian, we can use it in Phase Play. ");
+        }
+        if(getname==myobj::enumstr(mob,"vsbType",EnabledAtResponse)){
+            return tr("We use this function to check if the skill can be used to respond. ")
+                    +tr("Return true means the skill is usable. ")
+                    +tr("For example, we can use Wusheng when we want to respond a slash. ");
+        }
+        if(getname==myobj::enumstr(mob,"vsbType",PlayerFilter)){
+            return tr("We use this function to check which player can be selected by the skillcard. ")
+                    +tr("Return true means the player to select is selectable. ")
+                    +tr("Warning: it is only valid when you view it as a skillcard. ")
+                    +tr("For example, we can only choose a wounded Male when we use Jieyin; ")
+                    +tr("we cannot choose two players with the handcard disparity over our total cards. ");
+        }
+        if(getname==myobj::enumstr(mob,"vsbType",SkillCardUse)){
+            return tr("We use this function to define the behavior of the skillcard. ");
+        }
+        return getname;
     }
     QStringList trans();
 };
@@ -227,7 +255,14 @@ public:
     int getType(){return DistanceSkill;}
     enum dtsbType{CorrectFunc=0};
     enum dtsbAbb{dts_cf=CorrectFunc};
-    QString findRemarkByName_event(QString getname){return getname;}
+    QString findRemarkByName_event(QString getname){
+        if(getname==myobj::enumstr(metaObject(),"dtsbType",CorrectFunc)){
+            return tr("We use this function to calculate the additional value of distance. ")
+                    +tr("Return value is the additional value beyond the geographical distance. ")
+                    +tr("For example, with Mashu, when we calculate the distance from us to others, the additional value is -1. ");
+        }
+        return getname;
+    }
     QStringList funtaglist(QString getstr){
         QStringList strlist;
         if(getstr==myobj::enumstr(metaObject(),"dtsbType",CorrectFunc)){strlist<<"rtn$";}
@@ -262,7 +297,14 @@ public:
     void setCardViewAsProperty(QString getstr);
     QString getCardViewAsPropertyRemark();
     void setCardViewAsPropertyRemark(QString getstr);
-    QString findRemarkByName_event(QString getname){return getname;}
+    QString findRemarkByName_event(QString getname){
+        if(getname==myobj::enumstr(metaObject(),"ftsbType",ViewFilter)){
+            return tr("We use this function to check which card should be filtered. ")
+                    +tr("Return true means the card should be filtered. ")
+                    +tr("For example, with Hongyan, all spade cards in our places should be filtered as heart cards. ");
+        }
+        return getname;
+    }
     QStringList funtaglist(QString getstr){
         QStringList strlist;
         if(getstr==myobj::enumstr(metaObject(),"ftsbType",ViewFilter)){strlist<<"room$"<<"rtb$";}
@@ -282,7 +324,14 @@ public:
     int getType(){return ProhibitSkill;}
     enum prsbType{IsProhibited=1};
     enum prsbAbb{prs_ip=IsProhibited};
-    QString findRemarkByName_event(QString getname){return getname;}
+    QString findRemarkByName_event(QString getname){
+        if(getname==myobj::enumstr(metaObject(),"prsbType",IsProhibited)){
+            return tr("We use this function to check when the target should be prohibited. ")
+                    +tr("Return true means the target should be prohibited. ")
+                    +tr("For example, with Kongcheng, when the user use Duel, we cannot be chosen as the target. ");
+        }
+        return getname;
+    }
     QStringList funtaglist(QString getstr){
         QStringList strlist;
         if(getstr==myobj::enumstr(metaObject(),"prsbType",IsProhibited)){strlist<<"rtb$";}
@@ -302,7 +351,14 @@ public:
     int getType(){return MaxCardsSkill;}
     enum mcsbType{ExtraFunc=1};
     enum mcsbAbb{mcs_ef=ExtraFunc};
-    QString findRemarkByName_event(QString getname){return getname;}
+    QString findRemarkByName_event(QString getname){
+        if(getname==myobj::enumstr(metaObject(),"mcsbType",ExtraFunc)){
+            return tr("We use this function to calculate the additional number of maxcards. ")
+                    +tr("Return value is the additional number beyond the general maxcards. ")
+                    +tr("For example, with Xueyi, our additional number of maxcards is 2*X, X is the number of Qun except us. ");
+        }
+        return getname;
+    }
     QStringList funtaglist(QString getstr){
         QStringList strlist;
         if(getstr==myobj::enumstr(metaObject(),"mcsbType",ExtraFunc)){strlist<<"rtn$";}
@@ -331,12 +387,31 @@ public:
     void setPatternProperty(QString getstr);
     QString getPatternPropertyRemark();
     void setPatternPropertyRemark(QString getstr);
-    QString findRemarkByName_event(QString getname){return getname;}
+    QString findRemarkByName_event(QString getname){
+        const QMetaObject *mob=metaObject();
+        if(getname==myobj::enumstr(mob,"tmsbType",ExtraTarget)){
+            return tr("We use this function to calculate the additional number of targets. ")
+                    +tr("Return value is the additional number. ")
+                    +tr("For example, with Tianyi successing, the additional number of targets of Slash is 1. ");
+        }
+        if(getname==myobj::enumstr(mob,"tmsbType",DistanceLimit)){
+            return tr("We use this function to calculate the additional distance beyond the limitation. ")
+                    +tr("Return value is the additional distance beyond the limitation. ")
+                    +tr("For example, with Duanliang, the additional distance for SupplyShortage is 1. ");
+        }
+        if(getname==myobj::enumstr(mob,"tmsbType",Residue)){
+            return tr("We use this function to calculate the additional times for use beyond the limitation. ")
+                    +tr("Return value is the additional times for use beyond the limitation. ")
+                    +tr("For example, with Tianyi successing, the additional times for use Slash is 1. ");
+        }
+        return getname;
+    }
     QStringList funtaglist(QString getstr){
+        const QMetaObject *mob=metaObject();
         QStringList strlist;
-        if(getstr==myobj::enumstr(metaObject(),"tmsbType",ExtraTarget)){strlist<<"rtn$";}
-        if(getstr==myobj::enumstr(metaObject(),"tmsbType",DistanceLimit)){strlist<<"rtn$";}
-        if(getstr==myobj::enumstr(metaObject(),"tmsbType",Residue)){strlist<<"rtn$";}
+        if(getstr==myobj::enumstr(mob,"tmsbType",ExtraTarget)){strlist<<"rtn$";}
+        if(getstr==myobj::enumstr(mob,"tmsbType",DistanceLimit)){strlist<<"rtn$";}
+        if(getstr==myobj::enumstr(mob,"tmsbType",Residue)){strlist<<"rtn$";}
         return strlist;
     }
     QStringList trans();

@@ -1,5 +1,6 @@
 #include "mycode.h"
 #include "mysk.h"
+#include "mysys.h"
 
 int myblock::globalint=0;
 void myblock::addBlock(myblock *getp){
@@ -112,6 +113,14 @@ bool myblock::insertBlock(myblock *getp){
     return false;
 }
 */
+QTreeWidgetItem *myblock::mytreeitem(){
+    QStringList strlist;
+    strlist<<name<<myobj::enumstr(metaObject(),"blockType",getType())<<getRemark();
+    QTreeWidgetItem *pitem=new QTreeWidgetItem(strlist);
+    foreach(myblock *ip,blocklist){pitem->addChild(ip->mytreeitem());}
+    return pitem;
+}
+
 myblock *myblock::getTopBlock(){
     myblock *p=this;
     while(p->upperLayer){p=p->upperLayer;}
@@ -124,6 +133,19 @@ QString myblock::getEvent(){
     myblock *p=getTopBlock();
     if(!getsk0()->eventstrlist().contains(p->name)){qWarning()<<"getevent:"<<p->name;}
     return p->name;
+}
+QString myblock::getRemark(){
+    if(getsk0()->eventstrlist().contains(name)){return getsk0()->findRemarkByName_event(name);}
+    QString tstr=remark;
+    if(upperLayer&&upperLayer->getType()==myblock::Function){
+        if(tstr==""){
+            tstr=myobj::enumstr(metaObject(),"blockType",Block)
+                    +QString::number(upperLayer->blocklist.indexOf(this)+1);
+        }
+        tstr+="  /from: ";
+        tstr+=upperLayer->getRemark();
+    }
+    return tstr;
 }
 
 void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrmlist, QStringList &blrmlist){
@@ -172,7 +194,7 @@ QStringList myfunction::trans(){
             if(vrlist.contains(i)){
                 if(rx.cap(1)!=""){tstr="\\1";}
                 //else if(myobj::b4vrstr(objlist.at(i)->type)){tstr="";}
-                else{tstr="if not %"+QString::number(i+1)+" then return false end;";}
+                else{tstr="if not %"+QString::number(i+1)+" then return defaultReturn end;";}
             }
             str.replace(rx,tstr);
         }
@@ -206,6 +228,31 @@ myfunction *myfunction::findFuncByObj(myobj *getp){
     if(rtobjlist.contains(getp)){return this;}
     return myblock::findFuncByObj(getp);
 }
+QString myfunction::getRemark(){
+    QString tstr;
+    QString rmstr=myfun::findRemarkByName(funname);
+    for(int i=0;i<objlist.length();i++){
+        if(!rmstr.contains(str4parameter()+QString::number(i+1))){qWarning()<<"getremark"<<funname<<i;}
+        tstr=getsk0()->findRemarkByName_obj(objlist.at(i),getsk0()->getsys()->findFuncByObj(objlist.at(i)),false);
+        if(tstr.contains(str4parameter())){tstr.replace(str4parameter(),str4parameter()+" ");}
+        if(tstr.contains(str4returnvalue())){tstr.replace(str4returnvalue(),str4returnvalue()+" ");}
+        rmstr.replace(str4parameter()+QString::number(i+1),
+                     QString("\"%1|%2\"").arg(objlist.at(i)->name,tstr));
+    }
+
+    for(int i=0;i<rtobjlist.length();i++){
+        if(!rmstr.contains(str4returnvalue()+QString::number(i+1))){qWarning()<<"getremark"<<funname<<i;}
+        tstr=getsk0()->findRemarkByName_obj(rtobjlist.at(i),this,false);
+        if(tstr.contains(str4parameter())){tstr.replace(str4parameter(),str4parameter()+" ");}
+        if(tstr.contains(str4returnvalue())){tstr.replace(str4returnvalue(),str4returnvalue()+" ");}
+        rmstr.replace(str4returnvalue()+QString::number(i+1),
+                     QString("\"%1|%2\"").arg(rtobjlist.at(i)->name,tstr));
+    }
+    rmstr.replace(str4parameter()+" ",str4parameter());
+    rmstr.replace(str4returnvalue()+" ",str4returnvalue());
+    return rmstr;
+}
+
 /*
 void myopr::myini(){
     name=eventstr;

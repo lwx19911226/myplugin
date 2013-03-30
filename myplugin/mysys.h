@@ -36,14 +36,25 @@ public:
     bool delSkill(mysk *getp);
     mygeneral *findGeneralByName(QString getname);
     mysk *findSkillByName(QString getname);
+    myfunction *findFuncByObj(myobj *);
     QStringList trans();
     QStringList trans4design();
     void myini_design(QString path);
     void undo();
     void redo();
 
-    QStringList getgstrlist(){QStringList strlist;foreach(mygeneral *ip,glist){strlist<<ip->name;}return strlist;}
-    QStringList getskstrlist(){QStringList strlist;foreach(mysk *ip,sklist){strlist<<ip->name;}return strlist;}
+    QStringList getgstrlist(){
+        QStringList strlist;
+        foreach(mygeneral *ip,glist){strlist<<ip->name;}
+        return strlist;
+    }
+    QStringList getskstrlist(int gettype){
+        QStringList strlist;
+        foreach(mysk *ip,sklist){
+            if(ip->getType()==gettype){strlist<<ip->name;}
+        }
+        return strlist;
+    }
     void sig_update(){
         //if(!psk0){return;}
         emit update();

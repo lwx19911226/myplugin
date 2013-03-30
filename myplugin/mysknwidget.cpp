@@ -1,7 +1,7 @@
 #include "mysknwidget.h"
 
-bool myshorter(const QString &s1,const QString &s2){
-    return s1.split("|").last().length()<s2.split("|").last().length();
+bool mycmp(const QString &s1,const QString &s2){
+    return s1.split("|").first().toLower()<s2.split("|").first().toLower();
 }
 QTableWidgetItem *mynewitem(QString getstr){
     QTableWidgetItem *pitem=new QTableWidgetItem(getstr);
@@ -15,10 +15,11 @@ mysknwidget::mysknwidget(MainWindow *getMain,QWidget *parent):QWidget(parent){
 
     p_tablewidget=new QTableWidget(this);
     p_tablewidget->setRowCount(myobj::myconstskstrlist.length()+pmain->psys->sklist.length());
-    p_tablewidget->setColumnCount(3);
+    p_tablewidget->setColumnCount(4);
     p_tablewidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    p_tablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     QStringList tstrlist;
-    tstrlist<<tr("Name")<<tr("Translation")<<tr("Description");
+    tstrlist<<tr("Name")<<tr("Translation")<<tr("Description")<<"";
     p_tablewidget->setHorizontalHeaderLabels(tstrlist);
     int rowi=0;
     foreach(mysk *ip,pmain->psys->sklist){
@@ -28,7 +29,7 @@ mysknwidget::mysknwidget(MainWindow *getMain,QWidget *parent):QWidget(parent){
         rowi++;
     }
     QStringList tskstrlist(myobj::myconstskstrlist);
-    qSort(tskstrlist.begin(),tskstrlist.end(),myshorter);
+    qSort(tskstrlist.begin(),tskstrlist.end(),mycmp);
     foreach(QString stri,tskstrlist){
         QString tstri=stri;
         for(int j=0;j<3;j++){

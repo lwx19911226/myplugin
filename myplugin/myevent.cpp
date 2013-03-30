@@ -61,7 +61,7 @@ void myevent::getavlobjlist(QString getstr,QList<myobj *> &list, QObject *getpf)
                 p->blockstr=getstr;
                 p->noDeclaration=true;
                 //p->isDynamic=false;
-                list.append(p);
+                list.prepend(p);
             }
         }
     }

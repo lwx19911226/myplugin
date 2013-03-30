@@ -25,7 +25,7 @@ class myobj : public QObject
 public:
     explicit myobj(QObject *parent = 0):QObject(parent){
         blockstr="";noDeclaration=false;isVerified=false;isGlobal=false;
-        //isDynamic=true;
+        //isDynamic=true;        
     }
     enum objType{all=0,myplayer=1,mysplayer=2,mycard=3,mybool=4,mylist=5,myplayerlist=6,mysplayerlist=7,mycardlist=8,mynumlist=9,mynum=10,mystr=11,mystrc=12};
     enum iniFormat{Name=0,Type=1,Remark=2,Extra=3};
@@ -172,6 +172,7 @@ public:
         if(type==mystrc){return QString("\"%1\"").arg(name);}
         return name;
     }
+
     static void myini();
     static void myini_lang();
     static void myini_cl();

@@ -129,11 +129,17 @@ MainWindow::MainWindow(QWidget *parent) :
     p_textedit_current=new QTextEdit;
     p_textedit_current->setReadOnly(true);
     p_textedit_current->setLineWrapMode(QTextEdit::NoWrap);
+    p_treewidget=new QTreeWidget;
+    p_treewidget->setColumnCount(3);
+    QStringList tstrlist;
+    tstrlist<<tr("Name")<<tr("Type")<<tr("Description");
+    p_treewidget->setHeaderLabels(tstrlist);
     //mytext();
     p_tabwidget2=new QTabWidget(ui->centralWidget);
     //p_tabwidget2->setTabPosition(QTabWidget::West);
     p_tabwidget2->addTab(p_textedit_all,tr("Full"));
     p_tabwidget2->addTab(p_textedit_current,tr("Current Skill"));
+    p_tabwidget2->addTab(p_treewidget,tr("Block Tree"));
 
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout;
@@ -159,7 +165,9 @@ MainWindow::MainWindow(QWidget *parent) :
     myrfr();
     //qWarning()<<"130325~";
     QObject::connect(psys,SIGNAL(update()),this,SLOT(myrfr()));
-
+    QObject::connect(p_tabwidget1,SIGNAL(currentChanged(int)),this,SLOT(myrfr()));
+    QObject::connect(p_tabwidget2,SIGNAL(currentChanged(int)),this,SLOT(myrfr()));
+    resize(QApplication::desktop()->screenGeometry().width()*0.75,QApplication::desktop()->screenGeometry().height()*0.75);
 }
 
 MainWindow::~MainWindow()
@@ -337,7 +345,7 @@ void MainWindow::itemchanged_sk(QTableWidgetItem *getp){
         if(getpp){
             QString gettext=getpp->text();
             if(getpp->column()>0){b4rfr=false;getpp->setText("");b4rfr=true;}
-            if(gettext!=""){strlist<<gettext;}
+            if(gettext!=""){strlist.prepend(gettext);}
         }
     }
     strmap.insert(hstr,strlist.join(",,"));
@@ -414,31 +422,39 @@ void MainWindow::myrfr(){
     b4rfr=false;
     p_lineedit_packagename->setText(psys->packagename);
     p_lineedit_packagetrans->setText(psys->package_trans);
-    QMap<QString,QString> strmap;
-    myrfr_tablewidget_removerow(str2tw_tab(mygeneral::tabstr()),psys->getgstrlist());
-    foreach(mygeneral *ip,psys->glist){
-        strmap.clear();
-        ip->propertymap_get(strmap,true);
-        int getrow=myrfr_tablewidget_getrow(str2tw_tab(mygeneral::tabstr()),ip->name);
-        myrfr_tablewidget_property(str2tw_tab(mygeneral::tabstr()),getrow,strmap);
-        //myrfr_g(ip,myrfr_tablewidget_getrow(p_tablewidget_g,ip->name));
-    }
-    str2tw_tab(mygeneral::tabstr())->resizeColumnsToContents();
-
-    QList<int> sktypelist;
-    mysk::typelist(sktypelist);
-    foreach(int gettype,sktypelist){
-        QList<mysk *> sklist;
-        psys->getsklist(sklist,gettype);
-        foreach(mysk *ip,sklist){
+    QMap<QString,QString> strmap;    
+    QString tstr=p_tabwidget1->tabText(p_tabwidget1->currentIndex());
+    QTableWidget *pcurrent=str2tw_tab(tstr);
+    if(tstr==mygeneral::tabstr()){
+        myrfr_tablewidget_removerow(pcurrent,psys->getgstrlist());
+        foreach(mygeneral *ip,psys->glist){
             strmap.clear();
             ip->propertymap_get(strmap,true);
-            int getrow=myrfr_tablewidget_getrow(str2tw_tab(mysk::type2str(gettype)),ip->name);
-            myrfr_tablewidget_property(str2tw_tab(mysk::type2str(gettype)),getrow,strmap);
+            int getrow=myrfr_tablewidget_getrow(pcurrent,ip->name);
+            myrfr_tablewidget_property(pcurrent,getrow,strmap);
+            //myrfr_g(ip,myrfr_tablewidget_getrow(p_tablewidget_g,ip->name));
         }
-        str2tw_tab(mysk::type2str(gettype))->resizeColumnsToContents();
+        pcurrent->resizeColumnsToContents();
     }
-
+    else{
+        QList<int> sktypelist;
+        mysk::typelist(sktypelist);
+        foreach(int gettype,sktypelist){
+            if(tstr==mysk::type2str(gettype)){
+                QList<mysk *> sklist;
+                psys->getsklist(sklist,gettype);
+                myrfr_tablewidget_removerow(pcurrent,psys->getskstrlist(gettype));
+                foreach(mysk *ip,sklist){
+                    strmap.clear();
+                    ip->propertymap_get(strmap,true);
+                    int getrow=myrfr_tablewidget_getrow(pcurrent,ip->name);
+                    myrfr_tablewidget_property(pcurrent,getrow,strmap);
+                }
+                pcurrent->resizeColumnsToContents();
+                break;
+            }
+        }
+    }
     if(psys->psk0){
         p_label_skname->setText(psys->psk0->name+" | "+psys->psk0->translation);
     }
@@ -448,7 +464,10 @@ void MainWindow::myrfr(){
     p_pushbutton_undo->setEnabled(!psys->dolist.isEmpty());
     p_pushbutton_redo->setEnabled(!psys->undostrlist.isEmpty());
     b4rfr=true;
-    mytext();
+    if(p_tabwidget2->currentWidget()==p_treewidget){mytree();}
+    else if(p_tabwidget2->currentWidget()==p_textedit_all){mytext_all();}
+    else if(p_tabwidget2->currentWidget()==p_textedit_current){mytext_current();}
+
     qWarning()<<"130315:rfr";
 }
 void MainWindow::myrfr_tablewidget_removerow(QTableWidget *ptw, QStringList getstrlist){
@@ -534,20 +553,18 @@ void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<
             }
         }
         ptw->setItem(getrow,i,new QTableWidgetItem);
-        qWarning()<<"130315-2"<<hstr<<getrow<<i;
+        qWarning()<<"130315-2"<<hstr<<getrow<<i<<tw2str_tab(ptw);
     }
 }
 
-void MainWindow::mytext(){
+void MainWindow::mytext_all(){
     //int geti=0;
     //for(int i=0;i<psys->trans().length();i++){
     //    if(!textlist.contains(psys->trans().at(i))){geti=i;break;}
     //}
     textlist_all=psys->trans();
     p_textedit_all->setText(mycode::mymdf(textlist_all,QString("\n"),false).join(""));
-    if(psys->psk0){textlist_current=psys->psk0->trans();}
-    else{textlist_current=QStringList();}
-    p_textedit_current->setText(mycode::mymdf(textlist_current,QString("\n"),false).join(""));
+
     //if(!p_textedit->scrollBarWidgets(Qt::AlignRight).isEmpty()){
     //    QScrollBar *pt=static_cast<QScrollBar *>(p_textedit->scrollBarWidgets(Qt::AlignRight).first());
     //    qWarning()<<"0224:"<<geti<<pt->minimum()<<pt->maximum();
@@ -565,15 +582,33 @@ void MainWindow::mytext(){
     cursor.mergeCharFormat(fmt);
     p_textedit->mergeCurrentCharFormat(fmt);
 */
-
 }
+void MainWindow::mytext_current(){
+    if(psys->psk0){textlist_current=psys->psk0->trans();}
+    else{textlist_current=QStringList();}
+    p_textedit_current->setText(mycode::mymdf(textlist_current,QString("\n"),false).join(""));
+}
+
+void MainWindow::mytree(){
+    p_treewidget->clear();
+    if(!psys->psk0){return;}
+    foreach(myblock *ip,psys->psk0->blocklist){
+        QTreeWidgetItem *pitem=ip->mytreeitem();
+        p_treewidget->addTopLevelItem(pitem);
+    }
+    p_treewidget->expandAll();
+    for(int i=0;i<p_treewidget->columnCount();i++){
+        p_treewidget->resizeColumnToContents(i);
+    }
+}
+
 void MainWindow::myadd(){
     if(!psys->psk0){return;}
     if(p_inputwidget){delete p_inputwidget;}
     qWarning()<<"myadd";
     p_inputwidget=new myinputwidget(this);
-    p_inputwidget->resize(600,600);
-    p_inputwidget->setWindowTitle("myplugin_add");
+    p_inputwidget->resize(QApplication::desktop()->screenGeometry().width()*0.75,QApplication::desktop()->screenGeometry().height()*0.75);
+    p_inputwidget->setWindowTitle(tr("Skill_Add"));
     p_inputwidget->show();
 }
 void MainWindow::myundo(){
@@ -600,10 +635,12 @@ void MainWindow::mydel(){
 }
 void MainWindow::myptg(){
     myptgwidget *p_ptgwidget=new myptgwidget;
+    p_ptgwidget->resize(QApplication::desktop()->screenGeometry().width()*0.5,QApplication::desktop()->screenGeometry().height()*0.5);
     p_ptgwidget->show();
 }
 void MainWindow::myskn(){
     mysknwidget *p_sknwidget=new mysknwidget(this);
+    p_sknwidget->resize(QApplication::desktop()->screenGeometry().width()*0.5,QApplication::desktop()->screenGeometry().height()*0.5);
     p_sknwidget->show();
 }
 void MainWindow::myreadme(){
