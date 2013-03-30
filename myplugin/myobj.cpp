@@ -27,9 +27,9 @@ void myobj::myini(){
         myini_cl();
         QStringList tstrlist;
         tstrlist<<tr("TriggerSkill")<<tr("ViewAsSkill")<<tr("DistanceSkill")<<tr("FilterSkill")<<tr("ProhibitSkill")
-               <<tr("MaxCardsSkill")<<tr("TargetModSkill")<<tr("Name")<<tr("Translation")<<tr("Kingdom")<<tr("Sex")
+               <<tr("MaxCardsSkill")<<tr("TargetModSkill")<<tr("ExistingSkill")<<tr("Name")<<tr("Translation")<<tr("Kingdom")<<tr("Sex")
               <<tr("HP")<<tr("Title")<<tr("Word")<<tr("Owner")<<tr("Description")<<tr("Words")<<tr("Subtype")<<tr("CardsNum")
-             <<tr("CardViewAs")<<tr("Pattern")<<tr("Block")<<tr("Function");
+             <<tr("CardViewAs")<<tr("Pattern")<<tr("SKName")<<tr("TargetPlayersNum")<<tr("Block")<<tr("Function");
     }
 }
 void myobj::myini_lang(){
@@ -66,11 +66,17 @@ void myobj::myini_lang(){
                         QString getname=tstrlist.at(index).split("|").first();
                         QString gettranslation=tstrlist.at(index).split("|").last();
                         if(rx2.cap(2).length()>10){myconstskstrlist<<tstrlist.at(index)+"|"+rx2.cap(2);}
-                        else if(!isConst(getname)){
-                            QStringList obstrlist;
-                            obstrlist<<getname<<"mystrc"<<tr("Object Name")+tr("[")+gettranslation+tr("]")<<"ob";
-                            //qWarning()<<"130328"<<obstrlist.join("|");
-                            myconstlist<<obstrlist.join("|");
+                        else{
+                            bool b=false;
+                            foreach(QString tstri,myconstlist){
+                                if(tstri.startsWith(getname+"|")){b=true;break;}
+                            }
+                            if(!b){
+                                QStringList obstrlist;
+                                obstrlist<<getname<<"mystrc"<<tr("Object Name")+tr("[")+gettranslation+tr("]")<<"ob";
+                                //qWarning()<<"130328"<<obstrlist.join("|");
+                                myconstlist<<obstrlist.join("|");
+                            }
                         }
 
                     }
@@ -83,6 +89,7 @@ void myobj::myini_lang(){
         }
         tfin.close();
     }
+    qSort(myconstskstrlist.begin(),myconstskstrlist.end(),mycmp);
 }
 void myobj::myini_cl(){
     QStringList oblist=getconstlist_tag("ob");
@@ -117,30 +124,45 @@ void myobj::myini_cl(){
     }
 }
 
-bool myobj::isConst(QString getstr){
-    myini();
-    foreach(QString stri,myconstlist){
-        if(stri.startsWith(getstr+"|")){return true;}
-    }
-    return false;
-}
-QStringList myobj::transConst(QString getstr){
+QString myobj::isConst(QString getstr, QString abbstr){
     myini();
     foreach(QString stri,myconstlist){
         if(stri.startsWith(getstr+"|")){
-            QStringList extrastrlist=stri.split("|").at(Extra).split(",,");
-            foreach(QString extrastri,extrastrlist){
-                if(!extrastri.startsWith("tr:")){continue;}
-                QString transstr=extrastri.mid(3);
-                if(transstr==""){return QStringList();}
-                QString namestr=stri.split("|").at(Name);
-                transstr.replace(QRegExp("([^\\\\]?)%1"),"\\1"+namestr);
-                return transstr.split(";");
+            bool b=true;
+            foreach(QString tstri,stri.split("|").at(Extra).split(",,")){
+                if(tstri.startsWith("bl:")&&tstri!="bl:"+abbstr){b=false;break;}
             }
+            if(b){return stri;}
+        }
+    }
+    return QString();
+}
+QStringList myobj::transConst(QString getstr, QString abbstr){
+    myini();
+    foreach(QString stri,myconstlist){
+        if(stri.startsWith(getstr+"|")){
+            bool b=true;
+            foreach(QString tstri,stri.split("|").at(Extra).split(",,")){
+                if(tstri.startsWith("bl:")&&tstri!="bl:"+abbstr){b=false;break;}
+            }
+            if(b){return transConst(stri);}
         }
     }
     return QStringList();
 }
+QStringList myobj::transConst(QString getconststr){
+    QStringList extrastrlist=getconststr.split("|").at(Extra).split(",,");
+    foreach(QString extrastri,extrastrlist){
+        if(!extrastri.startsWith("tr:")){continue;}
+        QString transstr=extrastri.mid(3);
+        if(transstr==""){return QStringList();}
+        QString namestr=getconststr.split("|").at(Name);
+        transstr.replace(QRegExp("([^\\\\]?)%1"),"\\1"+namestr);
+        return transstr.split(";");
+    }
+    return QStringList();
+}
+
 void myobj::newConst(QList<myobj *> &list,QString getbl,QObject *getpf,bool only){
     myini();
     myobj *pnew;
@@ -223,3 +245,37 @@ bool myobj::matchTag(QString getname, QString gettag){
     return true;
 }
 
+QString myobj::enumstr(const QMetaObject *mob,QByteArray getname,int getint){
+    return tr(mob->enumerator(mob->indexOfEnumerator(getname)).valueToKey(getint));
+}
+int myobj::enumint(const QMetaObject *mob,QByteArray getname,QString getstr,int defaultint){
+    QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
+    for(int i=0;i<myenum.keyCount();i++){
+        if((getstr==myenum.key(i))||(getstr==tr(myenum.key(i)))){return myenum.value(i);}
+    }
+    qWarning()<<"enumint"<<getname<<getstr;
+    return defaultint;
+}
+QStringList myobj::enumstrlist(const QMetaObject *mob,QByteArray getname){
+    QStringList strlist;
+    QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
+    for(int i=0;i<myenum.keyCount();i++){
+        strlist<<enumstr(mob,getname,myenum.value(i));
+    }
+    return strlist;
+}
+void myobj::enumintlist(const QMetaObject *mob,QByteArray getname,QList<int> &list){
+    QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
+    for(int i=0;i<myenum.keyCount();i++){
+        list<<myenum.value(i);
+    }
+}
+bool myobj::enumcontains(const QMetaObject *mob,QByteArray getname,QString getstr){
+    return enumstrlist(mob,getname).contains(getstr)||enumstrlist(mob,getname).contains(tr(getstr.toUtf8()));
+}
+bool myobj::enumcontains(const QMetaObject *mob,QByteArray getname,int getint){
+    return enumcontains(mob,getname,enumstr(mob,getname,getint));
+}
+int myobj::enumcnt(const QMetaObject *mob,QByteArray getname){
+    return mob->enumerator(mob->indexOfEnumerator(getname)).keyCount();
+}

@@ -9,6 +9,7 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
 
     p_lineedit_filter=new QLineEdit(this);
     QObject::connect(p_lineedit_filter,SIGNAL(textEdited(QString)),this,SLOT(filterItems()));
+    QLabel *p_label0=new QLabel(tr("Current Skill:")+" "+pmain->psys->psk0->name+" | "+pmain->psys->psk0->translation,this);
     QFormLayout *p_formlayout=new QFormLayout;
     p_formlayout->addRow(tr("Filter:"),p_lineedit_filter);
 
@@ -37,6 +38,7 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
     p_textedit->setReadOnly(true);
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout(this);
+    p_vboxlayout->addWidget(p_label0);
     p_vboxlayout->addLayout(p_hboxlayout);
     p_vboxlayout->addWidget(p_columnview);
     QWidget *p_widget1=new QWidget(this);
@@ -96,7 +98,7 @@ void myinputwidget::myadd(){
     //qWarning()<<p_inputmodel->getItem(p_columnview->currentIndex())->getstr();
     QStringList list=getSel();
     if(list.length()<3){return;}
-    if(list.last()=="input others"){return;}
+    if(list.last()==myinputitem::str4input()){return;}
     QString geteventstr=list.at(0);
     QString getblockstr=list.at(1).split("|").at(0);
     QString getfunstr=list.at(2);
@@ -151,13 +153,9 @@ QString myinputwidget::getRemark(myinputitem *pi){
 }
 
 void myinputwidget::showRemark(){
-
-    //QList<QString> list;
-    //getSel(list);
-    //if(!list.isEmpty()&&(list.last()=="input others"||list.last().startsWith(">"))){return;}
     QStringList strlist;
     myinputitem *pi=p_inputmodel->getItem(p_columnview->currentIndex());
-    if(pi&&(pi->type==0||pi->getstr()=="input others"||pi->getstr().startsWith(">"))){return;}
+    if(pi&&(pi->type==0||myinputitem::spstr(pi->getstr()))){return;}
     while(pi->pf){
         strlist.prepend(QString("%1 : %2").arg(pi->getstr()).arg(getRemark(pi)));
         pi=pi->pf;
@@ -169,7 +167,7 @@ void myinputwidget::showRemark(){
 
 void myinputwidget::changeRTR(){
     QStringList list=getSel();
-    if(!list.isEmpty()&&list.last()=="input others"){return;}
+    if(!list.isEmpty()&&list.last()==myinputitem::str4input()){return;}
     foreach(QLabel *ip,p_label_list){ip->hide();}
     foreach(QLineEdit *ip,p_lineedit_list){ip->hide();}
     if(list.isEmpty()){return;}
@@ -275,8 +273,7 @@ void myinputwidget::filterItems(){
     p_columnview->setCurrentIndex(p_inputmodel->getIndex(p,true));
     //qWarning()<<"filteritem";
     foreach(myinputitem *ip,p0->pchlist){
-        if(ip->getstr().startsWith(">")){continue;}
-        if(ip->getstr()=="input others"){continue;}
+        if(myinputitem::spstr(ip->getstr())){continue;}
         ip->visible=reg.exactMatch(ip->getstr())||reg.exactMatch(getRemark(ip));
     }
     p->delAllChildren();
@@ -297,8 +294,7 @@ void myinputwidget::filterItems_obj(){
     p_columnview->setCurrentIndex(p_inputmodel->getIndex(p,true));
     //qWarning()<<"filteritem_const";
     foreach(myinputitem *ip,p0->pchlist){
-        if(ip->getstr().startsWith(">")){continue;}
-        if(ip->getstr()=="input others"){continue;}
+        if(myinputitem::spstr(ip->getstr())){continue;}
         if(p_combobox_filter->currentText()==tr("ALL")){ip->visible=true;continue;}
         QStringList gettaglist=pmain->psys->psk0->funtaglist(ip->getParent(myinputitem::func_Event)->getstr());
         gettaglist<<myfun::remark2tag(p_combobox_filter->currentText());
@@ -308,8 +304,12 @@ void myinputwidget::filterItems_obj(){
         else if(p0->type+1>=myinputitem::func_Obj){
             myobj *pt=pmain->psys->psk0->findObjByName(ip->getstr(),ip->getParent(myinputitem::func_Event)->getstr());
             if(pt){
-                if(p_combobox_filter->currentText()==tr("Const")){ip->visible=myobj::isConst(ip->getstr());}
-                else if(p_combobox_filter->currentText()==tr("Variable")){ip->visible=!myobj::isConst(ip->getstr());}
+                bool b=false;
+                foreach(QString stri,myobj::myconstlist){
+                    if(stri.startsWith(pt->name+"|")){b=true;break;}
+                }
+                if(p_combobox_filter->currentText()==tr("Const")){ip->visible=b;}
+                else if(p_combobox_filter->currentText()==tr("Variable")){ip->visible=!b;}
                 else{ip->visible=myobj::matchTag(ip->getstr(),myobj::remark2tag(p_combobox_filter->currentText()));}
             }
         }

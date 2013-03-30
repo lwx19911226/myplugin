@@ -114,9 +114,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *p_pushbutton_readme=new QPushButton(ui->centralWidget);
     p_pushbutton_readme->setText(tr("Readme"));
     QObject::connect(p_pushbutton_readme,SIGNAL(clicked()),this,SLOT(myreadme()));
-    QPushButton *p_pushbutton_sgs=new QPushButton(ui->centralWidget);
-    p_pushbutton_sgs->setText(tr("QSanguosha"));
-    QObject::connect(p_pushbutton_sgs,SIGNAL(clicked()),this,SLOT(mysgs()));
+    QPushButton *p_pushbutton_sgs=new QPushButton(ui->centralWidget);    
+    QDir dir("..");
+    if(dir.exists("QSanguosha.exe")){
+        p_pushbutton_sgs->setText(tr("QSanguosha"));
+        QObject::connect(p_pushbutton_sgs,SIGNAL(clicked()),this,SLOT(mysgs()));
+    }
+    else{
+        p_pushbutton_sgs->setText(tr("No QSanguosha"));
+        p_pushbutton_sgs->setEnabled(false);
+    }
     QHBoxLayout *p_hboxlayout3=new QHBoxLayout;
     p_hboxlayout3->addWidget(p_pushbutton_ptg);
     p_hboxlayout3->addWidget(p_pushbutton_skn);
@@ -273,10 +280,11 @@ QString MainWindow::tw2str_tab(QTableWidget *ptw){
     return QString();
 }
 void MainWindow::itemsel_sk(QTableWidget *ptw){
-    if(ptw->item(ptw->currentRow(),0)){
-        QString getname=ptw->item(ptw->currentRow(),0)->text();
-        qWarning()<<"itemsel_sk:"<<psys->psk0->name<<getname;
-        if(psys->psk0->name!=getname){
+    QTableWidgetItem *pitem=ptw->item(ptw->currentRow(),0);
+    if(pitem){
+        QString getname=pitem->text();
+        if(psys->psk0&&(psys->psk0->name==getname)){}
+        else{
             mysk *pt=psys->findSkillByName(getname);
             if(pt){psys->psk0=pt;}
             else{}
@@ -285,18 +293,19 @@ void MainWindow::itemsel_sk(QTableWidget *ptw){
 }
 void MainWindow::itemsel(){
     if(!b4rfr){return;}
-    if(p_tabwidget1->tabText(p_tabwidget1->currentIndex())==mygeneral::tabstr()){
-        QTableWidget *ptw=static_cast<QTableWidget *>(p_tabwidget1->currentWidget());
+    QString twtab=p_tabwidget1->tabText(p_tabwidget1->currentIndex());
+    QTableWidget *ptw=str2tw_tab(twtab);
+    if(twtab==mygeneral::tabstr()){
         QString getname=ptw->item(ptw->currentRow(),0)->text();
-        qWarning()<<"itemsel:"<<psys->pg0->name<<getname;
-        if(psys->pg0->name!=getname){
+        if(psys->pg0&&(psys->pg0->name==getname)){}
+        else{
             mygeneral *pg=psys->findGeneralByName(getname);
             if(pg){psys->pg0=pg;}
             else{}
         }
     }
-    if(mysk::typestrlist().contains(p_tabwidget1->tabText(p_tabwidget1->currentIndex()))){
-        itemsel_sk(static_cast<QTableWidget *>(p_tabwidget1->currentWidget()));
+    if(mysk::typestrlist().contains(twtab)){
+        itemsel_sk(ptw);
     }
     myrfr();
     /*
@@ -370,7 +379,7 @@ void MainWindow::itemchanged_sk(QTableWidgetItem *getp){
     }
     */
 }
-bool MainWindow::tablewidget_cw(QWidget *getcw, QTableWidget *&ptw, int &ii, int &jj){
+bool MainWindow::tw_cw(QWidget *getcw, QTableWidget *&ptw, int &ii, int &jj){
     ptw=static_cast<QTableWidget *>(getcw->parent());
     if(!ptw){return false;}
     ptw=static_cast<QTableWidget *>(ptw->parent());
@@ -388,7 +397,7 @@ bool MainWindow::tablewidget_cw(QWidget *getcw, QTableWidget *&ptw, int &ii, int
 void MainWindow::itemchanged_cbb_sk(QComboBox *pcbb){
     QTableWidget *ptw;
     int ii,jj;
-    if(tablewidget_cw(pcbb,ptw,ii,jj)){
+    if(tw_cw(pcbb,ptw,ii,jj)){
         mysk *psk=psys->findSkillByName(ptw->item(ii,0)->text());
         if(!psk){}
         else{
@@ -401,7 +410,7 @@ void MainWindow::itemchanged_cbb_sk(QComboBox *pcbb){
 void MainWindow::itemchanged_cbb_g(QComboBox *pcbb){
     QTableWidget *ptw;
     int ii,jj;
-    if(tablewidget_cw(pcbb,ptw,ii,jj)){
+    if(tw_cw(pcbb,ptw,ii,jj)){
         mygeneral *pg=psys->findGeneralByName(ptw->item(ii,0)->text());
         if(!pg){}
         else{
@@ -426,12 +435,12 @@ void MainWindow::myrfr(){
     QString tstr=p_tabwidget1->tabText(p_tabwidget1->currentIndex());
     QTableWidget *pcurrent=str2tw_tab(tstr);
     if(tstr==mygeneral::tabstr()){
-        myrfr_tablewidget_removerow(pcurrent,psys->getgstrlist());
+        myrfr_tw_removerow(pcurrent,psys->getgstrlist());
         foreach(mygeneral *ip,psys->glist){
             strmap.clear();
             ip->propertymap_get(strmap,true);
-            int getrow=myrfr_tablewidget_getrow(pcurrent,ip->name);
-            myrfr_tablewidget_property(pcurrent,getrow,strmap);
+            int getrow=myrfr_tw_getrow(pcurrent,ip->name);
+            myrfr_tw_property(pcurrent,getrow,strmap);
             //myrfr_g(ip,myrfr_tablewidget_getrow(p_tablewidget_g,ip->name));
         }
         pcurrent->resizeColumnsToContents();
@@ -443,21 +452,23 @@ void MainWindow::myrfr(){
             if(tstr==mysk::type2str(gettype)){
                 QList<mysk *> sklist;
                 psys->getsklist(sklist,gettype);
-                myrfr_tablewidget_removerow(pcurrent,psys->getskstrlist(gettype));
+                myrfr_tw_removerow(pcurrent,psys->getskstrlist(gettype));
                 foreach(mysk *ip,sklist){
                     strmap.clear();
                     ip->propertymap_get(strmap,true);
-                    int getrow=myrfr_tablewidget_getrow(pcurrent,ip->name);
-                    myrfr_tablewidget_property(pcurrent,getrow,strmap);
+                    int getrow=myrfr_tw_getrow(pcurrent,ip->name);
+                    myrfr_tw_property(pcurrent,getrow,strmap);
                 }
                 pcurrent->resizeColumnsToContents();
                 break;
             }
         }
     }
+    QString sk0str;
     if(psys->psk0){
-        p_label_skname->setText(psys->psk0->name+" | "+psys->psk0->translation);
+        sk0str=psys->psk0->name+" | "+psys->psk0->translation;
     }
+    p_label_skname->setText(sk0str);
     if(psys->pg0){
         //p_label_gname->setText(psys->pg0->name+" | "+psys->pg0->translation);
     }
@@ -468,9 +479,9 @@ void MainWindow::myrfr(){
     else if(p_tabwidget2->currentWidget()==p_textedit_all){mytext_all();}
     else if(p_tabwidget2->currentWidget()==p_textedit_current){mytext_current();}
 
-    qWarning()<<"130315:rfr";
+    qWarning()<<"myrfr";
 }
-void MainWindow::myrfr_tablewidget_removerow(QTableWidget *ptw, QStringList getstrlist){
+void MainWindow::myrfr_tw_removerow(QTableWidget *ptw, QStringList getstrlist){
     for(int i=0;i<ptw->rowCount();){
         if(!getstrlist.contains(ptw->item(i,0)->text())){
             ptw->removeRow(i);
@@ -479,14 +490,14 @@ void MainWindow::myrfr_tablewidget_removerow(QTableWidget *ptw, QStringList gets
         i++;
     }
 }
-int MainWindow::myrfr_tablewidget_getrow(QTableWidget *ptw, QString getstr){
+int MainWindow::myrfr_tw_getrow(QTableWidget *ptw, QString getstr){
     for(int i=0;i<ptw->rowCount();i++){
         if(ptw->item(i,0)&&(ptw->item(i,0)->text()==getstr)){return i;}
     }
     ptw->insertRow(ptw->rowCount());
     return ptw->rowCount()-1;
 }
-void MainWindow::myrfr_tablewidget_str(QTableWidget *ptw,int getrow, int getcol, QString getstr){
+void MainWindow::myrfr_tw_str(QTableWidget *ptw,int getrow, int getcol, QString getstr){
     bool b4sk=mysk::typestrlist().contains(tw2str_tab(ptw));
     if(b4sk){
         mysk *tsk=psys->newsk(mysk::str2type(tw2str_tab(ptw)));
@@ -509,7 +520,7 @@ void MainWindow::myrfr_tablewidget_str(QTableWidget *ptw,int getrow, int getcol,
         ptw->setItem(getrow,getcol,new QTableWidgetItem(getstr));
     }    
 }
-void MainWindow::myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow, int getcol, QString getstr,QStringList list4new){
+void MainWindow::myrfr_tw_cbb(QTableWidget *ptw,int getrow, int getcol, QString getstr,QStringList list4new){
     while(ptw->columnCount()<=getcol){ptw->insertColumn(ptw->columnCount());}
     bool b4edit=false;
     if((list4new.length()>1)&&(list4new.at(1)=="")){b4edit=true;list4new.removeOne("");}
@@ -531,7 +542,7 @@ void MainWindow::myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow, int getcol,
         QObject::connect(pt,SIGNAL(editTextChanged(QString)),this,SLOT(itemchanged_cbb()));
     }
 }
-void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<QString, QString> &strmap){
+void MainWindow::myrfr_tw_property(QTableWidget *ptw, int getrow, QMap<QString, QString> &strmap){
     for(int i=0;i<ptw->columnCount();i++){
         if(i>=strmap.values().length()){return;}
         QString hstr=ptw->horizontalHeaderItem(i)->text();
@@ -539,8 +550,8 @@ void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<
             if(strmap.count(hstr)==1){
                 QString getstr=strmap.value(hstr);
                 QStringList tstrlist=mycode::mysplit(getstr);
-                if(tstrlist.length()>1){myrfr_tablewidget_cbb(ptw,getrow,i,tstrlist.first(),tstrlist);}
-                else{myrfr_tablewidget_str(ptw,getrow,i,tstrlist.first());}
+                if(tstrlist.length()>1){myrfr_tw_cbb(ptw,getrow,i,tstrlist.first(),tstrlist);}
+                else{myrfr_tw_str(ptw,getrow,i,tstrlist.first());}
                 continue;
             }
             int ii;
@@ -548,12 +559,12 @@ void MainWindow::myrfr_tablewidget_property(QTableWidget *ptw, int getrow, QMap<
                 if(ptw->horizontalHeaderItem(ii)->text()!=hstr){break;}
             }            
             if(i-ii-1<strmap.count(hstr)){
-                myrfr_tablewidget_str(ptw,getrow,i,strmap.values(hstr).at(strmap.count(hstr)-i+ii));
+                myrfr_tw_str(ptw,getrow,i,strmap.values(hstr).at(strmap.count(hstr)-i+ii));
                 continue;
             }
         }
         ptw->setItem(getrow,i,new QTableWidgetItem);
-        qWarning()<<"130315-2"<<hstr<<getrow<<i<<tw2str_tab(ptw);
+        qWarning()<<"myrfr_tw_property"<<hstr<<getrow<<i<<tw2str_tab(ptw);
     }
 }
 
@@ -604,6 +615,7 @@ void MainWindow::mytree(){
 
 void MainWindow::myadd(){
     if(!psys->psk0){return;}
+    if(psys->psk0->getType()==mysk::ExistingSkill){return;}
     if(p_inputwidget){delete p_inputwidget;}
     qWarning()<<"myadd";
     p_inputwidget=new myinputwidget(this);

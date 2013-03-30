@@ -22,8 +22,8 @@ public:
         owner=NULL;
     }
     mysk(const mysk &getcpy):QObject(getcpy.parent()){qWarning()<<"130325"<<getcpy.name;}
-    enum skType{TriggerSkill=1,ViewAsSkill=2,DistanceSkill=3,FilterSkill=4,ProhibitSkill=5,MaxCardsSkill=6,TargetModSkill=7};
-    enum skAbb{trs=TriggerSkill,vs=ViewAsSkill,dts=DistanceSkill,fts=FilterSkill,prs=ProhibitSkill,mcs=MaxCardsSkill,tms=TargetModSkill};
+    enum skType{TriggerSkill=1,ViewAsSkill=2,DistanceSkill=3,FilterSkill=4,ProhibitSkill=5,MaxCardsSkill=6,TargetModSkill=7,ExistingSkill=8};
+    enum skAbb{trs=TriggerSkill,vs=ViewAsSkill,dts=DistanceSkill,fts=FilterSkill,prs=ProhibitSkill,mcs=MaxCardsSkill,tms=TargetModSkill,exs=ExistingSkill};
     //enum skClass{myvs=ViewAsSkill,mytrs=TriggerSkill,mydts=DistanceSkill,myfts=FilterSkill,mytms=TargetModSkill};
     static QString type2str(int gettype){return myobj::enumstr(&staticMetaObject,"skType",gettype);}
     static int str2type(QString getstr){return myobj::enumint(&staticMetaObject,"skType",getstr);}
@@ -118,7 +118,8 @@ public:
     virtual void iniObj();
     virtual myblock *iniBlock(QString getstr);
     virtual QStringList trans()=0;
-    QStringList trans4avlobjlist(QString getstr="");
+    virtual QStringList trans4avlobjlist(QString getstr);
+    QStringList trans4avlobjlist(QString getstr,QString abbstr);
     //QStringList trans4design();
     void dotrans(QString getstr);
     virtual QStringList funtaglist(QString getstr){qWarning()<<"funtaglist:"<<getstr;return QStringList();}
@@ -166,6 +167,7 @@ public:
     void setSubtypeProperty(QString getstr);
     void iniObj();
     QStringList trans();
+    QStringList trans4avlobjlist(QString getstr);
     QString findRemarkByName_event(QString getname);
 };
 Q_DECLARE_METATYPE(mytrs)
@@ -176,15 +178,16 @@ class myvs:public mysk
     Q_ENUMS(vsProperty)
     Q_ENUMS(vsbType)
     Q_ENUMS(vsbAbb)
-    Q_PROPERTY(QString CardsNumProperty READ getCardsNumProperty WRITE setCardsNumProperty)
+    Q_PROPERTY(QString CardsNumProperty READ getCardsNumProperty WRITE setCardsNumProperty)    
     Q_PROPERTY(QString CardViewAsProperty READ getCardViewAsProperty WRITE setCardViewAsProperty)
     Q_PROPERTY(QString CardViewAsPropertyRemark READ getCardViewAsPropertyRemark WRITE setCardViewAsPropertyRemark)
+    Q_PROPERTY(QString TargetPlayersNumProperty READ getTargetPlayersNumProperty WRITE setTargetPlayersNumProperty)
 public:
     explicit myvs(QObject *parent=0):mysk(parent){
-        vsn=0;objname_viewas=myobj::getconstlist_tag("ob").first();
+        vsn=0;objname_viewas=myobj::getconstlist_tag("ob").first();tgtn=1;
     }
     int getType(){return ViewAsSkill;}    
-    enum vsProperty{CardsNum=11,CardViewAs=12};    
+    enum vsProperty{CardsNum=11,CardViewAs=12,TargetPlayersNum=13};
     //void propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark);
     //void propertymap_set(QMap<QString, QString> &strmap, bool b4remark);
     //QString propertystr_get();
@@ -204,8 +207,11 @@ public:
 
     int vsn;
     QString objname_viewas;
+    int tgtn;
     QString getCardsNumProperty();
     void setCardsNumProperty(QString getstr);
+    QString getTargetPlayersNumProperty();
+    void setTargetPlayersNumProperty(QString getstr);
     QString getCardViewAsProperty();
     void setCardViewAsProperty(QString getstr);
     QString getCardViewAsPropertyRemark();
@@ -417,5 +423,42 @@ public:
     QStringList trans();
 };
 Q_DECLARE_METATYPE(mytms)
+
+class myexs:public mysk
+{
+    Q_OBJECT
+    Q_ENUMS(exsProperty)
+    Q_PROPERTY(QString SKNameProperty READ getSKNameProperty WRITE setSKNameProperty)
+    Q_PROPERTY(QString SKNamePropertyRemark READ getSKNamePropertyRemark WRITE setSKNamePropertyRemark)
+public:
+    explicit myexs(QObject *parent=0):mysk(parent){
+        tgtsk=NULL;
+        skname=myobj::myconstskstrlist.first().split("|").first();
+    }
+    int getType(){return ExistingSkill;}
+    enum exsProperty{SKName=11};
+    QString skname;
+    mysk *tgtsk;
+    QString getskname();
+    void setskname(QString getstr);
+    QString getSKNameProperty();
+    void setSKNameProperty(QString getstr);
+    QString getSKNamePropertyRemark();
+    void setSKNamePropertyRemark(QString getstr);
+    QStringList propertystrlist(bool b4tab=false){
+        const QMetaObject *mob=metaObject();
+        QStringList strlist;
+        strlist<<myobj::enumstr(mob,"skProperty",Name);
+        strlist<<myobj::enumstr(mob,"skProperty",Owner);
+        if(b4tab){}
+        strlist<<myobj::enumstrlist(mob,"exsProperty");
+        return strlist;
+    }
+    QString propertystr_get();
+    void propertystr_set(QString getstr);
+    QString findRemarkByName_event(QString getname){return getname;}
+    QStringList trans(){return QStringList();}
+};
+Q_DECLARE_METATYPE(myexs)
 
 #endif // MYTRS_H

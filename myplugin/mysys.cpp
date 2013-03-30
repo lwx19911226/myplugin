@@ -129,8 +129,16 @@ void mysys::getsklist(QList<mysk *> &rsklist,int gettype){
         if(ip->getType()==gettype){rsklist<<ip;}
     }
 }
-void mysys::getavlobjlist_global(QList<myobj *> &list){
+void mysys::getsklist_noexs(QList<mysk *> &rsklist){
     foreach(mysk *ip,sklist){
+        if(ip->getType()!=mysk::ExistingSkill){rsklist<<ip;}
+    }
+}
+
+void mysys::getavlobjlist_global(QList<myobj *> &list){
+    QList<mysk *> tsklist;
+    getsklist_noexs(tsklist);
+    foreach(mysk *ip,tsklist){
         foreach(myobj *pobj,ip->avlobjlist){
             if(pobj->isGlobal){list.prepend(pobj);}
         }
@@ -154,6 +162,7 @@ mysk *mysys::newsk(int gettype){
     qRegisterMetaType<myprs>("myprs");
     qRegisterMetaType<mymcs>("mymcs");
     qRegisterMetaType<mytms>("mytms");
+    qRegisterMetaType<myexs>("myexs");
     foreach(QString stri,mysk::typeclasslist()){
         if(QMetaType::type(stri.toUtf8())==0){qWarning()<<"newsk"<<stri;}
     }
@@ -226,6 +235,11 @@ bool mysys::delSkill(mysk *getp){
     if(getp->owner){getp->owner->sklist.removeOne(getp);}
     sklist.removeOne(getp);
     sklist_r.append(getp);
+    QList<mysk *> tsklist;
+    getsklist(tsklist,mysk::ExistingSkill);
+    foreach(mysk *ip,tsklist){
+        if(static_cast<myexs *>(ip)->tgtsk==getp){delSkill(ip);}
+    }
     QList<mydo *> tdolist;
     foreach(mydo *ip,dolist){
         if(ip->psktgt!=getp){tdolist<<ip;}
@@ -259,19 +273,29 @@ QStringList mysys::trans(){
         strlist<<ip->trans();
     }
     strlist<<"dofile \"lua/sgs_ex.lua\"";
-    foreach(mysk *ip,sklist){
+    QList<mysk *> tsklist,exslist;
+    getsklist_noexs(tsklist);
+    getsklist(exslist,mysk::ExistingSkill);
+    foreach(mysk *ip,tsklist){
         strlist<<ip->trans();
     }    
     strlist<<"function addsk(sk)"<<"if not sgs.Sanguosha:getSkill(sk:objectName()) then"<<"local sklist=sgs.SkillList()"
           <<"sklist:append(sk)"<<"sgs.Sanguosha:addSkills(sklist)"<<"end"<<"end";
-    foreach(mysk *ip,sklist){
+    strlist<<"function addexsk(gn,skname)"<<"if sgs.Sanguosha:getSkill(skname) then"<<"gn:addSkill(skname)"
+          <<"for _,tsk in sgs.qlist(sgs.Sanguosha:getRelatedSkills(skname)) do"<<"gn:addSkill(tsk:objectName())"
+         <<"end"<<"end"<<"end";
+    foreach(mysk *ip,tsklist){
         strlist<<QString("addsk(%1)").arg(ip->name);
     }
-    foreach(mysk *ip,sklist){
-        if(ip->owner){
-            strlist<<QString("%1:addSkill(\"%2\")").arg(ip->owner->name).arg(ip->name);
-        }
-    }    
+    foreach(mysk *ip,tsklist){
+        if(!ip->owner){continue;}
+        strlist<<QString("%1:addSkill(\"%2\")").arg(ip->owner->name).arg(ip->name);
+    }
+    foreach(mysk *ip,exslist){
+        if(!ip->owner){continue;}
+        strlist<<QString("addexsk(%1,\"%2\")").arg(ip->owner->name,static_cast<myexs *>(ip)->getskname());
+    }
+
     strlist<<packagename+"_trans={}";
     strlist<<"function addsktrans(t,name,trans,dscrpt,wds)"<<"t[name]=trans"<<"t[\":\"..name]=dscrpt"
           <<"if wds then"<<"if #wds==1 then t[\"$\"..name]=wds[1]"
@@ -288,7 +312,7 @@ QStringList mysys::trans(){
     foreach(mygeneral *ip,glist){
         strlist<<QString("addgtrans(%1_trans,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\")").arg(packagename,ip->name,ip->translation,ip->title,ip->word,ip->cv);
     }
-    foreach(mysk *ip,sklist){
+    foreach(mysk *ip,tsklist){
         strlist<<QString("addsktrans(%1_trans,\"%2\",\"%3\",\"%4\",{%5})").arg(packagename,ip->name,ip->translation,ip->description,mycode::mymdf(ip->wordslist,QString("\""),QString("\"")).join(","));
     }
     strlist<<QString("sgs.LoadTranslationTable(cmpltrans(%1_trans))").arg(packagename);

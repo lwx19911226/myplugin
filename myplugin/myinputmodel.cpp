@@ -153,10 +153,11 @@ bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int 
             value.toString().toInt(&b);
             if(!b){return false;}
         }
-        pi0->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1);
-        pi->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1);
-        QModelIndex it=createIndex(pi->pf->pchlist.length()-1,0,pi->pf->pchlist.last());
-        emit dataChanged(it,it);
+        pi0->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1,true);
+        pi->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1,true);
+        QModelIndex ited=createIndex(pi->pf->pchlist.length()-1,0,pi->pf->pchlist.last());
+        QModelIndex itst=createIndex(0,0,pi->pf->pchlist.first());
+        emit dataChanged(itst,ited);
         return true;
     }
     return false;
@@ -166,7 +167,7 @@ Qt::ItemFlags myinputmodel::flags(const QModelIndex &index) const{
     if (!index.isValid()){return 0;}
     if(getItem(index)->getstr().startsWith(">")){return Qt::NoItemFlags;}
     Qt::ItemFlags r=Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-    if(getItem(index)->getstr()=="input others"){
+    if(getItem(index)->getstr()==myinputitem::str4input()){
         myinputitem *pi=getItem(index);
         if(pi->type-myinputitem::func_Obj<0){return false;}
         QStringList strlist;

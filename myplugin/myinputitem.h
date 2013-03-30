@@ -36,6 +36,8 @@ public:
     bool sameValue(myinputitem *getp){return (type==getp->type)&&(mydata==getp->mydata);}
     myinputitem *search(myinputitem *getp);
     QString getstr(){return mydata.toString();}
+    static bool spstr(QString getstr){return getstr.startsWith(">")||(getstr==str4input());}
+    static QString str4input(){return tr("input others");}
     void delAllChildren(){
         foreach(myinputitem *ip,pchlist){delete ip;}
         pchlist.clear();

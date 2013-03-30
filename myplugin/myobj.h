@@ -29,40 +29,13 @@ public:
     }
     enum objType{all=0,myplayer=1,mysplayer=2,mycard=3,mybool=4,mylist=5,myplayerlist=6,mysplayerlist=7,mycardlist=8,mynumlist=9,mynum=10,mystr=11,mystrc=12};
     enum iniFormat{Name=0,Type=1,Remark=2,Extra=3};
-    static QString enumstr(const QMetaObject *mob,QByteArray getname,int getint){
-        return tr(mob->enumerator(mob->indexOfEnumerator(getname)).valueToKey(getint));
-    }
-    static int enumint(const QMetaObject *mob,QByteArray getname,QString getstr,int defaultint=-1){
-        QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
-        for(int i=0;i<myenum.keyCount();i++){
-            if((getstr==myenum.key(i))||(getstr==tr(myenum.key(i)))){return myenum.value(i);}
-        }
-        qWarning()<<"enumint"<<getname<<getstr;
-        return defaultint;
-    }
-    static QStringList enumstrlist(const QMetaObject *mob,QByteArray getname){
-        QStringList strlist;
-        QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
-        for(int i=0;i<myenum.keyCount();i++){
-            strlist<<enumstr(mob,getname,myenum.value(i));
-        }
-        return strlist;
-    }
-    static void enumintlist(const QMetaObject *mob,QByteArray getname,QList<int> &list){
-        QMetaEnum myenum=mob->enumerator(mob->indexOfEnumerator(getname));
-        for(int i=0;i<myenum.keyCount();i++){
-            list<<myenum.value(i);
-        }
-    }
-    static bool enumcontains(const QMetaObject *mob,QByteArray getname,QString getstr){
-        return enumstrlist(mob,getname).contains(getstr)||enumstrlist(mob,getname).contains(tr(getstr.toUtf8()));
-    }
-    static bool enumcontains(const QMetaObject *mob,QByteArray getname,int getint){
-        return enumcontains(mob,getname,enumstr(mob,getname,getint));
-    }
-    static int enumcnt(const QMetaObject *mob,QByteArray getname){
-        return mob->enumerator(mob->indexOfEnumerator(getname)).keyCount();
-    }
+    static QString enumstr(const QMetaObject *mob,QByteArray getname,int getint);
+    static int enumint(const QMetaObject *mob,QByteArray getname,QString getstr,int defaultint=-1);
+    static QStringList enumstrlist(const QMetaObject *mob,QByteArray getname);
+    static void enumintlist(const QMetaObject *mob,QByteArray getname,QList<int> &list);
+    static bool enumcontains(const QMetaObject *mob,QByteArray getname,QString getstr);
+    static bool enumcontains(const QMetaObject *mob,QByteArray getname,int getint);
+    static int enumcnt(const QMetaObject *mob,QByteArray getname);
 
     QString name;
     int type;
@@ -112,15 +85,7 @@ public:
     static bool b4input(int &gettype){
         if(gettype==mystr){gettype=mystrc;}
         return isSubtype(mynum,gettype)||isSubtype(mystr,gettype);
-    }
-    /*
-    static bool b4vrstr(int gettype){
-        if(isSubtype(Mynum,gettype)){return true;}
-        if(isSubtype(Mystr,gettype)){return true;}
-        if(isSubtype(Mylist,gettype)){return true;}
-        return false;
-    }
-    */
+    }    
     static bool isSubtype(int gettype0,int gettype){
         if(gettype0==all){return true;}
         if(gettype0==mylist){
@@ -176,8 +141,9 @@ public:
     static void myini();
     static void myini_lang();
     static void myini_cl();
-    static bool isConst(QString getstr);
-    static QStringList transConst(QString getstr);
+    static QString isConst(QString getstr,QString abbstr);
+    static QStringList transConst(QString getstr,QString abbstr);
+    static QStringList transConst(QString getconststr);
     static void newConst(QList<myobj *> &list,QString getbl,QObject *getpf,bool only=false);
     static QStringList getconstlist_tag(QString);
     static QStringList getconstrmlist_tag(QString);
@@ -186,6 +152,9 @@ public:
     static QString name2remark(QString);
     static QString remark2tag(QString);
     static bool matchTag(QString getname,QString gettag);
+    static bool mycmp(const QString &s1,const QString &s2){
+        return s1.split("|").first().toLower()<s2.split("|").first().toLower();
+    }
 signals:
     
 public slots:

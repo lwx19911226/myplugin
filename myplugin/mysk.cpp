@@ -2,7 +2,7 @@
 #include "mysys.h"
 int mysk::globalint=0;
 void str2first(QStringList &strlist,QString str){
-    strlist.removeOne(str);
+    if(!strlist.removeOne(str)){qWarning()<<"str2first"<<str;return;}
     strlist.prepend(str);
 }
 
@@ -285,18 +285,26 @@ void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr,bool b
 }
 
 QStringList mysk::trans4avlobjlist(QString getstr){
+    const QMetaObject *mob=metaObject();
+    int btype=myobj::enumint(mob,enumname_btype(getType()).toUtf8(),getstr);
+    QString abbstr=myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),btype);
+    return trans4avlobjlist(getstr,abbstr);
+}
+QStringList mysk::trans4avlobjlist(QString getstr, QString abbstr){
     QStringList strlist;
     foreach(myobj *ip,avlobjlist){
         if(ip->blockstr!=getstr){continue;}
         if(ip->noDeclaration){continue;}
-        if(myobj::isConst(ip->name)){
-            strlist<<myobj::transConst(ip->name);
+        QString getconststr=myobj::isConst(ip->name,abbstr);
+        if(getconststr!=""){
+            strlist<<myobj::transConst(getconststr);
             continue;
         }
         strlist<<QString("local %1").arg(ip->name);
     }
     return strlist;
 }
+
 /*
 void mysk::getusdobjlist(int gettype, QList<myobj *> &list, QString getstr){
     foreach(myobj *ip,usdobjlist){
@@ -484,7 +492,7 @@ QStringList mytrs::trans(){
     strlist<<"on_trigger=function(self,event,player,data)";
     strlist<<"local room=player:getRoom()";
     strlist<<default4skname();
-    strlist<<trans4avlobjlist();
+    strlist<<trans4avlobjlist("");
     foreach(myblock *ip,blocklist){
         QStringList blockstrlist;
         blockstrlist<<QString("if event==%1 then").arg(myevent::trans(ip->name));
@@ -501,6 +509,9 @@ QStringList mytrs::trans(){
     strlist<<"if selfplayer==nil then return false end\nreturn selfplayer:isAlive()";
     strlist<<"end,\n}";
     return strlist;
+}
+QStringList mytrs::trans4avlobjlist(QString getstr){
+    return mysk::trans4avlobjlist(getstr,"trs");
 }
 QString mytrs::findRemarkByName_event(QString getname){
     return myevent::findRemarkByName(getname);
@@ -560,9 +571,12 @@ QStringList myvs::trans(){
             tstrlist<<trans4avlobjlist(bname);
             strlist<<mycode::myindent(tstrlist);
             strlist<<pt->trans();
-            strlist<<"end,";
+            strlist<<"return false end,";
         }
         else{}
+        if(tgtn!=1){
+            strlist<<QString("feasible=function(self,targets) return (#targets>=%1) end,").arg(tgtn);
+        }
         bname=myobj::enumstr(mob,"vsbType",SkillCardUse);
         pt=findBlockByName(bname);
         if(pt&&!pt->blocklist.isEmpty()){
@@ -589,7 +603,7 @@ QStringList myvs::trans(){
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans();
-        strlist<<"end,";
+        strlist<<"return false end,";
     }
     strlist<<"view_as=function(self,cards)";
     if(vsn<10){strlist<<"if #cards~="+QString::number(vsn)+" then return nil end";}
@@ -610,7 +624,7 @@ QStringList myvs::trans(){
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans();
-        strlist<<"end,";
+        strlist<<"return false end,";
     }
     bname=myobj::enumstr(mob,"vsbType",EnabledAtResponse);
     pt=findBlockByName(bname);
@@ -621,12 +635,12 @@ QStringList myvs::trans(){
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans();
-        strlist<<"end,";
+        strlist<<"return false end,";
     }
     if(objname_viewas==myobj::objname_nullification()){
-        strlist<<"enabled_at_nullification=function(self,player)";
-        strlist<<"return true";
-        strlist<<"end,";
+        strlist<<"enabled_at_nullification=function(self,player) return true end,";
+        //strlist<<"return true";
+        //strlist<<"end,";
     }
     strlist<<"}";
     return strlist;
@@ -641,6 +655,12 @@ void myvs::setCardsNumProperty(QString getstr){
     bool b;
     int getn=getstr.toInt(&b);
     if(b){vsn=getn;}
+}
+QString myvs::getTargetPlayersNumProperty(){return QString::number(tgtn);}
+void myvs::setTargetPlayersNumProperty(QString getstr){
+    bool b;
+    int getn=getstr.toInt(&b);
+    if(b){tgtn=getn;}
 }
 QString myvs::getCardViewAsProperty(){
     QStringList strlist=myobj::getconstlist_tag("ob");
@@ -887,45 +907,72 @@ void mytms::setPatternPropertyRemark(QString getstr){
     pattern=tstr;
 }
 
-/*
-void myfts::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
-    mysk::propertymap_get(strmap,b4remark);
-    if(b4remark){
-        strmap.insert(property2str(CardViewAs),myobj::name2remark(objname_viewas));
-        strlistmap.insert(property2str(CardViewAs),myobj::getconstrmlist_tag("ob"));
-    }
-    else{
-        strmap.insert(property2str(CardViewAs),objname_viewas);
-        strlistmap.insert(property2str(CardViewAs),myobj::getconstlist_tag("ob"));
-    }
+QString myexs::getskname(){
+    if(tgtsk){return (skname=tgtsk->name);}
+    else{return skname;}
 }
-void myfts::propertymap_set(QMap<QString, QString> &strmap,bool b4remark){
-    if(strmap.contains(property2str(CardViewAs))){
-        QString getstr=strmap.value(property2str(CardViewAs));
-        if(b4remark){objname_viewas=myobj::remark2name(getstr);}
-        else{objname_viewas=getstr;}
-    }
-    mysk::propertymap_set(strmap,b4remark);
+void myexs::setskname(QString getstr){
+    tgtsk=getsys()->findSkillByName(getstr);
+    skname=getstr;
 }
-
-QString myfts::propertystr_get(){
+QString myexs::getSKNameProperty(){
+    QStringList tstrlist;
+    QList<mysk *> tsklist;
+    getsys()->getsklist_noexs(tsklist);
+    foreach(mysk *ip,tsklist){tstrlist<<ip->name;}
+    foreach(QString stri,myobj::myconstskstrlist){tstrlist<<stri.split("|").first();}
+    str2first(tstrlist,getskname());
+    return tstrlist.join("|");
+}
+void myexs::setSKNameProperty(QString getstr){setskname(getstr);}
+QString myexs::getSKNamePropertyRemark(){
+    QStringList tstrlist;
+    QString tstr;
+    if(tgtsk){tstr=tgtsk->name+"\\|"+tgtsk->translation;}
+    QList<mysk *> tsklist;
+    getsys()->getsklist_noexs(tsklist);
+    foreach(mysk *ip,tsklist){tstrlist<<ip->name+"\\|"+ip->translation;}
+    foreach(QString stri,myobj::myconstskstrlist){
+        QString getname=stri.split("|").first();
+        QString gettrans=stri.split("|").at(1);
+        tstrlist<<getname+"\\|"+gettrans;
+        if(getname==skname){tstr=getname+"\\|"+gettrans;}
+    }
+    str2first(tstrlist,tstr);
+    return tstrlist.join("|");
+}
+void myexs::setSKNamePropertyRemark(QString getstr){
+    QList<mysk *> tsklist;
+    getsys()->getsklist_noexs(tsklist);
+    foreach(mysk *ip,tsklist){
+        if(getstr.split("|").first()==ip->name){setskname(ip->name);return;}
+    }
+    foreach(QString stri,myobj::myconstskstrlist){
+        QString getname=stri.split("|").first();
+        if(getstr.split("|").first()==getname){setskname(getname);return;}
+    }
+    qWarning()<<"setsknamepropertyremark"<<getstr;
+}
+QString myexs::propertystr_get(){
     QStringList strlist;
-    strlist<<mysk::propertystr_get(true);
-    strlist<<objname_viewas;
-    strlist<<mysk::propertystr_get(false);
+    strlist<<type2abb(getType());
+    strlist<<getName();
+    strlist<<getOwnerProperty().split("|").first();
+    strlist<<getSKNameProperty().split("|").first();
     return strlist.join("|");
 }
-void myfts::propertystr_set(QString getstr){
-    QStringList frlist,bklist,midlist;
-    if(!propertystr_dvd(getstr,frlist,midlist,bklist)){qWarning()<<"propertystr_set:0"<<getstr;return;}
-    if(midlist.length()!=1){qWarning()<<"propertystr_set:1"<<getstr;return;}
-    QMap<QString,QString> strmap;
-    strmap.insert(property2str(CardViewAs),midlist.at(0));
-    propertymap_set(strmap,false);
-    mysk::propertystr_set(frlist,true);
-    mysk::propertystr_set(bklist,false);
+
+void myexs::propertystr_set(QString getstr){
+    QStringList tstrlist=getstr.split("|");
+    if((tstrlist.length()==4)&&(tstrlist.first()==type2abb(getType()))){
+        setName(tstrlist.at(1));
+        setOwnerProperty(tstrlist.at(2));
+        setSKNameProperty(tstrlist.at(3));
+    }
+    else{qWarning()<<"propertystr_set"<<getstr;return;}
 }
-*/
+
+
 /*
 void mytrs::addFunction(QString geteventstr,QString getblockstr,
                    QString getfunstr ,QList<myobj *> &getobjlist,

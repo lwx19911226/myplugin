@@ -1,8 +1,5 @@
 #include "mysknwidget.h"
 
-bool mycmp(const QString &s1,const QString &s2){
-    return s1.split("|").first().toLower()<s2.split("|").first().toLower();
-}
 QTableWidgetItem *mynewitem(QString getstr){
     QTableWidgetItem *pitem=new QTableWidgetItem(getstr);
     pitem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
@@ -14,7 +11,9 @@ mysknwidget::mysknwidget(MainWindow *getMain,QWidget *parent):QWidget(parent){
     setWindowTitle(tr("Skill Name List"));
 
     p_tablewidget=new QTableWidget(this);
-    p_tablewidget->setRowCount(myobj::myconstskstrlist.length()+pmain->psys->sklist.length());
+    QList<mysk *> tsklist;
+    pmain->psys->getsklist_noexs(tsklist);
+    p_tablewidget->setRowCount(myobj::myconstskstrlist.length()+tsklist.length());
     p_tablewidget->setColumnCount(4);
     p_tablewidget->setSelectionMode(QAbstractItemView::SingleSelection);
     p_tablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -22,15 +21,15 @@ mysknwidget::mysknwidget(MainWindow *getMain,QWidget *parent):QWidget(parent){
     tstrlist<<tr("Name")<<tr("Translation")<<tr("Description")<<"";
     p_tablewidget->setHorizontalHeaderLabels(tstrlist);
     int rowi=0;
-    foreach(mysk *ip,pmain->psys->sklist){
+    foreach(mysk *ip,tsklist){
         p_tablewidget->setItem(rowi,0,mynewitem(ip->name));
         p_tablewidget->setItem(rowi,1,mynewitem(ip->translation));
         p_tablewidget->setItem(rowi,2,mynewitem(ip->description));
         rowi++;
     }
-    QStringList tskstrlist(myobj::myconstskstrlist);
-    qSort(tskstrlist.begin(),tskstrlist.end(),mycmp);
-    foreach(QString stri,tskstrlist){
+    //QStringList tskstrlist(myobj::myconstskstrlist);
+    //qSort(tskstrlist.begin(),tskstrlist.end(),mycmp);
+    foreach(QString stri,myobj::myconstskstrlist){
         QString tstri=stri;
         for(int j=0;j<3;j++){
             p_tablewidget->setItem(rowi,j,mynewitem(tstri.split("|").at(j)));

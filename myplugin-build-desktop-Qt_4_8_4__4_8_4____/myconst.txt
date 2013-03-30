@@ -20,6 +20,7 @@
 >>phase|阶段
 >>place|牌的位置
 >>nature|伤害属性
+>>method|处理方式
 
 >selfplayer|mysplayer|触发技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:trs
 >player|mysplayer|触发技时机触发者|bl:trs
@@ -32,14 +33,15 @@
 >defaultReturn|mybool|视为技判断出牌阶段是否允许使用默认返回值|tr:local %1=false,,bl:vs_ep
 >sgs.Self|myplayer|视为技拥有者|bl:vs_er
 >defaultReturn|mybool|视为技判断响应时是否允许使用默认返回值|tr:local %1=false,,bl:vs_er
->selfcard|mycard|视为技技能牌|tr:local selfcard=self,,bl:vs_pf
+>selfcard|mycard|视为技技能牌|tr:local %1=self,,bl:vs_pf
 >to_select|myplayer|视为技将选的一名角色|bl:vs_pf
 >#targets|mynum|视为技已选角色数|bl:vs_pf
 >sgs.Self|myplayer|视为技拥有者|bl:vs_pf
 >defaultReturn|mybool|视为技判断选角色默认返回值|tr:local %1=false,,bl:vs_pf
->selfcard|mycard|视为技技能牌|tr:local selfcard=self,,bl:vs_scu
->selfplayer|mysplayer|视为技拥有者|tr:local selfplayer=source,,bl:vs_scu
+>selfcard|mycard|视为技技能牌|tr:local %1=self,,bl:vs_scu
+>selfplayer|mysplayer|视为技拥有者|tr:local %1=source,,bl:vs_scu
 >#targets|mynum|视为技已选角色数|bl:vs_scu
+>defaultReturn|all|视为技技能牌使用默认返回值|tr:local %1,,bl:vs_scu
 >from|myplayer|距离技距离计算起始角色|bl:dts_cf
 >players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:dts_cf
 >to|myplayer|距离技距离计算终止角色|bl:dts_cf
@@ -91,6 +93,11 @@
 >sgs.Player_PlaceTable|mynum|位置：面板|place
 >sgs.Player_PlaceUnknown|mynum|位置：未知|place
 >sgs.Player_PlaceWuGu|mynum|位置：五谷|place
+//method
+>sgs.Card_MethodUse|mynum|处理方式：使用|method
+>sgs.Card_MethodResponse|mynum|处理方式：打出|method
+>sgs.Card_MethodDiscard|mynum|处理方式：弃置|method
+>sgs.Card_MethodPindian|mynum|处理方式：拼点|method
 //pattern
 >.|mystrc|任意一张手牌|pt
 >.S|mystrc|任意一张黑桃手牌|pt

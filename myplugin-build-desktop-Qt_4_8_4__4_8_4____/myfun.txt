@@ -45,6 +45,13 @@
 >ifReturnNum|mybool,mynum||if %1 then return %2 end|如果参数1为真，停止技能结算，参数2为结算结果|rt,rtn$
 >ifnotReturnNum|mybool,mynum||if not %1 then return %2 end|如果参数1为假，停止技能结算，参数2为结算结果|rt,rtn$
 
+//
+>selectedCard|mynum~|mycard|%2=selected[%1]|视为技已选择子卡中第X（参数1）张卡（返回值1），X从1开始，比如【乱击】第2张子卡须与已选择第1张子卡花色相同|cd,selected$
+>patternMatch|mystr~|mybool~|%2=string.find(pattern,%1)|模式是否（返回值1）包含对象名（参数1），比如【南蛮入侵】模式包含【杀】对象名slash|pattern$
+>patternMatchSkillCard||mybool~|%1=(pattern=="@"..selfskname)|模式是否（返回值1）匹配技能牌|pattern$
+>selectedPlayer|mynum~|myplayer|%2=targets[%1]|视为技技能牌已选择角色中第X（参数1）名角色（返回值1），X从1开始|pl,targets$
+>targetPlayer|mynum~|mysplayer|%2=targets[%1]|视为技技能牌角色目标中第X（参数1）名角色（返回值1），X从1开始|pl,targets$,room$
+
 //player property
 >getHp|myplayer~|mynum~|<1:>%2=%1:getHp()|角色（参数1）当前体力值（返回值1）|pl
 >getLostHp|myplayer~|mynum~|<1:>%2=%1:getLostHp()|角色（参数1）已损失体力值（返回值1）|pl
@@ -84,9 +91,17 @@
 >playerFromOthers|mysplayer~|mysplayer~|<1:>%2=room:askForPlayerChosen(%1,room:getOtherPlayers(%1),selfskname)|令一名角色（参数1）选择一名其它角色（返回值1）|pl,ask,room$
 >askForPlayerChosen|mysplayer~,mysplayerlist~|mysplayer|<1:>%3=room:askForPlayerChosen(%1,%2,selfskname);if %3 then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），若成功选择则代码段1（否则给定角色列表为空）|pl,ask,block,room$
 >askForSuit|mysplayer~|mynum~|<1:>%2=room:askForSuit(%1,selfskname)|令一名角色（参数1）选择一种花色（返回值1）|pl,ask,room$
->cardFromHE|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return false end;if %2:isNude() then return false end;>%3=room:askForCardChosen(%1,%2,"he",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->cardFromHEJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return false end;if %2:isAllNude() then return false end;>%3=room:askForCardChosen(%1,%2,"hej",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备判定区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->askForDiscard|mysplayer~,mynum~,mybool,mybool|mybool~|<1:if not %1 then return false end;if not %3 and ((%4 and (%1:getCards("he"):length()<%2)) or (not %4 and (%1:getCards("h"):length()<%2))) then return false end;>%5=room:askForDiscard(%1,selfskname,%2,%2,%3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）弃置X（参数2）张牌，是否可选不弃（参数3），是否包括装备（参数4），目标是否弃置（返回值1），若目标弃置则代码段1，否则代码段2|pl,ask,block,room$
+>cardFromH|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isKongcheng() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"h",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）一张手牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromE|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getEquips():isEmpty() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"e",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）装备区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getJudgingArea():isEmpty() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"j",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）判定区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromHE|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isNude() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"he",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromHEJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isAllNude() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"hej",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备判定区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>askForDiscard|mysplayer~,mynum~,mybool,mybool|mybool~|<1:if not %1 then return defaultReturn end;if not %3 and ((%4 and (%1:getCards("he"):length()<%2)) or (not %4 and (%1:getCards("h"):length()<%2))) then return defaultReturn end;>%5=room:askForDiscard(%1,selfskname,%2,%2,%3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）弃置X（参数2）张牌，是否可选不弃（参数3），是否包括装备（参数4），目标是否弃置（返回值1），若目标弃置则代码段1，否则代码段2|pl,ask,block,room$
+>askForCard|mysplayer~,mystr~,mynum~,mybool~,mysplayer|mycard|<1:>local askcm%%=%3;if %4 then askcm%%=sgs.Card_MethodResponse;%6=room:askForCard(%1,%2,selfskname,data,askcm%%,%5,%4);if %6 then;%block;else;%block;end|令一名角色（参数1）打出牌（返回值1），模式（参数2），处理类别（参数3），是否改判（参数4），打出目标（参数5）可以不存在，如果打出则代码段1，否则代码段2|pl,cd,ask,block,room$
+>askForUseCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$
+>askForUseSkillCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,"@"..%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用技能牌，视为技名（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$
+>askForUseSlashToPlayer|mysplayer~,mysplayer~,mybool~,mybool~|mybool~|<1:><2:>%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对另一名角色（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
+>askForUseSlashToPlayers|mysplayer~,mysplayerlist~,mybool~,mybool~|mybool~|<1:>%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对给定角色列表（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
 >cardFromList|mysplayer~,mynumlist~,mybool|mycard|<1:>room:fillAG(%2,%1);local cardFromList%%=room:askForAG(%1,%2,%3,selfskname);%1:invoke("clearAG");if cardFromList%%>=0 then;%4=sgs.Sanguosha:getCard(cardFromList%%);%block;end|令一名角色（参数1）通过五谷选择框从牌列表中选择一张牌（返回值1），牌ID列表（参数2），是否可以不选（参数3），若成功选择则代码段1|pl,cd,ask,room$
 >askForGuanxing|mysplayer~,mynumlist~,mybool||<1:>room:askForGuanxing(%1,%2,%3)|令角色（参数1）将牌以任意顺序置于牌堆顶和底，牌的ID列表（参数2），若参数3为真，则只置于顶|pl,cd,ask,room$
 >guanxingx|mysplayer~,mynum~,mybool||<1:>room:askForGuanxing(%1,room:getNCards(%2,false),false)|令角色（参数1）将牌堆顶X（参数2）张牌以任意顺序置于牌堆顶和底，若参数3为真，则只置于顶|pl,ask,room$
@@ -114,6 +129,10 @@
 >selfMinus|mynum~,mynum~||%1=%1-%2|令数1（参数1）减少数2（参数2）|cal
 >and2|mybool,mybool|mybool|%3=(%1 and %2)|布尔值1（参数1）与布尔值2（参数2），结果（返回值1）|cal
 >or2|mybool,mybool|mybool|%3=(%1 or %2)|布尔值1（参数1）或布尔值2（参数2），结果（返回值1）|cal
+>moreThan|mynum~,mynum~|mybool~|%3=(%1>%2)|数1（参数1）是否（返回值1）大于数2（参数2）|cal
+>lessThan|mynum~,mynum~|mybool~|%3=(%1<%2)|数1（参数1）是否（返回值1）小于数2（参数2）|cal
+>noMoreThan|mynum~,mynum~|mybool~|%3=(%1<=%2)|数1（参数1）是否（返回值1）小于等于数2（参数2）|cal
+>noLessThan|mynum~,mynum~|mybool~|%3=(%1>=%2)|数1（参数1）是否（返回值1）大于等于数2（参数2）|cal
 
 //list
 >listlength|mylist~|mynum~|%2=%1:length()|列表（参数1）长度（返回值1）|list
@@ -124,12 +143,6 @@
 >splayerlist0||mysplayerlist~|%1=sgs.SPlayerList()|空角色列表（返回值1）|pl,list,room$
 >numlist0||mynumlist~|%1=sgs.IntList()|空数字列表（返回值1）|list
 //>numlistx|mynum|mynumlist|%2=sgs.IntList();for var%%=1,%1,1 do %2:append(var%%) end|数字1至X（参数1）列表（返回值1）|
-
-//
->selectedCard|mynum~|mycard|%2=selected[%1]|视为技已选择子卡中第X（参数1）张卡（返回值1），X从1开始，比如【乱击】第2张子卡须与已选择第1张子卡花色相同|cd,selected$
->patternMatch|mystr~|mybool~|%2=string.find(pattern,%1)|模式是否（返回值1）包含对象名（参数1），比如【南蛮入侵】模式包含【杀】对象名slash|pattern$
->selectedPlayer|mynum~|myplayer|%2=targets[%1]|视为技技能牌已选择角色中第X（参数1）名角色（返回值1），X从1开始|pl,targets$
->targetPlayer|mynum~|mysplayer|%2=targets[%1]|视为技技能牌角色目标中第X（参数1）名角色（返回值1），X从1开始|pl,targets$,room$
 
 //debug
 >playerSpeak|mysplayer~||<1:>%1:speak(selfskname..","..%1:objectName()..","..%1:getSeat())|令角色（参数1）说出技能名角色名和座位，可用于调试程序是否执行|pl,debug,room$

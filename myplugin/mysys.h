@@ -26,6 +26,7 @@ public:
     void myini(QString getpath="");
 
     void getsklist(QList<mysk *> &rsklist,int gettype);
+    void getsklist_noexs(QList<mysk *> &rsklist);
     void getavlobjlist_global(QList<myobj *> &list);    
     mygeneral *newGeneral(QString getname,int getkingdom=mygeneral::god,int gethp=4,bool getsex=true);
     mysk *newSkill(QString getname,int gettype);

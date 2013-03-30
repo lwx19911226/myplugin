@@ -4,9 +4,16 @@ void myinputitem::newChild(QVariant getdata,bool extra,bool front){
     p->mydata=getdata;
     p->pf=this;
     p->type=type+1;
-    if(front){pchlist.prepend(p);}
-    else{pchlist.append(p);}
-    if(extra){pchlist.last()->newChild(QVariant("input others"));}
+    if(!front){pchlist.append(p);}
+    else if(spstr(p->getstr())){pchlist.prepend(p);}
+    else{
+        int geti=0;
+        for(geti=0;geti<pchlist.length();geti++){
+            if(!spstr(pchlist.at(geti)->getstr())){break;}
+        }
+        pchlist.insert(geti,p);
+    }
+    if(extra){pchlist.last()->newChild(QVariant(str4input()));}
 }
 myinputitem *myinputitem::getChild(int i,bool visibility){
     //if(i>=0&&i<=pchlist.length()-1){return pchlist.at(i);}

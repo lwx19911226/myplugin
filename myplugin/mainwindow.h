@@ -72,11 +72,11 @@ public:
 
     void myrfr_g(mygeneral *getp,int getrow);
     void myrfr_trs(mytrs *getp,int getrow);
-    void myrfr_tablewidget_str(QTableWidget *ptw,int getrow,int getcol,QString getstr);
-    void myrfr_tablewidget_cbb(QTableWidget *ptw,int getrow,int getcol,QString getstr,QStringList list4new);
-    void myrfr_tablewidget_removerow(QTableWidget *ptw,QStringList getstrlist);
-    int myrfr_tablewidget_getrow(QTableWidget *ptw,QString getstr);
-    void myrfr_tablewidget_property(QTableWidget *ptw,int getrow,QMap<QString,QString> &strmap);
+    void myrfr_tw_str(QTableWidget *ptw,int getrow,int getcol,QString getstr);
+    void myrfr_tw_cbb(QTableWidget *ptw,int getrow,int getcol,QString getstr,QStringList list4new);
+    void myrfr_tw_removerow(QTableWidget *ptw,QStringList getstrlist);
+    int myrfr_tw_getrow(QTableWidget *ptw,QString getstr);
+    void myrfr_tw_property(QTableWidget *ptw,int getrow,QMap<QString,QString> &strmap);
     void mytext_all();
     void mytext_current();
     void mytree();
@@ -84,7 +84,7 @@ public:
     void itemsel_sk(QTableWidget *ptw);
     void itemchanged_cbb_sk(QComboBox *pcbb);
     void itemchanged_cbb_g(QComboBox *pcbb);
-    bool tablewidget_cw(QWidget *getcw,QTableWidget *&ptw,int &ii,int &jj);
+    bool tw_cw(QWidget *getcw,QTableWidget *&ptw,int &ii,int &jj);
     QTableWidget *str2tw_tab(QString);
     QString tw2str_tab(QTableWidget *);
 private slots:
