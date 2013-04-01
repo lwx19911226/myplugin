@@ -154,7 +154,7 @@ public:
     QStringList funtaglist(QString getstr){
         if(!myevent::isEvent(getstr)){qWarning()<<"funtaglist:"<<getstr;}
         QStringList strlist;
-        strlist<<"room$"<<"rtb$";
+        strlist<<"room$"<<"rtb$"<<getstr+"$";
         return strlist;
     }
     QStringList eventstrlist(){

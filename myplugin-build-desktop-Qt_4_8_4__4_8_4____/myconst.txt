@@ -19,8 +19,11 @@
 >>suit|花色
 >>phase|阶段
 >>place|牌的位置
->>nature|伤害属性
 >>method|处理方式
+>>nature|伤害属性
+>>role|身份
+>>kingdom|势力
+
 
 >selfplayer|mysplayer|触发技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:trs
 >player|mysplayer|触发技时机触发者|bl:trs
@@ -69,6 +72,17 @@
 >sgs.DamageStruct_Normal|mynum|普通属性（伤害）|nature
 >sgs.DamageStruct_Fire|mynum|火属性（伤害）|nature
 >sgs.DamageStruct_Thunder|mynum|雷属性（伤害）|nature
+//role
+>lord|mystrc|身份：主公|role
+>loyalist|mystrc|身份：忠臣|role
+>rebel|mystrc|身份：反贼|role
+>renegade|mystrc|身份：内奸|role
+//kingdom
+>wei|mystrc|势力：魏|kingdom
+>shu|mystrc|势力：蜀|kingdom
+>wu|mystrc|势力：吴|kingdom
+>qun|mystrc|势力：群|kingdom
+>god|mystrc|势力：神|kingdom
 //phase
 >sgs.Player_Start|mynum|回合开始阶段|phase
 >sgs.Player_Judge|mynum|判定阶段|phase
@@ -85,8 +99,8 @@
 //place
 >sgs.Player_PlaceHand|mynum|位置：手牌|place
 >sgs.Player_PlaceEquip|mynum|位置：装备|place
->sgs.Player_PlaceDelayedTrick|mynum|位置：延时锦囊|place
->sgs.Player_PlaceJudge|mynum|位置：判定区|place
+>sgs.Player_PlaceDelayedTrick|mynum|位置：判定区|place
+>sgs.Player_PlaceJudge|mynum|位置：判定面板（是这么描述么..）|place
 >sgs.Player_PlaceSpecial|mynum|位置：特殊区|place
 >sgs.Player_DiscardPile|mynum|位置：弃牌堆|place
 >sgs.Player_DrawPile|mynum|位置：摸牌堆|place

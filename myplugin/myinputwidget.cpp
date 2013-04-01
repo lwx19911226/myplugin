@@ -210,6 +210,7 @@ void myinputwidget::changeFilter(){
             p_combobox_filter->addItem(tr("ALL"));
             p_combobox_filter->addItems(myfun::getfuntagrmlist());
             p_combobox_filter->setCurrentIndex(0);
+            p_combobox_filter->setMaxVisibleItems(p_combobox_filter->count());
             p_combobox_filter->show();
         }
         else if(gettype>=myinputitem::func_Obj){
@@ -223,6 +224,7 @@ void myinputwidget::changeFilter(){
                 p_combobox_filter->addItem(tr("Variable"));
                 p_combobox_filter->addItems(myobj::getconsttaglist());
                 p_combobox_filter->setCurrentIndex(0);
+                p_combobox_filter->setMaxVisibleItems(p_combobox_filter->count());
             }
             p_combobox_filter->show();
         }
@@ -264,13 +266,15 @@ void myinputwidget::filterItems(){
     if(!reg.isValid()){return;}
     myinputitem *pi0=p_inputmodel->getItem0(p_columnview->currentIndex());
     myinputitem *pi=p_inputmodel->getItem(p_columnview->currentIndex());
-    if(pi0->type==myinputitem::func_Start){return;}
+    //if(pi0->type==myinputitem::func_Start){return;}
 
     myinputitem *p0,*p;
     if(pi->pchlist.isEmpty()){p0=pi0->pf;p=pi->pf;}
     else{p0=pi0;p=pi;}
     p_columnview->hide();
-    p_columnview->setCurrentIndex(p_inputmodel->getIndex(p,true));
+    //qWarning()<<"filteritem?";
+    if(p->type>myinputitem::func_Start){p_columnview->setCurrentIndex(p_inputmodel->getIndex(p,true));}
+    else{p_columnview->setCurrentIndex(QModelIndex());}
     //qWarning()<<"filteritem";
     foreach(myinputitem *ip,p0->pchlist){
         if(myinputitem::spstr(ip->getstr())){continue;}

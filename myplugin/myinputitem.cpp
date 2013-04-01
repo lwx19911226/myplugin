@@ -34,6 +34,7 @@ int myinputitem::getChildren_cnt(bool visibility){
     return cnt;
 }
 int myinputitem::getRank(bool visibility){
+    if(!pf){return 0;}
     int cnt=0;
     foreach(myinputitem *ip,pf->pchlist){
         if(visibility&&!ip->visible){continue;}

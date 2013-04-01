@@ -14,7 +14,6 @@ void myevent::myini(){
     QFile fin("myevent.txt");
     if(!fin.open(QFile::ReadOnly)){
         QMessageBox::warning(NULL,"FILE ERROR","No myevent.txt");
-        qWarning("no myevent.txt\n");
         return;
     }
     QTextStream cin(&fin);

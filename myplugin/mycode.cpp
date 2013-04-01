@@ -5,11 +5,7 @@
 int myblock::globalint=0;
 void myblock::addBlock(myblock *getp){
     if(getp->name==name){
-        foreach(myblock *ip,getp->blocklist){
-            if(ip->getType()>=Block){
-                ip->upperLayer=this;
-            }
-        }
+        foreach(myblock *ip,getp->blocklist){ip->upperLayer=this;}
         blocklist.append(getp->blocklist);
     }
     else{
@@ -19,26 +15,15 @@ void myblock::addBlock(myblock *getp){
 }
 void myblock::addBlock(myblock *getp, QString getstr){
     if(!matchName(getstr)){return;}
-    if(name==getstr){
-        addBlock(getp);
-        return;
-    }
+    if(name==getstr){addBlock(getp);return;}
     foreach(myblock *ip,blocklist){
-        if(ip->matchName(getstr)){
-            ip->addBlock(getp,getstr);
-            return;
-        }
+        if(ip->matchName(getstr)){ip->addBlock(getp,getstr);return;}
     }    
 }
-bool myblock::matchName(QString getstr){
-    return getstr.startsWith(name);
-}
+bool myblock::matchName(QString getstr){return getstr.startsWith(name);}
 QStringList myblock::trans(){
     QStringList strlist;
-    //QString blank=QString("    ");
-    foreach(myblock *ip,blocklist){
-        strlist<<ip->trans();
-    }
+    foreach(myblock *ip,blocklist){strlist<<ip->trans();}
     return mycode::myindent(strlist);
 }
 int myblock::getLayer(){
@@ -54,19 +39,15 @@ int myblock::getLayer(){
 QStringList myblock::need4block(){
     QStringList list;
     list.append(name);
-    foreach(myblock *ip,blocklist){
-        list<<ip->need4block();
-    }
+    foreach(myblock *ip,blocklist){list<<ip->need4block();}
     return list;
 }
 myblock *myblock::findBlockByName(QString getname){
     if(name==getname){return this;}
     myblock *pblock;
     foreach(myblock *ip,blocklist){
-        if(ip->getType()>=Block){
-            pblock=ip->findBlockByName(getname);
-            if(pblock){return pblock;}
-        }
+        pblock=ip->findBlockByName(getname);
+        if(pblock){return pblock;}
     }
     return NULL;
 }
@@ -228,6 +209,7 @@ myfunction *myfunction::findFuncByObj(myobj *getp){
     if(rtobjlist.contains(getp)){return this;}
     return myblock::findFuncByObj(getp);
 }
+
 QString myfunction::getRemark(){
     QString tstr;
     QString rmstr=myfun::findRemarkByName(funname);
@@ -284,7 +266,6 @@ void mycondition::myini(){
     p->remark=remark+" case(else)";
     static_cast<myblock *>(this)->addBlock(p);
 }
-//void mycondition::addStc(myfunction *getstc, myobj *getobj){map[getobj]->addStc(getstc);}
 void mycondition::addBlock(myblock *getp, QString getstr){
     QString str=getstr.mid(name.length()+1);    
     if(str.startsWith("else")){
@@ -355,16 +336,5 @@ void myforeach::addBlock(myblock *getp, QString getstr){
     if(getstr.startsWith(blocklist.first()->name)){
         blocklist.first()->addBlock(getp,getstr);
     }
-}
-*/
-/*
-void myfunction::set(QString funname, QList<myobj *> getobjlist,
-                QList<QString> &rtnamelist,QList<QString> &rtrmlist,QString geteventstr,
-                QList<QString> &blrmlist){
-    funp=new myfun(this);
-    funp->name=funname;
-    funp->setrt(rtnamelist,rtrmlist,geteventstr);
-    funp->setBlock(blrmlist);
-    funp->objlist.append(getobjlist);
 }
 */

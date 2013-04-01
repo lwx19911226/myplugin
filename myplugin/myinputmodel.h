@@ -43,7 +43,7 @@ public:
     mysk *getsk0(){return getsys()->psk0;}
     //int getType(){return getmain()->p_inputwidget->type;}
     QModelIndex getIndex(myinputitem *getp,bool visibility=false){
-        if(!getp->pf){return QModelIndex();}
+        //if(!getp->pf){return QModelIndex();}
         return createIndex(getp->getRank(visibility),0,getp);
     }
 

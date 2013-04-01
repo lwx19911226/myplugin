@@ -40,7 +40,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="83"/>
-        <location filename="mainwindow.cpp" line="595"/>
+        <location filename="mainwindow.cpp" line="623"/>
         <source>Skill_Add</source>
         <translation>添加行为</translation>
     </message>
@@ -60,7 +60,12 @@
         <translation>模式生成小助手</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="142"/>
+        <location filename="mainwindow.cpp" line="124"/>
+        <source>No QSanguosha</source>
+        <translation>未发现【太阳神三国杀】</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="149"/>
         <source>Block Tree</source>
         <translation>树状图示</translation>
     </message>
@@ -85,32 +90,32 @@
         <translation>查看Readme文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="118"/>
+        <location filename="mainwindow.cpp" line="120"/>
         <source>QSanguosha</source>
         <translation>运行【太阳神三国杀】</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="135"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Name</source>
         <translation>名称（EN）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="135"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="135"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="140"/>
+        <location filename="mainwindow.cpp" line="147"/>
         <source>Full</source>
         <translation>完整显示</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="141"/>
+        <location filename="mainwindow.cpp" line="148"/>
         <source>Current Skill</source>
         <translation>当前技能部分</translation>
     </message>
@@ -118,17 +123,17 @@
 <context>
     <name>mydts</name>
     <message>
-        <location filename="mysk.h" line="259"/>
+        <location filename="mysk.h" line="266"/>
         <source>We use this function to calculate the additional value of distance. </source>
         <translation>用于计算额外距离。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="260"/>
+        <location filename="mysk.h" line="267"/>
         <source>Return value is the additional value beyond the geographical distance. </source>
         <translation>返回值表示额外距离值。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="261"/>
+        <location filename="mysk.h" line="268"/>
         <source>For example, with Mashu, when we calculate the distance from us to others, the additional value is -1. </source>
         <translation>比如，在【马术】的作用下，我们计算与别人的距离时，额外距离为-1。</translation>
     </message>
@@ -136,17 +141,17 @@
 <context>
     <name>myfts</name>
     <message>
-        <location filename="mysk.h" line="301"/>
+        <location filename="mysk.h" line="308"/>
         <source>We use this function to check which card should be filtered. </source>
         <translation>用于判断锁定视为技需要视为的牌。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="302"/>
+        <location filename="mysk.h" line="309"/>
         <source>Return true means the card should be filtered. </source>
         <translation>返回值为真表示此牌需要视为。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="303"/>
+        <location filename="mysk.h" line="310"/>
         <source>For example, with Hongyan, all spade cards in our places should be filtered as heart cards. </source>
         <translation>比如，在【红颜】的作用下，我们区域内所有黑桃都需要被视为红桃。</translation>
     </message>
@@ -175,6 +180,14 @@
         <location filename="mygeneral.h" line="27"/>
         <source>NULL</source>
         <translation>无</translation>
+    </message>
+</context>
+<context>
+    <name>myinputitem</name>
+    <message>
+        <location filename="myinputitem.h" line="40"/>
+        <source>input others</source>
+        <translation>输入其它值</translation>
     </message>
 </context>
 <context>
@@ -211,56 +224,61 @@
 <context>
     <name>myinputwidget</name>
     <message>
-        <location filename="myinputwidget.cpp" line="13"/>
+        <location filename="myinputwidget.cpp" line="12"/>
+        <source>Current Skill:</source>
+        <translation>当前技能：</translation>
+    </message>
+    <message>
+        <location filename="myinputwidget.cpp" line="14"/>
         <source>Filter:</source>
         <translation>筛选：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="64"/>
+        <location filename="myinputwidget.cpp" line="66"/>
         <source>Skill_Add</source>
         <translation>添加行为</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="165"/>
+        <location filename="myinputwidget.cpp" line="163"/>
         <source>Remarks: </source>
         <translation>标注：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="181"/>
+        <location filename="myinputwidget.cpp" line="179"/>
         <source>Remarks for return values: </source>
         <translation>请输入标注（返回值）：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="192"/>
+        <location filename="myinputwidget.cpp" line="190"/>
         <source>Remarks for blocks: </source>
         <translation>请输入标注（代码段）：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="195"/>
+        <location filename="myinputwidget.cpp" line="193"/>
         <source>Block</source>
         <translation>代码段</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="195"/>
+        <location filename="myinputwidget.cpp" line="193"/>
         <source>: </source>
         <translation>：</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="212"/>
-        <location filename="myinputwidget.cpp" line="223"/>
+        <location filename="myinputwidget.cpp" line="210"/>
+        <location filename="myinputwidget.cpp" line="222"/>
         <location filename="myinputwidget.cpp" line="302"/>
         <source>ALL</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="224"/>
-        <location filename="myinputwidget.cpp" line="311"/>
+        <location filename="myinputwidget.cpp" line="223"/>
+        <location filename="myinputwidget.cpp" line="315"/>
         <source>Const</source>
         <translation>常量</translation>
     </message>
     <message>
-        <location filename="myinputwidget.cpp" line="225"/>
-        <location filename="myinputwidget.cpp" line="312"/>
+        <location filename="myinputwidget.cpp" line="224"/>
+        <location filename="myinputwidget.cpp" line="316"/>
         <source>Variable</source>
         <translation>变量</translation>
     </message>
@@ -268,17 +286,17 @@
 <context>
     <name>mymcs</name>
     <message>
-        <location filename="mysk.h" line="355"/>
+        <location filename="mysk.h" line="362"/>
         <source>We use this function to calculate the additional number of maxcards. </source>
         <translation>用于计算额外手牌上限。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="356"/>
+        <location filename="mysk.h" line="363"/>
         <source>Return value is the additional number beyond the general maxcards. </source>
         <translation>返回值表示额外手牌上限。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="357"/>
+        <location filename="mysk.h" line="364"/>
         <source>For example, with Xueyi, our additional number of maxcards is 2*X, X is the number of Qun except us. </source>
         <translation>比如，在【血裔】的作用下，我们的额外手牌上限为2*X，X为其他群雄数。</translation>
     </message>
@@ -319,6 +337,11 @@
         <location filename="myobj.cpp" line="30"/>
         <source>TargetModSkill</source>
         <translation>目标技</translation>
+    </message>
+    <message>
+        <location filename="myobj.cpp" line="30"/>
+        <source>ExistingSkill</source>
+        <translation>已有技能</translation>
     </message>
     <message>
         <location filename="myobj.cpp" line="30"/>
@@ -401,37 +424,47 @@
         <translation>行为</translation>
     </message>
     <message>
-        <location filename="myobj.cpp" line="71"/>
+        <location filename="myobj.cpp" line="32"/>
+        <source>SKName</source>
+        <translation>已有技能名</translation>
+    </message>
+    <message>
+        <location filename="myobj.cpp" line="32"/>
+        <source>TargetPlayersNum</source>
+        <translation>目标角色数</translation>
+    </message>
+    <message>
+        <location filename="myobj.cpp" line="76"/>
         <source>Object Name</source>
         <translation>对象名</translation>
     </message>
     <message>
-        <location filename="myobj.cpp" line="93"/>
+        <location filename="myobj.cpp" line="100"/>
         <source>Class Name</source>
         <translation>类名</translation>
     </message>
     <message>
-        <location filename="myobj.cpp" line="93"/>
-        <location filename="myobj.cpp" line="105"/>
+        <location filename="myobj.cpp" line="100"/>
+        <location filename="myobj.cpp" line="112"/>
         <source>, </source>
         <translation>，</translation>
     </message>
     <message>
-        <location filename="myobj.cpp" line="93"/>
+        <location filename="myobj.cpp" line="100"/>
         <source>Pattern for any </source>
         <translation>模式任意一张</translation>
     </message>
     <message>
-        <location filename="myobj.cpp" line="71"/>
-        <location filename="myobj.cpp" line="90"/>
-        <location filename="myobj.cpp" line="93"/>
+        <location filename="myobj.cpp" line="76"/>
+        <location filename="myobj.cpp" line="97"/>
+        <location filename="myobj.cpp" line="100"/>
         <source>[</source>
         <translation>【</translation>
     </message>
     <message>
-        <location filename="myobj.cpp" line="71"/>
-        <location filename="myobj.cpp" line="90"/>
-        <location filename="myobj.cpp" line="93"/>
+        <location filename="myobj.cpp" line="76"/>
+        <location filename="myobj.cpp" line="97"/>
+        <location filename="myobj.cpp" line="100"/>
         <source>]</source>
         <translation>】</translation>
     </message>
@@ -439,17 +472,17 @@
 <context>
     <name>myprs</name>
     <message>
-        <location filename="mysk.h" line="328"/>
+        <location filename="mysk.h" line="335"/>
         <source>We use this function to check when the target should be prohibited. </source>
         <translation>用于判断目标是否应该被禁止，即不能选为目标。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="329"/>
+        <location filename="mysk.h" line="336"/>
         <source>Return true means the target should be prohibited. </source>
         <translation>返回值为真表示目标应该被禁止。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="330"/>
+        <location filename="mysk.h" line="337"/>
         <source>For example, with Kongcheng, when the user use Duel, we cannot be chosen as the target. </source>
         <translation>比如，在【空城】的作用下，不能选为【决斗】的目标。</translation>
     </message>
@@ -515,7 +548,7 @@
 <context>
     <name>mysk</name>
     <message>
-        <location filename="mysk.cpp" line="371"/>
+        <location filename="mysk.cpp" line="379"/>
         <source>Default Block</source>
         <translation>默认代码段</translation>
     </message>
@@ -523,27 +556,27 @@
 <context>
     <name>mysknwidget</name>
     <message>
-        <location filename="mysknwidget.cpp" line="14"/>
+        <location filename="mysknwidget.cpp" line="11"/>
         <source>Skill Name List</source>
         <translation>技能名称列表</translation>
     </message>
     <message>
-        <location filename="mysknwidget.cpp" line="22"/>
+        <location filename="mysknwidget.cpp" line="21"/>
         <source>Name</source>
         <translation>名称（EN）</translation>
     </message>
     <message>
-        <location filename="mysknwidget.cpp" line="22"/>
+        <location filename="mysknwidget.cpp" line="21"/>
         <source>Translation</source>
         <translation>名称翻译（CN）</translation>
     </message>
     <message>
-        <location filename="mysknwidget.cpp" line="22"/>
+        <location filename="mysknwidget.cpp" line="21"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="mysknwidget.cpp" line="42"/>
+        <location filename="mysknwidget.cpp" line="41"/>
         <source>Copy</source>
         <translation>复制到剪贴板</translation>
     </message>
@@ -551,47 +584,47 @@
 <context>
     <name>mytms</name>
     <message>
-        <location filename="mysk.h" line="392"/>
+        <location filename="mysk.h" line="399"/>
         <source>We use this function to calculate the additional number of targets. </source>
         <translation>用于计算额外目标数。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="393"/>
+        <location filename="mysk.h" line="400"/>
         <source>Return value is the additional number. </source>
         <translation>返回值表示额外目标数。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="394"/>
+        <location filename="mysk.h" line="401"/>
         <source>For example, with Tianyi successing, the additional number of targets of Slash is 1. </source>
         <translation>比如，【天义】成功后，【杀】的额外目标数为1。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="397"/>
+        <location filename="mysk.h" line="404"/>
         <source>We use this function to calculate the additional distance beyond the limitation. </source>
         <translation>用于计算使用牌时额外距离。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="398"/>
+        <location filename="mysk.h" line="405"/>
         <source>Return value is the additional distance beyond the limitation. </source>
         <translation>返回值表示额外距离。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="399"/>
+        <location filename="mysk.h" line="406"/>
         <source>For example, with Duanliang, the additional distance for SupplyShortage is 1. </source>
         <translation>比如，在【断粮】的作用下，【兵粮寸断】的额外距离为1。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="402"/>
+        <location filename="mysk.h" line="409"/>
         <source>We use this function to calculate the additional times for use beyond the limitation. </source>
         <translation>用于计算额外使用次数。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="403"/>
+        <location filename="mysk.h" line="410"/>
         <source>Return value is the additional times for use beyond the limitation. </source>
         <translation>返回值表示额外使用次数。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="404"/>
+        <location filename="mysk.h" line="411"/>
         <source>For example, with Tianyi successing, the additional times for use Slash is 1. </source>
         <translation>比如，【天义】成功后，【杀】的额外使用次数为1。</translation>
     </message>
@@ -599,85 +632,85 @@
 <context>
     <name>myvs</name>
     <message>
-        <location filename="mysk.cpp" line="650"/>
-        <location filename="mysk.cpp" line="652"/>
-        <location filename="mysk.cpp" line="658"/>
+        <location filename="mysk.cpp" line="674"/>
+        <location filename="mysk.cpp" line="676"/>
+        <location filename="mysk.cpp" line="682"/>
         <source>SkillCard</source>
         <translation>技能牌</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="216"/>
+        <location filename="mysk.h" line="223"/>
         <source>We use this function to check which card can be selected. </source>
         <translation>用于判断视为技所能选的牌。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="217"/>
+        <location filename="mysk.h" line="224"/>
         <source>Return true means the card to select is selectable. </source>
         <translation>返回值为真表示可选。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="218"/>
+        <location filename="mysk.h" line="225"/>
         <source>For example, we can only choose a red card when we use Wusheng; </source>
         <translation>比如，当我们使用【武圣】时，我们只能选红牌；</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="219"/>
+        <location filename="mysk.h" line="226"/>
         <source>we can only choose a spade handcard when we use Luanji and select a spade handcard before.</source>
         <translation>当我们使用乱击时，所选第二张手牌必须与第一张手牌花色相同。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="222"/>
+        <location filename="mysk.h" line="229"/>
         <source>We use this function to check if the skill can be used in Phase Play. </source>
         <translation>用于判断视为技是否能在出牌阶段使用。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="223"/>
-        <location filename="mysk.h" line="228"/>
+        <location filename="mysk.h" line="230"/>
+        <location filename="mysk.h" line="235"/>
         <source>Return true means the skill is usable. </source>
         <translation>返回值为真表示可用。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="224"/>
+        <location filename="mysk.h" line="231"/>
         <source>For example, before we use Fanjian, we can use it in Phase Play. </source>
         <translation>比如，我们可以在出牌阶段使用【反间】，且仅一次。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="227"/>
+        <location filename="mysk.h" line="234"/>
         <source>We use this function to check if the skill can be used to respond. </source>
         <translation>用于判断视为技是否能用于响应。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="229"/>
+        <location filename="mysk.h" line="236"/>
         <source>For example, we can use Wusheng when we want to respond a slash. </source>
         <translation>比如，我们可以使用【武圣】响应【杀】。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="232"/>
+        <location filename="mysk.h" line="239"/>
         <source>We use this function to check which player can be selected by the skillcard. </source>
         <translation>用于判断视为技技能牌所能选的角色。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="233"/>
+        <location filename="mysk.h" line="240"/>
         <source>Return true means the player to select is selectable. </source>
         <translation>返回值为真表示可选。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="234"/>
+        <location filename="mysk.h" line="241"/>
         <source>Warning: it is only valid when you view it as a skillcard. </source>
         <translation>注意：仅对技能牌有效。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="235"/>
+        <location filename="mysk.h" line="242"/>
         <source>For example, we can only choose a wounded Male when we use Jieyin; </source>
         <translation>比如，我们使用【结姻】时只能选择一名受伤的男性；</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="236"/>
+        <location filename="mysk.h" line="243"/>
         <source>we cannot choose two players with the handcard disparity over our total cards. </source>
         <translation>我们使用【缔盟】时不能选择两名手牌差过大的角色。</translation>
     </message>
     <message>
-        <location filename="mysk.h" line="239"/>
+        <location filename="mysk.h" line="246"/>
         <source>We use this function to define the behavior of the skillcard. </source>
         <translation>用于确定视为技技能牌的行为。</translation>
     </message>
