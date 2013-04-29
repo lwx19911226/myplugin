@@ -14,6 +14,7 @@
 >>>trs|luatiandu|天妒|luagj|Frequent|:收判定|$
 >>>trs|lualuoshen|洛神|luazhj|Frequent|:洛牌|$飘飘兮
 >>>vs|luatuxivs|突袭|luazhl|0|SkillCard|2|:偷|$
+>>>exs|liegong|luacc|liegong
 >>>>luajianxiong::Damaged|Damaged|onlySkillOwner|player||
 >>>>luajianxiong::Damaged|Damaged|getCardPlace|damage.card|伤害牌的位置|
 >>>>luajianxiong::Damaged|Damaged|ifEqualNum|1->0,sgs.Player_PlaceTable||伤害牌位于面板,伤害牌不位于面板

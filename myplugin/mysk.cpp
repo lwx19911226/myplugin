@@ -913,6 +913,7 @@ QString myexs::getskname(){
 }
 void myexs::setskname(QString getstr){
     tgtsk=getsys()->findSkillByName(getstr);
+    if(tgtsk==this){tgtsk=NULL;}
     skname=getstr;
 }
 QString myexs::getSKNameProperty(){

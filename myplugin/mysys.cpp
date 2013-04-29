@@ -3,6 +3,9 @@ int mysys::globalint=0;
 void mysys::myini(QString getpath){    
     //funstrlist=myfun::getfunstrlist();
     //eventstrlist=myevent::geteventstrlist();
+    myobj::myini();
+    myfun::myini();
+    myevent::myini();
     myini_design(getpath);
 }
 
@@ -81,7 +84,9 @@ void mysys::myini_design(QString path){
             QString getabb=tstr.split("|").at(0);
             QString getname=tstr.split("|").at(1);
             mysk *psk=findSkillByName(getname);
-            if(!psk){psk=newSkill(getname,mysk::abb2type(getabb));}
+            if(!psk){
+                psk=newSkill(getname,mysk::abb2type(getabb));
+            }
             psk->propertystr_set(tstr);
             /*
             QString gettranslation=tstrlist.at(1);
@@ -112,6 +117,7 @@ void mysys::myini_design(QString path){
             qWarning()<<stri;
         }
     }
+
     foreach(QString stri,strlist_do){
         QString skname=stri.mid(4,stri.indexOf("::")-4);
         QString getstr=stri.mid(stri.indexOf("::")+2);
@@ -165,9 +171,10 @@ mysk *mysys::newsk(int gettype){
     qRegisterMetaType<myexs>("myexs");
     foreach(QString stri,mysk::typeclasslist()){
         if(QMetaType::type(stri.toUtf8())==0){qWarning()<<"newsk"<<stri;}
-    }
+    }    
     mysk *psk=NULL;
     int id=QMetaType::type(mysk::type2class(gettype).toUtf8());
+
     if(id!=0){
         psk=static_cast<mysk *>(QMetaType::construct(id));
         psk->setParent(this);
@@ -178,7 +185,7 @@ mysk *mysys::newSkill(QString getname, int gettype){
     //if(gettype==mysk::TriggerSkill){return newTrs(getname);}
     //if(gettype==mysk::ViewAsSkill){return newVs(getname);}
     mysk *psk=newsk(gettype);
-    if(!psk){qWarning()<<"newskill"<<getname<<gettype;}
+    if(!psk){qWarning()<<"newskill"<<getname<<gettype;}    
     psk0=psk;
     psk0->setName(getname);
     psk0->iniObj();
