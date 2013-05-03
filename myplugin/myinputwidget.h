@@ -56,6 +56,7 @@ public slots:
     //void changeColumnViewWidths();
     void filterItems();
     void filterItems_obj();
+    void myscroll(const QModelIndex &);
 };
 
 #endif // MYINPUTWIDGET_H

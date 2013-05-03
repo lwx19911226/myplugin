@@ -24,7 +24,7 @@ myptgwidget::myptgwidget(QWidget *parent) :
         p_tablewidget->setItem(i,2,new QTableWidgetItem(QString::number(i+1)));
     }
     p_tablewidget->setItem(0,3,new QTableWidgetItem("hand"));
-    p_tablewidget->setItem(1,3,new QTableWidgetItem("equip"));
+    p_tablewidget->setItem(1,3,new QTableWidgetItem("equipped"));
     p_tablewidget->setSelectionMode(QAbstractItemView::MultiSelection);
     p_tablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 

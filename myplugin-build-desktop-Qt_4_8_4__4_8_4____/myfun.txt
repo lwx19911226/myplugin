@@ -85,6 +85,7 @@
 >isSkipped|mysplayer~,mynum~|mybool~|<1:>%3=%1:isSkipped(%2)|角色（参数1）的阶段（参数2）是否（返回值1）被跳过|pl,room$
 >getNext|mysplayer~|mysplayer~|<1:>%2=%1:getNext()|角色（参数1）的下一名角色（返回值1）|pl,room$
 >getNextAlive|mysplayer~|mysplayer~|<1:>%2=%1:getNextAlive()|角色（参数1）的下一名存活角色（返回值1）|pl,room$
+>isSkillOwner|myplayer~|mybool~|<1:>%2=%1:hasSkill(selfskname)|角色（参数1）是否（返回值1）为技能拥有者|pl
 
 //card property
 >isNDTrick|mycard~|mybool~|<1:>%2=%1:isNDTrick()|牌（参数1）是否为非延时锦囊？（返回值1）|cd

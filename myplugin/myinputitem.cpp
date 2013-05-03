@@ -1,5 +1,5 @@
 #include "myinputitem.h"
-void myinputitem::newChild(QVariant getdata,bool extra,bool front){
+myinputitem *myinputitem::newChild(QVariant getdata,bool extra,bool front){
     myinputitem *p=new myinputitem;
     p->mydata=getdata;
     p->pf=this;
@@ -14,6 +14,7 @@ void myinputitem::newChild(QVariant getdata,bool extra,bool front){
         pchlist.insert(geti,p);
     }
     if(extra){pchlist.last()->newChild(QVariant(str4input()));}
+    return p;
 }
 myinputitem *myinputitem::getChild(int i,bool visibility){
     //if(i>=0&&i<=pchlist.length()-1){return pchlist.at(i);}

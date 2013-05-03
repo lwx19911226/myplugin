@@ -86,12 +86,16 @@ myinputitem *myinputmodel::getItem0(const QModelIndex &index) const{
 }
 
 bool myinputmodel::canFetchMore(const QModelIndex &parent) const{
-    if(getItem0(parent)&&getItem0(parent)->pchlist.length()==1){return true;}
+    myinputitem *p0=getItem0(parent);
+    if(!p0){return false;}
+    if(!p0->pf){return false;}
+    //if(p0&&!p0->pchlist.isEmpty()){return true;}
+    if(p0->pchlist.length()==1){return true;}
     return false;
 }
 
 void myinputmodel::fetchMore(const QModelIndex &parent){
-    //qWarning()<<"fetchmore0";
+    qWarning()<<"fetchmore0";
     myinputitem *pp=getItem0(parent);
     myinputitem *p=getItem(parent);
     if(pp->type+1==myinputitem::func_Block){
@@ -132,7 +136,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     }
     p->delAllChildren();
     myinputitem::mycpy(pp,p,true);
-    //qWarning()<<"fetchmore";
+    qWarning()<<"fetchmore";
 }
 
 bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int role){
@@ -153,11 +157,13 @@ bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int 
             value.toString().toInt(&b);
             if(!b){return false;}
         }
-        pi0->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1,true);
-        pi->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1,true);
-        QModelIndex ited=createIndex(pi->pf->pchlist.length()-1,0,pi->pf->pchlist.last());
-        QModelIndex itst=createIndex(0,0,pi->pf->pchlist.first());
+        pi0->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1,false);
+        myinputitem *pt=pi->pf->newChild(value,pi->type-myinputitem::func_Obj<strlist.length()-1,false);
+        QModelIndex ited=createIndex(pi0->pf->pchlist.length()-1,0,pi0->pf->pchlist.last());
+        QModelIndex itst=createIndex(0,0,pi0->pf->pchlist.first());
+        QModelIndex itt=createIndex(pt->getRank(true),0,pt);
         emit dataChanged(itst,ited);
+        emit myscroll(itt);
         return true;
     }
     return false;

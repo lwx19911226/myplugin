@@ -50,7 +50,7 @@ public:
     myinputitem *rootitem0,*rootitem;
     //int sktype;
 signals:
-
+    void myscroll(const QModelIndex &);
 public slots:
 
 };

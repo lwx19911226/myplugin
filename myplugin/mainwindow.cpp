@@ -29,11 +29,11 @@ MainWindow::MainWindow(QWidget *parent) :
     psys->myini(getpath);
 
     p_lineedit_packagename=new QLineEdit(ui->centralWidget);
-    QObject::connect(p_lineedit_packagename,SIGNAL(returnPressed()),this,SLOT(changePackageName()));
+    QObject::connect(p_lineedit_packagename,SIGNAL(textEdited(QString)),this,SLOT(changePackageName()));
     QFormLayout *p_formlayout4=new QFormLayout;    
     p_formlayout4->addRow(tr("Package Name:"),p_lineedit_packagename);
     p_lineedit_packagetrans=new QLineEdit(ui->centralWidget);
-    QObject::connect(p_lineedit_packagetrans,SIGNAL(returnPressed()),this,SLOT(changePackageTranslation()));
+    QObject::connect(p_lineedit_packagetrans,SIGNAL(textEdited(QString)),this,SLOT(changePackageTranslation()));
     QFormLayout *p_formlayout5=new QFormLayout;
     p_formlayout5->addRow(tr("Package Translation:"),p_lineedit_packagetrans);
     QHBoxLayout *p_hboxlayout1=new QHBoxLayout;
@@ -479,7 +479,7 @@ void MainWindow::myrfr(){
     else if(p_tabwidget2->currentWidget()==p_textedit_all){mytext_all();}
     else if(p_tabwidget2->currentWidget()==p_textedit_current){mytext_current();}
 
-    qWarning()<<"myrfr";
+    //qWarning()<<"myrfr";
 }
 void MainWindow::myrfr_tw_removerow(QTableWidget *ptw, QStringList getstrlist){
     for(int i=0;i<ptw->rowCount();){

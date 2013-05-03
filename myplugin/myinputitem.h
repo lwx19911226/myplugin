@@ -27,7 +27,7 @@ public:
     bool visible;
 
     int getcnt(){return 1;}
-    void newChild(QVariant getdata,bool extra=false,bool front=false);
+    myinputitem *newChild(QVariant getdata,bool extra=false,bool front=false);
     myinputitem *getChild(int i,bool visibility=false);
     int getChildren_cnt(bool visibility=false);
     int getRank(bool visibility=false);

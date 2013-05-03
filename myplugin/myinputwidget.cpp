@@ -74,6 +74,8 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
     p_vboxlayout2->addLayout(p_hboxlayout2);
     setLayout(p_vboxlayout2);
     setAutoFillBackground(true);
+
+    QObject::connect(p_inputmodel,SIGNAL(myscroll(QModelIndex)),this,SLOT(myscroll(QModelIndex)));
 }
 
 myinputwidget::~myinputwidget(){
@@ -282,7 +284,7 @@ void myinputwidget::filterItems(){
     }
     p->delAllChildren();
     myinputitem::mycpy(p0,p,true);
-
+    if(!p->pchlist.isEmpty()){myscroll(p_inputmodel->getIndex(p->pchlist.first()));}
     p_columnview->show();
 }
 void myinputwidget::filterItems_obj(){
@@ -319,6 +321,11 @@ void myinputwidget::filterItems_obj(){
         }
     }    
     p->delAllChildren();
-    myinputitem::mycpy(p0,p,true);    
+    myinputitem::mycpy(p0,p,true);
+    if(!p->pchlist.isEmpty()){myscroll(p_inputmodel->getIndex(p->pchlist.first()));}
     p_columnview->show();
+}
+
+void myinputwidget::myscroll(const QModelIndex &index){
+    p_columnview->scrollTo(index);
 }
