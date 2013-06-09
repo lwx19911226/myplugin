@@ -45,34 +45,7 @@ void mysys::myini_design(QString path){
             QString getname=tstr.split("|").at(0);
             mygeneral *pg=findGeneralByName(getname);
             if(!pg){pg=newGeneral(getname);}
-            pg->propertystr_set(tstr);
-            /*
-            QString gettranslation=tstrlist.at(1);
-            int getkingdom=mygeneral::str2kingdom(tstrlist.at(2));
-            bool getsex=mygeneral::str2sex(tstrlist.at(3));
-            int gethp=tstrlist.at(4).toInt();
-            if(pg){
-                pg->translation=gettranslation;
-                pg->kingdom=getkingdom;
-                pg->sex=getsex;
-                pg->hp=gethp;
-            }
-            else{
-                pg=newGeneral(getname,getkingdom,gethp,getsex);
-                pg->translation=gettranslation;
-            }
-            for(int i=5;i<tstrlist.length();i++){
-                if(tstrlist.at(i).startsWith("#")){
-                    pg->title=tstrlist.at(i).mid(1);
-                }
-                else if(tstrlist.at(i).startsWith("~")){
-                    pg->word=tstrlist.at(i).mid(1);
-                }
-                else if(tstrlist.at(i).startsWith("cv:")){
-                    pg->cv=tstrlist.at(i).mid(3);
-                }
-            }
-            */
+            pg->propertystr_set(tstr);            
         }
         else{
             qWarning()<<stri;
@@ -87,31 +60,7 @@ void mysys::myini_design(QString path){
             if(!psk){
                 psk=newSkill(getname,mysk::abb2type(getabb));
             }
-            psk->propertystr_set(tstr);
-            /*
-            QString gettranslation=tstrlist.at(1);
-            int gettype=mytrs::str2type(tstrlist.at(2));
-            mygeneral *pg=findGeneralByName(tstrlist.at(3));
-            mytrs *psk=static_cast<mytrs *>(findSkillByName(getname));
-            if(psk){
-                psk->setOwner(pg);
-                psk->translation=gettranslation;
-                psk->subtype=gettype;
-            }
-            else{
-                psk=newTrs(getname,gettype);
-                psk->setOwner(pg);
-                psk->translation=gettranslation;
-            }
-            for(int i=4;i<tstrlist.length();i++){
-                if(tstrlist.at(i).startsWith(":")){
-                    psk->description=tstrlist.at(i).mid(1);
-                }
-                else if(tstrlist.at(i).startsWith("$")){
-                    psk->wordslist<<tstrlist.at(i).mid(1);
-                }
-            }
-            */
+            psk->propertystr_set(tstr);            
         }
         else{
             qWarning()<<stri;
@@ -130,6 +79,7 @@ void mysys::myini_design(QString path){
     fin.close();
     sig_update();
 }
+
 void mysys::getsklist(QList<mysk *> &rsklist,int gettype){
     foreach(mysk *ip,sklist){
         if(ip->getType()==gettype){rsklist<<ip;}
@@ -280,17 +230,20 @@ QStringList mysys::trans(){
         strlist<<ip->trans();
     }
     strlist<<"dofile \"lua/sgs_ex.lua\"";
+    strlist<<"dofile \"lua/myplugin_sysfunc.lua\"";
     QList<mysk *> tsklist,exslist;
     getsklist_noexs(tsklist);
     getsklist(exslist,mysk::ExistingSkill);
     foreach(mysk *ip,tsklist){
         strlist<<ip->trans();
-    }    
+    }
+/*
     strlist<<"function addsk(sk)"<<"if not sgs.Sanguosha:getSkill(sk:objectName()) then"<<"local sklist=sgs.SkillList()"
           <<"sklist:append(sk)"<<"sgs.Sanguosha:addSkills(sklist)"<<"end"<<"end";
     strlist<<"function addexsk(gn,skname)"<<"if sgs.Sanguosha:getSkill(skname) then"<<"gn:addSkill(skname)"
           <<"for _,tsk in sgs.qlist(sgs.Sanguosha:getRelatedSkills(skname)) do"<<"gn:addSkill(tsk:objectName())"
          <<"end"<<"end"<<"end";
+*/
     foreach(mysk *ip,tsklist){
         strlist<<QString("addsk(%1)").arg(ip->name);
     }
@@ -304,6 +257,7 @@ QStringList mysys::trans(){
     }
 
     strlist<<packagename+"_trans={}";
+/*
     strlist<<"function addsktrans(t,name,trans,dscrpt,wds)"<<"t[name]=trans"<<"t[\":\"..name]=dscrpt"
           <<"if wds then"<<"if #wds==1 then t[\"$\"..name]=wds[1]"
          <<"else table.foreach(wds,function(i,v) t[string.format(\"$%s%d\",name,i)]=v end)"<<"end"<<"end"<<"end";
@@ -315,6 +269,7 @@ QStringList mysys::trans(){
         <<"tmplist4here[\"@\"..string.sub(key,2)]=t[string.sub(key,2)]"<<"end"<<"if string.sub(key,1,1)~=\":\" and not t[\":\"..key] then"
        <<"tmplist4here[\"designer:\"..key]=tmplist4here[\"designer:\"..key] or \"\""<<"tmplist4here[\"illustrator:\"..key]=tmplist4here[\"illustrator:\"..key] or \"Internet\""
       <<"end"<<"end"<<"return tmplist4here"<<"end";
+*/
     strlist<<QString("%1_trans[\"%1\"]=\"%2\"").arg(packagename).arg(package_trans);
     foreach(mygeneral *ip,glist){
         strlist<<QString("addgtrans(%1_trans,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\")").arg(packagename,ip->name,ip->translation,ip->title,ip->word,ip->cv);

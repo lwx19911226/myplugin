@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QString getpath;
     QFile ft("tmp4design.txt");
     if(ft.exists()&&(QMessageBox::question(this,"DESIGN FILE",
-                                           "There exists temp design files left before, do you want to import it?",
+                                           "There exists temp design files left before. Do you want to import it?",
                                           QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)){
         getpath="tmp4design.txt";
     }
@@ -222,7 +222,7 @@ void MainWindow::tipbox(){
     }
 }
 void MainWindow::myimport(){    
-    int ret=QMessageBox::question(this,"DESIGN FILE","Before you import a new design file, do you want to save the current design file?",
+    int ret=QMessageBox::question(this,"DESIGN FILE","Before importing a new design file, do you want to save the current design file?",
                                   QMessageBox::Yes,QMessageBox::No);
     if(ret==QMessageBox::Yes){myexport_design();}
     QString path=QFileDialog::getOpenFileName(this,"DESIGN FILE",".","design files (*.txt)");
@@ -249,6 +249,20 @@ void MainWindow::myexport(){
     cout<<mycode::mymdf(psys->trans(),QString("\n"),false).join("");
     QMessageBox::warning(this,"SAVE","Save the LUA file successfully as "+path);
     fout.close();
+    QFile fsys("myplugin_sysfunc.lua");
+    if(fsys.exists()){
+        QString patht="../lua/"+fsys.fileName();
+        QFile fsyst(patht);
+        if(fsyst.exists()){
+            if(!fsyst.remove()){
+                qWarning()<<"save copy remove";return;
+            }
+        }
+        if(!fsys.copy(patht)){
+            QMessageBox::warning(this,"SAVE","Fail to copy "+fsys.fileName()+" to "+patht+". Please manually copy it.");
+            qWarning()<<"save copy";return;
+        }
+    }
     myexport_design();
 }
 void MainWindow::myexport_design(QString getpath){
@@ -264,7 +278,7 @@ void MainWindow::myexport_design(QString getpath){
 }
 void MainWindow::myexport_design(){
     QString path2=QFileDialog::getSaveFileName(this,"DESIGN FILE",".","design files (*.txt)");
-    myexport_design(path2);
+    if(path2!=""){myexport_design(path2);}
 }
 
 QTableWidget *MainWindow::str2tw_tab(QString getstr){

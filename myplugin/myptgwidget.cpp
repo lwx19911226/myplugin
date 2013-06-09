@@ -9,28 +9,37 @@ myptgwidget::myptgwidget(QWidget *parent) :
     p_tablewidget=new QTableWidget(this);
     int rowmax=qMax(qMax(13,cllist.length()),suitlist.length());
     p_tablewidget->setRowCount(rowmax);
-    p_tablewidget->setColumnCount(4);
+    p_tablewidget->setColumnCount(6);
     QStringList headerlist;
-    headerlist<<tr("Class")<<tr("Suit")<<tr("Number")<<tr("Place");
+    headerlist<<tr("")<<tr("Class")<<tr("")<<tr("Suit")<<tr("Number")<<tr("Place");
     p_tablewidget->setHorizontalHeaderLabels(headerlist);
-
+    QCheckBox *pcheckbox=NULL;
     for(int i=0;i<cllist.length();i++){
-        p_tablewidget->setItem(i,0,new QTableWidgetItem(cllist.at(i)));
+        pcheckbox=new QCheckBox(p_tablewidget);
+        p_tablewidget->setCellWidget(i,0,pcheckbox);
+        p_tablewidget->setItem(i,1,new QTableWidgetItem(cllist.at(i)));
     }
     for(int i=0;i<suitlist.length();i++){
-        p_tablewidget->setItem(i,1,new QTableWidgetItem(suitlist.at(i)));
+        pcheckbox=new QCheckBox(p_tablewidget);
+        p_tablewidget->setCellWidget(i,2,pcheckbox);
+        p_tablewidget->setItem(i,3,new QTableWidgetItem(suitlist.at(i)));
     }
     for(int i=0;i<13;i++){
-        p_tablewidget->setItem(i,2,new QTableWidgetItem(QString::number(i+1)));
+        p_tablewidget->setItem(i,4,new QTableWidgetItem(QString::number(i+1)));
     }
-    p_tablewidget->setItem(0,3,new QTableWidgetItem("hand"));
-    p_tablewidget->setItem(1,3,new QTableWidgetItem("equipped"));
+    p_tablewidget->setItem(0,5,new QTableWidgetItem("hand"));
+    p_tablewidget->setItem(1,5,new QTableWidgetItem("equipped"));
     p_tablewidget->setSelectionMode(QAbstractItemView::MultiSelection);
     p_tablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    p_tablewidget->resizeColumnsToContents();
+
+    QLabel *plabel=new QLabel(tr("Note: if the checkbox before Slash is checked, it means non-Slash."),this);
 
     p_checkbox_judge=new QCheckBox(tr("Judge"),this);
+    p_checkbox_judge->hide();
     p_checkbox_or=new QCheckBox(tr("Or"),this);
-    QObject::connect(p_checkbox_judge,SIGNAL(clicked(bool)),p_checkbox_or,SLOT(setHidden(bool)));
+    //QObject::connect(p_checkbox_judge,SIGNAL(clicked(bool)),p_checkbox_or,SLOT(setHidden(bool)));
+    //QObject::connect(p_checkbox_judge,SIGNAL(clicked(bool)),this,SLOT(myjudge(bool)));
     QPushButton *p_pushbutton_generate=new QPushButton(tr("Generate"),this);
     QObject::connect(p_pushbutton_generate,SIGNAL(clicked()),this,SLOT(mygenerate()));
     QPushButton *p_pushbutton_copy=new QPushButton(tr("Copy"),this);
@@ -51,6 +60,7 @@ myptgwidget::myptgwidget(QWidget *parent) :
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout(this);
     p_vboxlayout->addWidget(p_tablewidget);
+    p_vboxlayout->addWidget(plabel);
     p_vboxlayout->addLayout(p_hboxlayout);
     p_vboxlayout->addLayout(p_formlayout);
 }
@@ -59,10 +69,10 @@ void myptgwidget::mygenerate(){
     QList<QTableWidgetItem *> pcllist,psuitlist,pnumlist,pplacelist;
     foreach(QTableWidgetItem *ip,list){
         switch(ip->column()){
-        case 0:pcllist<<ip;break;
-        case 1:psuitlist<<ip;break;
-        case 2:pnumlist<<ip;break;
-        case 3:pplacelist<<ip;break;
+        case 1:pcllist<<ip;break;
+        case 3:psuitlist<<ip;break;
+        case 4:pnumlist<<ip;break;
+        case 5:pplacelist<<ip;break;
         default:;
         }
     }
@@ -85,7 +95,12 @@ void myptgwidget::mygenerate(){
         else{
             QStringList tstrlist;
             foreach(QTableWidgetItem *ip,pcllist){
-                tstrlist<<ip->text();
+                QCheckBox *pcheckbox=static_cast<QCheckBox *>(p_tablewidget->cellWidget(ip->row(),0));
+                QString str=ip->text();
+                if(pcheckbox->isChecked()){
+                    str="^"+str;
+                }
+                tstrlist<<str;
             }
             strlist<<tstrlist.join(",");
         }
@@ -93,7 +108,12 @@ void myptgwidget::mygenerate(){
         else{
             QStringList tstrlist;
             foreach(QTableWidgetItem *ip,psuitlist){
-                tstrlist<<myobj::suitstr(ip->text());
+                QCheckBox *pcheckbox=static_cast<QCheckBox *>(p_tablewidget->cellWidget(ip->row(),2));
+                QString str=myobj::suitstr(ip->text());
+                if(pcheckbox->isChecked()){
+                    str="^"+str;
+                }
+                tstrlist<<str;
             }
             strlist<<tstrlist.join(",");
         }
@@ -137,4 +157,12 @@ void myptgwidget::mydel(){
         ptstrlist.takeLast();
         p_lineedit->setText(ptstrlist.join("#"));
     }
+}
+void myptgwidget::myjudge(bool checked){
+    p_tablewidget->setColumnHidden(0,checked);
+    p_tablewidget->setColumnHidden(1,checked);
+    p_tablewidget->setColumnHidden(2,checked);
+    p_tablewidget->setColumnHidden(5,checked);
+    p_checkbox_or->setHidden(checked);
+    mygenerate();
 }

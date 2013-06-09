@@ -22,6 +22,7 @@ public slots:
     void mygenerate();
     void mycopy();
     void mydel();
+    void myjudge(bool checked);
 };
 
 #endif // MYPTGWIDGET_H

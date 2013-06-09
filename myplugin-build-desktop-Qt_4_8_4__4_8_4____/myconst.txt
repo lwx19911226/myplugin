@@ -138,5 +138,16 @@
 >BasicCard|mystrc|模式（任意一张基本牌），也表示类名【基本牌】|cl,,pt
 >TrickCard|mystrc|模式（任意一张锦囊牌），也表示类名【锦囊牌】|cl,,pt
 >EquipCard|mystrc|模式（任意一张装备牌），也表示类名【装备牌】|cl,,pt
+>Weapon|mystrc|模式（任意一张武器牌），也表示类名【武器牌】|cl,,pt
+>Armor|mystrc|模式（任意一张装备牌），也表示类名【装备牌】|cl,,pt
+>DefensiveHorse|mystrc|模式（任意一张防御马），也表示类名【防御马】|cl,,pt
+>OffensiveHorse|mystrc|模式（任意一张进攻马），也表示类名【进攻马】|cl,,pt
+>ChiTu|mystrc|模式（任意一张赤兔），对象名【赤兔】，进攻马|ob,,cl,,pt
+>DaYuan|mystrc|模式（任意一张大宛），对象名【大宛】，进攻马|ob,,cl,,pt
+>ZiXing|mystrc|模式（任意一张紫骍），对象名【紫骍】，进攻马|ob,,cl,,pt
+>ZhuaHuangFeiDian|mystrc|模式（任意一张爪黄飞电），对象名【爪黄飞电】，防御马|ob,,cl,,pt
+>DiLu|mystrc|模式（任意一张的卢），对象名【的卢】，防御马|ob,,cl,,pt
+>JueYing|mystrc|模式（任意一张绝影），对象名【绝影】，防御马|ob,,cl,,pt
+>HuaLiu|mystrc|模式（任意一张骅骝），对象名【骅骝】，防御马|ob,,cl,,pt
 //>Slash|mystrc|模式（任意一张杀），也表示类名【杀】|cl,,pt
 //>Duel|mystrc|模式（任意一张决斗），也表示类名【决斗】|cl,,pt

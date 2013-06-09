@@ -21,6 +21,7 @@
 #include <QFormLayout>
 #include <QVBoxLayout>
 #include <QSplitter>
+#include <QLabel>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QComboBox>

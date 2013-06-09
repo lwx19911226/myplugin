@@ -136,35 +136,47 @@ class mytrs : public mysk
     Q_OBJECT
     Q_ENUMS(trsType)
     Q_ENUMS(trsProperty)
+    Q_ENUMS(cantriggerType)
     Q_PROPERTY(QString SubtypeProperty READ getSubtypeProperty WRITE setSubtypeProperty)
+    Q_PROPERTY(QString CanTriggerProperty READ getCanTriggerProperty WRITE setCanTriggerProperty)
+    Q_PROPERTY(QString CanTriggerPropertyRemark READ getCanTriggerPropertyRemark WRITE setCanTriggerPropertyRemark)
 public:
     explicit mytrs(QObject *parent = 0):mysk(parent){
-        subtype=NotFrequent;
+        subtype=NotFrequent;cantrigger=SkillOwnerAlive;
     }
-    enum trsProperty{Subtype=11};    
+    enum trsProperty{Subtype=11,CanTrigger=12};
     //void propertymap_get(QMap<QString,QString> &strmap,QMap<QString,QStringList> &strlistmap,bool b4remark);
     //void propertymap_set(QMap<QString, QString> &strmap, bool b4remark);
     //void propertystr_set(QString getstr);
     //QString propertystr_get();
     enum trsType{NotFrequent=0,Frequent=1,Compulsory=2,Limited=3,Wake=4};
+    enum cantriggerType{SkillOwnerAlive=0,TriggerAlive=1,Always=2};
     static QString subtype2str(int gettype){return myobj::enumstr(&staticMetaObject,"trsType",gettype);}
     static int str2subtype(QString getstr){return myobj::enumint(&staticMetaObject,"trsType",getstr,NotFrequent);}
     static QStringList subtypestrlist(){return myobj::enumstrlist(&staticMetaObject,"trsType");}
     static QString type2trans(int gettype){return "sgs.Skill_"+subtype2str(gettype);}
+    static QString cantrigger2str(int gettype){return myobj::enumstr(&staticMetaObject,"cantriggerType",gettype);}
+    static int str2cantrigger(QString getstr){return myobj::enumint(&staticMetaObject,"cantriggerType",getstr,SkillOwnerAlive);}
+    static QStringList cantriggerstrlist(){return myobj::enumstrlist(&staticMetaObject,"cantriggerType");}
     QStringList funtaglist(QString getstr){
-        if(!myevent::isEvent(getstr)){qWarning()<<"funtaglist:"<<getstr;}
         QStringList strlist;
-        strlist<<"room$"<<"rtb$"<<getstr+"$";
+        strlist<<"room$"<<"rtb$";
+        //if(getstr=="CanTrigger"){return strlist;}
+        if(!myevent::isEvent(getstr)){qWarning()<<"funtaglist:"<<getstr;}        
+        strlist<<getstr+"$";
         return strlist;
     }
-    QStringList eventstrlist(){
-        return myevent::geteventstrlist();
-    }
+    QStringList eventstrlist();
 
     int subtype;
+    int cantrigger;
     int getType(){return TriggerSkill;}
     QString getSubtypeProperty();
     void setSubtypeProperty(QString getstr);
+    QString getCanTriggerProperty();
+    void setCanTriggerProperty(QString getstr);
+    QString getCanTriggerPropertyRemark();
+    void setCanTriggerPropertyRemark(QString getstr);
     void iniObj();
     QStringList trans();
     QStringList trans4avlobjlist(QString getstr);

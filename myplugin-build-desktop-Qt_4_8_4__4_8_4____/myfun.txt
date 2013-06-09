@@ -102,6 +102,7 @@
 >getSubcards|mycard~|mynumlist~|<1:>%2=%1:getSubcards()|牌（参数1）的子卡ID列表（返回值1）|cd,list
 >subcardsLength|mycard~|mynum~|<1:>%2=%1:subcardsLength()|牌（参数1）的子卡数（返回值1）|cd
 >getSkillName|mycard~|mystr~|<1:>%2=%1:getSkillName()|牌（参数1）的技能名（返回值1）|cd
+>match|mycard~,myplayer~,mystr~|mybool~|<1:><2:>%4=mymatch(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl
 
 //action
 >getCurrent||mysplayer~|%1=room:getCurrent()|当前回合角色（返回值1）|pl,room$
@@ -154,7 +155,7 @@
 
 //
 >cloneCard|mystr~|mycard|%2=sgs.Sanguosha:cloneCard(%1,sgs.NoSuit,0)|获得一张虚拟牌（返回值1），无花色无点数，牌的对象名（参数1），比如【离间】的决斗|cd
->judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=sgs.JudgeStruct();judge%%.pattern=sgs.QRegExp(%1);judge%%.who=%2;judge%%.reason=selfskname;judge%%.good=%3;room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2|pl,cd,block,room$
+>judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=myjudgestruct(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2，注意：目前判定模式仅支持花色和数字|pl,cd,block,room$
 >damage|mysplayer,mysplayer~,mycard,mynum,mynum||<2:>local damage%%=sgs.DamageStruct();damage%%.from=%1;damage%%.to=%2;damage%%.card=%3;damage%%.damage=%4;damage%%.nature=%5;room:damage(damage%%)|对一名角色（参数2）造成X（参数4）点伤害，伤害来源（参数1），造成伤害的牌（参数3），伤害属性（参数5）|pl,cd,room$
 >recover|mysplayer~,mynum~,mycard,mysplayer~||<1:><4:>local rcv%%=sgs.RecoverStruct();rcv%%.recover=%2;rcv%%.card=%3;rcv%%.who=%4;room:recover(%1,rcv%%,true)|令一名角色（参数1）回复X（参数2）点体力，回复牌（参数3）可以不存在，回复来源（参数4）|pl,cd,room$
 >moveCardTo|mycard~,mysplayer,mynum~,mybool~||<1:>room:moveCardTo(%1,%2,%3,%4)|将牌（参数1）移动至位置（参数3），如果位置不为手牌装备判定区，则目标角色（参数2）不存在，是否明牌（参数4）|pl,cd,room$

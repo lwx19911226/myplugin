@@ -505,15 +505,36 @@ QStringList mytrs::trans(){
     }
     strlist<<"end,";
     strlist<<"can_trigger=function(self,player)";
-    strlist<<"local room=player:getRoom()\nlocal selfplayer=room:findPlayerBySkillName(self:objectName())";
-    strlist<<"if selfplayer==nil then return false end\nreturn selfplayer:isAlive()";
+    strlist<<"local room=player:getRoom()";
+    switch(cantrigger){
+    case SkillOwnerAlive:
+        strlist<<"local selfplayer=room:findPlayerBySkillName(self:objectName())";
+        strlist<<"return selfplayer and selfplayer:isAlive()";
+        break;
+    case TriggerAlive:strlist<<"return player and player:isAlive()";break;
+    case Always:strlist<<"return true";break;
+    default:qWarning()<<"trs cantrigger";
+    }
     strlist<<"end,\n}";
     return strlist;
 }
 QStringList mytrs::trans4avlobjlist(QString getstr){
     return mysk::trans4avlobjlist(getstr,"trs");
 }
+QStringList mytrs::eventstrlist(){
+    QStringList strlist=myevent::geteventstrlist();
+    //if(cantrigger==UserDefined){strlist.prepend("CanTrigger");}
+    return strlist;
+}
 QString mytrs::findRemarkByName_event(QString getname){
+/*
+    if(getname=="CanTrigger"){
+        return tr("We use this function to check if the triggerskill can be triggered.")
+                +tr("Return true means it can be triggered.")
+                +tr("For example, Fankui can be triggered when the trigger is the skill owner and he is alive;")
+                +tr("Guicai can be triggered when the skill owner is alive but the trigger may be someone else.");
+    }
+*/
     return myevent::findRemarkByName(getname);
 }
 QString mytrs::getSubtypeProperty(){
@@ -523,6 +544,18 @@ QString mytrs::getSubtypeProperty(){
     return strlist.join("|");
 }
 void mytrs::setSubtypeProperty(QString getstr){subtype=str2subtype(getstr);}
+QString mytrs::getCanTriggerProperty(){
+    QStringList strlist=cantriggerstrlist();
+    QString str=cantrigger2str(cantrigger);
+    str2first(strlist,str);
+    return strlist.join("|");
+}
+void mytrs::setCanTriggerProperty(QString getstr){cantrigger=str2cantrigger(getstr);}
+QString mytrs::getCanTriggerPropertyRemark(){
+    return getCanTriggerProperty();
+}
+void mytrs::setCanTriggerPropertyRemark(QString getstr){setCanTriggerProperty(getstr);}
+
 /*
 void mytrs::propertymap_get(QMap<QString, QString> &strmap, QMap<QString, QStringList> &strlistmap,bool b4remark){
     mysk::propertymap_get(strmap,b4remark);

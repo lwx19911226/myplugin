@@ -39,8 +39,8 @@ void myobj::myini_lang(){
         myconstskstrlist<<"NULL";
         return;
     }
-    QRegExp rx1(".*\\[\"(.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
-    QRegExp rx2(".*\\[\":(.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
+    QRegExp rx1(".*\\[\"(\\w+.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
+    QRegExp rx2(".*\\[\":(\\w+.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
     //QRegExp rxt(".*\\[::.*\\].*");
     //if(rxt.exactMatch("[::1]")){qWarning()<<"130327-0";}
     QString str;
@@ -81,6 +81,7 @@ void myobj::myini_lang(){
 
                     }
                 }
+                else{qWarning()<<"130609"<<str;}
             }
             else if(rx1.exactMatch(str)){
                 ttstrlist<<rx1.cap(1);
