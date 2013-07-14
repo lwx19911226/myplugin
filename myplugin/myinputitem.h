@@ -26,6 +26,15 @@ public:
     int type;
     bool visible;
 
+    static QString type2str(int gettype){
+        switch(gettype){
+        case func_Event:return tr("EVENT");
+        case func_Block:return tr("BLOCK");
+        case func_Fun:return tr("FUNCTION");
+        case func_Obj:return tr("OBJECT");
+        default:qWarning()<<"inputitemtype";return QString();
+        }
+    }
     int getcnt(){return 1;}
     myinputitem *newChild(QVariant getdata,bool extra=false,bool front=false);
     myinputitem *getChild(int i,bool visibility=false);

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "myinputwidget.h"
+#include "mydemowidget.h"
+#include "myptgwidget.h"
 #include "mysknwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -14,31 +16,45 @@ MainWindow::MainWindow(QWidget *parent) :
     myini_tips();
     tipbox();
     b4rfr=true;
+    QFileInfo fi("../QSanguosha.exe");
+    int getqsv=mysys::VersionUnknown;
+    if(fi.exists()){
+        int tm=fi.lastModified().date().month();
+        int td=fi.lastModified().date().day();
+        QString qsvstr=QString("V%1%2").arg(QString::number(tm),2,'0').arg(QString::number(td),2,'0');
+        getqsv=mysys::str2qsv(qsvstr);
+    }
 
     psys=new mysys(this);
-    QString getpath;
     QFile ft("tmp4design.txt");
     if(ft.exists()&&(QMessageBox::question(this,"DESIGN FILE",
                                            "There exists temp design files left before. Do you want to import it?",
                                           QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)){
-        getpath="tmp4design.txt";
+        path4design="tmp4design.txt";
     }
     else{
-        getpath=QFileDialog::getOpenFileName(NULL,"DESIGN FILE",".","design files (*.txt)");
+        path4design=QFileDialog::getOpenFileName(NULL,"DESIGN FILE",".","design files (*.txt)");
     }
-    psys->myini(getpath);
+    psys->myini(path4design,getqsv);
 
     p_lineedit_packagename=new QLineEdit(ui->centralWidget);
     QObject::connect(p_lineedit_packagename,SIGNAL(textEdited(QString)),this,SLOT(changePackageName()));
     QFormLayout *p_formlayout4=new QFormLayout;    
-    p_formlayout4->addRow(tr("Package Name:"),p_lineedit_packagename);
+    p_formlayout4->addRow(tr("Package Name")+tr(": "),p_lineedit_packagename);
     p_lineedit_packagetrans=new QLineEdit(ui->centralWidget);
     QObject::connect(p_lineedit_packagetrans,SIGNAL(textEdited(QString)),this,SLOT(changePackageTranslation()));
     QFormLayout *p_formlayout5=new QFormLayout;
-    p_formlayout5->addRow(tr("Package Translation:"),p_lineedit_packagetrans);
+    p_formlayout5->addRow(tr("Package Translation")+tr(": "),p_lineedit_packagetrans);
+    p_combobox_qsv=new QComboBox(ui->centralWidget);
+    p_combobox_qsv->addItems(mysys::qsvstrlist());
+    p_combobox_qsv->setEnabled(path4design=="");
+    QObject::connect(p_combobox_qsv,SIGNAL(currentIndexChanged(QString)),this,SLOT(changeQSV()));
+    QFormLayout *p_formlayout_qsv=new QFormLayout;
+    p_formlayout_qsv->addRow(tr("QSanguosha Version")+tr(": "),p_combobox_qsv);
     QHBoxLayout *p_hboxlayout1=new QHBoxLayout;
     p_hboxlayout1->addLayout(p_formlayout4);
     p_hboxlayout1->addLayout(p_formlayout5);
+    p_hboxlayout1->addLayout(p_formlayout_qsv);
 
     QTableWidget *p_tablewidget_g=new QTableWidget;
     p_tablewidget_g->setColumnCount(mygeneral::propertystrlist().length());
@@ -73,28 +89,28 @@ MainWindow::MainWindow(QWidget *parent) :
     QFormLayout *p_formlayout1=new QFormLayout;
     p_formlayout1->addRow(tr("Current Skill:"),p_label_skname);
 
-    QPushButton *p_pushbutton_new=new QPushButton(ui->centralWidget);
-    p_pushbutton_new->setText(tr("New"));
+    QPushButton *p_pushbutton_new=new QPushButton(tr("New"),ui->centralWidget);
+    //p_pushbutton_new->setText(tr("New"));
     QObject::connect(p_pushbutton_new,SIGNAL(clicked()),this,SLOT(mynew()));
-    QPushButton *p_pushbutton_del=new QPushButton(ui->centralWidget);
-    p_pushbutton_del->setText(tr("Delete"));
+    QPushButton *p_pushbutton_del=new QPushButton(tr("Delete"),ui->centralWidget);
+    //p_pushbutton_del->setText(tr("Delete"));
     QObject::connect(p_pushbutton_del,SIGNAL(clicked()),this,SLOT(mydel()));
-    QPushButton *p_pushbutton_add=new QPushButton(ui->centralWidget);
-    p_pushbutton_add->setText(tr("Skill_Add"));
+    QPushButton *p_pushbutton_add=new QPushButton(tr("Skill_Add"),ui->centralWidget);
+    //p_pushbutton_add->setText(tr("Skill_Add"));
     QObject::connect(p_pushbutton_add,SIGNAL(clicked()),this,SLOT(myadd()));
-    p_pushbutton_undo=new QPushButton(ui->centralWidget);
-    p_pushbutton_undo->setText(tr("Skill_Undo"));
+    p_pushbutton_undo=new QPushButton(tr("Skill_Undo"),ui->centralWidget);
+    //p_pushbutton_undo->setText(tr("Skill_Undo"));
     p_pushbutton_undo->setEnabled(false);
     QObject::connect(p_pushbutton_undo,SIGNAL(clicked()),this,SLOT(myundo()));
-    p_pushbutton_redo=new QPushButton(ui->centralWidget);
-    p_pushbutton_redo->setText(tr("Skill_Redo"));
+    p_pushbutton_redo=new QPushButton(tr("Skill_Redo"),ui->centralWidget);
+    //p_pushbutton_redo->setText(tr("Skill_Redo"));
     p_pushbutton_redo->setEnabled(false);
     QObject::connect(p_pushbutton_redo,SIGNAL(clicked()),this,SLOT(myredo()));    
-    QPushButton *p_pushbutton_import=new QPushButton(ui->centralWidget);
-    p_pushbutton_import->setText(tr("Import"));
+    QPushButton *p_pushbutton_import=new QPushButton(tr("Import"),ui->centralWidget);
+    //p_pushbutton_import->setText(tr("Import"));
     QObject::connect(p_pushbutton_import,SIGNAL(clicked()),this,SLOT(myimport()));
-    QPushButton *p_pushbutton_export=new QPushButton(ui->centralWidget);
-    p_pushbutton_export->setText(tr("Export"));
+    QPushButton *p_pushbutton_export=new QPushButton(tr("Export"),ui->centralWidget);
+    //p_pushbutton_export->setText(tr("Export"));
     QObject::connect(p_pushbutton_export,SIGNAL(clicked()),this,SLOT(myexport()));
     QHBoxLayout *p_hboxlayout2=new QHBoxLayout;
     p_hboxlayout2->addWidget(p_pushbutton_new);
@@ -105,26 +121,29 @@ MainWindow::MainWindow(QWidget *parent) :
     p_hboxlayout2->addWidget(p_pushbutton_import);
     p_hboxlayout2->addWidget(p_pushbutton_export);
 
-    QPushButton *p_pushbutton_ptg=new QPushButton(ui->centralWidget);
-    p_pushbutton_ptg->setText(tr("Pattern Generator"));
+    QPushButton *p_pushbutton_demo=new QPushButton(tr("Demo"),ui->centralWidget);
+    QObject::connect(p_pushbutton_demo,SIGNAL(clicked()),this,SLOT(mydemo()));
+    QPushButton *p_pushbutton_ptg=new QPushButton(tr("Pattern Generator"),ui->centralWidget);
+    //p_pushbutton_ptg->setText(tr("Pattern Generator"));
     QObject::connect(p_pushbutton_ptg,SIGNAL(clicked()),this,SLOT(myptg()));
-    QPushButton *p_pushbutton_skn=new QPushButton(ui->centralWidget);
-    p_pushbutton_skn->setText(tr("Skill Name List"));
+    QPushButton *p_pushbutton_skn=new QPushButton(tr("Skill Name List"),ui->centralWidget);
+    //p_pushbutton_skn->setText(tr("Skill Name List"));
     QObject::connect(p_pushbutton_skn,SIGNAL(clicked()),this,SLOT(myskn()));
-    QPushButton *p_pushbutton_readme=new QPushButton(ui->centralWidget);
-    p_pushbutton_readme->setText(tr("Readme"));
+    QPushButton *p_pushbutton_readme=new QPushButton(tr("Readme"),ui->centralWidget);
+    //p_pushbutton_readme->setText(tr("Readme"));
     QObject::connect(p_pushbutton_readme,SIGNAL(clicked()),this,SLOT(myreadme()));
     QPushButton *p_pushbutton_sgs=new QPushButton(ui->centralWidget);    
-    QDir dir("..");
-    if(dir.exists("QSanguosha.exe")){
-        p_pushbutton_sgs->setText(tr("QSanguosha"));
+    if(fi.exists()){
+        p_pushbutton_sgs->setText(tr("QSanguosha")+mysys::qsv2str(psys->qsv));
         QObject::connect(p_pushbutton_sgs,SIGNAL(clicked()),this,SLOT(mysgs()));
+        if(p_combobox_qsv->isEnabled()){p_combobox_qsv->setEnabled(false);}
     }
     else{
         p_pushbutton_sgs->setText(tr("No QSanguosha"));
         p_pushbutton_sgs->setEnabled(false);
     }
     QHBoxLayout *p_hboxlayout3=new QHBoxLayout;
+    p_hboxlayout3->addWidget(p_pushbutton_demo);
     p_hboxlayout3->addWidget(p_pushbutton_ptg);
     p_hboxlayout3->addWidget(p_pushbutton_skn);
     p_hboxlayout3->addWidget(p_pushbutton_readme);
@@ -168,6 +187,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->setLayout(p_vboxlayout2);
 
     p_inputwidget=NULL;
+    p_demowidget=NULL;
     //qWarning()<<"130325~~";
     myrfr();
     //qWarning()<<"130325~";
@@ -181,6 +201,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     if(p_inputwidget){delete p_inputwidget;}
+    if(p_demowidget){delete p_demowidget;}
 }
 void MainWindow::myini_tips(){
     QFile fin("readme.txt");
@@ -227,9 +248,11 @@ void MainWindow::myimport(){
     if(ret==QMessageBox::Yes){myexport_design();}
     QString path=QFileDialog::getOpenFileName(this,"DESIGN FILE",".","design files (*.txt)");
     if(path!=""){
+        path4design=path;
+        int getqsv=psys->qsv;
         delete psys;
         psys=new mysys(this);
-        psys->myini(path);
+        psys->myini(path,getqsv);
         QObject::connect(psys,SIGNAL(update()),this,SLOT(myrfr()));
         psys->sig_update();
     }
@@ -445,6 +468,7 @@ void MainWindow::myrfr(){
     b4rfr=false;
     p_lineedit_packagename->setText(psys->packagename);
     p_lineedit_packagetrans->setText(psys->package_trans);
+    p_combobox_qsv->setCurrentIndex(p_combobox_qsv->findText(mysys::qsv2str(psys->qsv)));
     QMap<QString,QString> strmap;    
     QString tstr=p_tabwidget1->tabText(p_tabwidget1->currentIndex());
     QTableWidget *pcurrent=str2tw_tab(tstr);
@@ -659,6 +683,11 @@ void MainWindow::mydel(){
         if(psys->psk0){psys->delSkill(psys->psk0);}
     }
 }
+void MainWindow::mydemo(){
+    if(!p_demowidget){p_demowidget=new mydemowidget;}
+    p_demowidget->show();
+    p_demowidget->activateWindow();
+}
 void MainWindow::myptg(){
     myptgwidget *p_ptgwidget=new myptgwidget;
     p_ptgwidget->resize(QApplication::desktop()->screenGeometry().width()*0.5,QApplication::desktop()->screenGeometry().height()*0.5);
@@ -691,6 +720,11 @@ void MainWindow::changePackageTranslation(){
     psys->package_trans=p_lineedit_packagetrans->text();
     psys->sig_update();
 }
+void MainWindow::changeQSV(){
+    if(!b4rfr){return;}
+    psys->qsv=mysys::str2qsv(p_combobox_qsv->currentText());
+}
+
 /*
 void MainWindow::myrfr_g(mygeneral *getp, int getrow){
     if(!getp){return;}

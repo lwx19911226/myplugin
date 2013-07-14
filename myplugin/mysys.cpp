@@ -1,14 +1,91 @@
 #include "mysys.h"
 int mysys::globalint=0;
-void mysys::myini(QString getpath){    
+void mysys::myini(QString getpath, int getqsv){
     //funstrlist=myfun::getfunstrlist();
-    //eventstrlist=myevent::geteventstrlist();
+    //eventstrlist=myevent::geteventstrlist();    
+    qsv=getqsv;
     myobj::myini();
     myfun::myini();
     myevent::myini();
-    myini_design(getpath);
-}
+    //myini_design(getpath);
+    qWarning()<<getpath;
+    QFile fin(getpath);
+    if(!fin.open(QFile::ReadOnly)){
+        QMessageBox::warning(NULL,"FILE ERROR","No design");
+        qWarning()<<"no"<<getpath;
+        return;
+    }
+    QTextStream cin(&fin);
+    //cin.setCodec("UTF-8");
+    QString str;
+    QStringList strlist;
+    for(;;){
+        if(cin.atEnd()){break;}
+        str=cin.readLine();
+        if(!str.startsWith(">")){continue;}
+        strlist<<str;
+    }
+    QStringList strlist_package=strlist.filter(QRegExp("^>[^>]"));
+    QStringList strlist_general=strlist.filter(QRegExp("^>>[^>]"));
+    QStringList strlist_trs=strlist.filter(QRegExp("^>>>[^>]"));
+    QStringList strlist_do=strlist.filter(QRegExp("^>>>>[^>]"));
+    if(strlist_package.length()==1&&strlist_package.first().count("|")>=1){
+        strlist=strlist_package.first().mid(1).split("|");
+        packagename=strlist.at(0);
+        package_trans=strlist.at(1);
+        if(strlist.length()==3){
+            int tqsv=str2qsv(strlist.at(2));
+            if((qsv!=VersionUnknown)&&(tqsv!=qsv)){
+                qsv=tqsv;
+                QMessageBox::warning(NULL,"FILE ERROR","Version error");
+            }
+        }
+    }
+    else{
+        qWarning()<<strlist_package;
+        return;
+    }
+    foreach(QString stri,strlist_general){
+        if(stri.count("|")>=4){
+            QString tstr=stri.mid(2);
+            QString getname=tstr.split("|").at(0);
+            mygeneral *pg=findGeneralByName(getname);
+            if(!pg){pg=newGeneral(getname);}
+            pg->propertystr_set(tstr);
+        }
+        else{
+            qWarning()<<stri;
+        }
+    }
+    foreach(QString stri,strlist_trs){
+        if(stri.count("|")>=3){
+            QString tstr=stri.mid(3);
+            QString getabb=tstr.split("|").at(0);
+            QString getname=tstr.split("|").at(1);
+            mysk *psk=findSkillByName(getname);
+            if(!psk){
+                psk=newSkill(getname,mysk::abb2type(getabb));
+            }
+            psk->propertystr_set(tstr);
+        }
+        else{
+            qWarning()<<stri;
+        }
+    }
 
+    foreach(QString stri,strlist_do){
+        QString skname=stri.mid(4,stri.indexOf("::")-4);
+        QString getstr=stri.mid(stri.indexOf("::")+2);
+        //qWarning()<<trsname<<getstr;
+        mysk *psk=findSkillByName(skname);
+        if(!psk){qWarning()<<"myini_design_psk"<<skname;}
+        else{psk->dotrans(getstr);}
+    }
+    qWarning()<<"design success";
+    fin.close();
+    sig_update();
+}
+/*
 void mysys::myini_design(QString path){
     qWarning()<<path;
     QFile fin(path);
@@ -79,7 +156,7 @@ void mysys::myini_design(QString path){
     fin.close();
     sig_update();
 }
-
+*/
 void mysys::getsklist(QList<mysk *> &rsklist,int gettype){
     foreach(mysk *ip,sklist){
         if(ip->getType()==gettype){rsklist<<ip;}
@@ -284,7 +361,7 @@ QStringList mysys::trans(){
 QStringList mysys::trans4design(){
     //QString str="";
     QStringList strlist;
-    strlist<<QString(">%1|%2").arg(packagename,package_trans);
+    strlist<<QString(">%1|%2|%3").arg(packagename).arg(package_trans).arg(qsv2str(qsv));
     foreach(mygeneral *ip,glist){
         strlist<<">>"+ip->propertystr_get();
         //strlist<<QString(">>%1|%2|%3|%4|%5|#%6|~%7|cv:%8").arg(ip->name,ip->translation,mygeneral::kingdom2str(ip->kingdom),mygeneral::sex2str(ip->sex)).arg(ip->hp).arg(ip->title,ip->word,ip->cv);

@@ -57,6 +57,7 @@ public slots:
     void filterItems();
     void filterItems_obj();
     void myscroll(const QModelIndex &);
+    void mytest(const QModelIndex &);
 };
 
 #endif // MYINPUTWIDGET_H

@@ -25,7 +25,7 @@
 
 
 //
->onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
+>onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl,V0224+V0610$
 >onlyExist|myplayer+mycard||if not %1 then return defaultReturn end|仅当角色或牌（参数1）存在时才发动|rt
 >ifActivation|mysplayer~||<1:>if not room:askForSkillInvoke(%1,selfskname,data) then return defaultReturn end|仅当角色（参数1）选择发动才发动|rt,ask,room$
 

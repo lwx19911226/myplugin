@@ -37,7 +37,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include "mysys.h"
-#include "myptgwidget.h"
+
 //#include "myinputwidget.h"
 
 namespace Ui {
@@ -45,10 +45,10 @@ class MainWindow;
 }
 
 class myinputwidget;
+class mydemowidget;
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-    
+    Q_OBJECT    
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -56,6 +56,7 @@ public:
     QMap<QString,QString> tips;
     mysys *psys;
     myinputwidget *p_inputwidget;
+    mydemowidget *p_demowidget;
     QTextEdit *p_textedit_all,*p_textedit_current;
     QStringList textlist_all,textlist_current;
     QLineEdit *p_lineedit_packagename,*p_lineedit_packagetrans;
@@ -64,9 +65,11 @@ public:
     //QTableWidget *p_tablewidget_g,*p_tablewidget_trs,*p_tablewidget_vs;
     QLabel *p_label_skname;
     QPushButton *p_pushbutton_undo,*p_pushbutton_redo;
+    QComboBox *p_combobox_qsv;
 
 
     bool b4rfr;
+    QString path4design;
 
     void myini_tips();
     void tipbox();
@@ -95,6 +98,7 @@ private slots:
     void myadd();
     void myundo();
     void myredo();
+    void mydemo();
     void myptg();
     void myskn();
     void myreadme();
@@ -104,6 +108,7 @@ private slots:
     void myrfr();
     void changePackageName();
     void changePackageTranslation();
+    void changeQSV();
     void itemchanged_g(QTableWidgetItem*);
     void itemchanged_sk(QTableWidgetItem *);
     void itemchanged_cbb();

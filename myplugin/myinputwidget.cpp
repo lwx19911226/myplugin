@@ -32,6 +32,7 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
     p_columnview->setColumnWidths(wlist);
     p_columnview->setSelectionMode(QAbstractItemView::SingleSelection);
     QObject::connect(p_columnview,SIGNAL(clicked(QModelIndex)),this,SLOT(changeColumnView()));
+    QObject::connect(p_columnview,SIGNAL(clicked(QModelIndex)),this,SLOT(mytest(QModelIndex)));
 
     p_textedit=new QTextEdit(this);
     p_textedit->setLineWrapMode(QTextEdit::NoWrap);
@@ -157,9 +158,11 @@ QString myinputwidget::getRemark(myinputitem *pi){
 void myinputwidget::showRemark(){
     QStringList strlist;
     myinputitem *pi=p_inputmodel->getItem(p_columnview->currentIndex());
+    if(!pi){return;}
     if(pi&&(pi->type==0||myinputitem::spstr(pi->getstr()))){return;}
     while(pi->pf){
-        strlist.prepend(QString("%1 : %2").arg(pi->getstr()).arg(getRemark(pi)));
+        strlist.prepend(myinputitem::type2str(pi->type)+tr(": ")+"<"+pi->getstr()+"> "+getRemark(pi));
+        //strlist.prepend(QString("%1 : %2").arg(pi->getstr()).arg(getRemark(pi)));
         pi=pi->pf;
     }
     strlist.prepend(tr("Remarks: "));
@@ -181,7 +184,7 @@ void myinputwidget::changeRTR(){
         p_label_list.at(0)->setText(tr("Remarks for return values: "));
         p_label_list.at(0)->show();
         for(int i=0;i<rtlist.length();i++){
-            p_label_list.at(i+1)->setText(myobj::gettypestr(rtlist.at(i))+": ");
+            p_label_list.at(i+1)->setText(tr("ReturnValue")+QString::number(i+1)+" "+myobj::gettypestr(rtlist.at(i))+tr(": "));
             p_label_list.at(i+1)->show();
             p_lineedit_list.at(i+1)->show();
         }
@@ -328,4 +331,8 @@ void myinputwidget::filterItems_obj(){
 
 void myinputwidget::myscroll(const QModelIndex &index){
     p_columnview->scrollTo(index);
+}
+
+void myinputwidget::mytest(const QModelIndex &index){
+    qWarning()<<p_inputmodel->getItem0(index)->getstr();
 }

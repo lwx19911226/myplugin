@@ -144,7 +144,7 @@ public:
     static QString isConst(QString getstr,QString abbstr);
     static QStringList transConst(QString getstr,QString abbstr);
     static QStringList transConst(QString getconststr);
-    static void newConst(QList<myobj *> &list,QString getbl,QObject *getpf,bool only=false);
+    static void newConst(QList<myobj *> &list,QObject *getpf,int getqsv,QString getbl,bool onlybl=false);
     static QStringList getconstlist_tag(QString);
     static QStringList getconstrmlist_tag(QString);
     static QStringList getconsttaglist();

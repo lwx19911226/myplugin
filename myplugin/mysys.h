@@ -8,6 +8,7 @@
 class mysys : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(QSVersion)
 public:
     QList<mysk *> sklist;
     QList<mysk *> sklist_r;
@@ -21,10 +22,17 @@ public:
     QStringList undostrlist;
     QList<mydo *> dolist_r;
     static int globalint;
+    enum QSVersion{VersionUnknown=0,V0224=1,V0610=2};
+    int qsv;
 
-    explicit mysys(QObject *parent = 0):QObject(parent){packagename="mypackage";psk0=NULL;pg0=NULL;}
-    void myini(QString getpath="");
-
+    explicit mysys(QObject *parent = 0):QObject(parent){
+        packagename="mypackage";psk0=NULL;pg0=NULL;qsv=VersionUnknown;
+    }
+    void myini(QString getpath,int getqsv);
+    //void myini_design(QString path);
+    static QString qsv2str(int getqsv){return myobj::enumstr(&staticMetaObject,"QSVersion",getqsv);}
+    static int str2qsv(QString getstr){return myobj::enumint(&staticMetaObject,"QSVersion",getstr,VersionUnknown);}
+    static QStringList qsvstrlist(){return myobj::enumstrlist(&staticMetaObject,"QSVersion");}
     void getsklist(QList<mysk *> &rsklist,int gettype);
     void getsklist_noexs(QList<mysk *> &rsklist);
     void getavlobjlist_global(QList<myobj *> &list);    
@@ -40,7 +48,7 @@ public:
     myfunction *findFuncByObj(myobj *);
     QStringList trans();
     QStringList trans4design();
-    void myini_design(QString path);
+
     void undo();
     void redo();
 

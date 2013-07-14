@@ -25,7 +25,7 @@ void myinputmodel::myini(){
     rootitem->mydata=QVariant("root");
     rootitem->type=myinputitem::func_Start;
 
-    rootitem0->newChild(QVariant(">"+tr("EVENT")+tr(": ")));
+    rootitem0->newChild(QVariant(">"+myinputitem::type2str(myinputitem::func_Event)+tr(": ")));
     if(getsk0()){
         foreach(QString stri,getsk0()->eventstrlist()){
             rootitem0->newChild(QVariant(stri),true);
@@ -99,7 +99,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     myinputitem *pp=getItem0(parent);
     myinputitem *p=getItem(parent);
     if(pp->type+1==myinputitem::func_Block){
-        pp->newChild(QVariant(">"+tr("BLOCK")+tr(": ")),false,true);
+        pp->newChild(QVariant(">"+myinputitem::type2str(myinputitem::func_Block)+tr(": ")),false,true);
         QString geteventstr=pp->getstr();
         //QStringList list;
         //list=getsys()->psk0->need4block(geteventstr);
@@ -110,8 +110,10 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     }
     else if(pp->type+1==myinputitem::func_Fun){
         QString geteventstr=pp->getParent(myinputitem::func_Event)->getstr();
-        pp->newChild(QVariant(">"+tr("FUNCTION")+tr(": ")),false,true);
-        foreach(QString stri,myfun::getfunstrlist(getsys()->psk0->funtaglist(geteventstr))){
+        pp->newChild(QVariant(">"+myinputitem::type2str(myinputitem::func_Fun)+tr(": ")),false,true);
+        QStringList tstrlist=getsys()->psk0->funtaglist(geteventstr);
+        tstrlist<<mysys::qsv2str(getsys()->qsv)+"$";
+        foreach(QString stri,myfun::getfunstrlist(tstrlist)){
             pp->newChild(QVariant(stri),!myfun::need(stri).isEmpty());
         }
     }
@@ -125,7 +127,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
             QList<myobj *> objlist;
             int geti=pp->type+1-myinputitem::func_Obj;
             QString gettypestr=myobj::gettypestr(strlist.at(geti));
-            pp->newChild(QVariant(">"+tr("OBJECT")+"("+gettypestr+")"+tr(": ")),false,true);
+            pp->newChild(QVariant(">"+myinputitem::type2str(myinputitem::func_Obj)+QString::number(geti+1)+" "+gettypestr+tr(": ")),false,true);
             foreach(QString stri,gettypestr.split("+")){
                 getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr,!myfun::notnil(getfunstr,geti));
             }

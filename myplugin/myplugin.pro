@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     mygeneral.cpp \
     myptgwidget.cpp \
     mysk.cpp \
-    mysknwidget.cpp
+    mysknwidget.cpp \
+    mydemowidget.cpp
 
 HEADERS  += mainwindow.h \
     mysys.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     mygeneral.h \
     myptgwidget.h \
     mysk.h \
-    mysknwidget.h
+    mysknwidget.h \
+    mydemowidget.h
 
 FORMS    += mainwindow.ui
 TRANSLATIONS += myplugin.ts

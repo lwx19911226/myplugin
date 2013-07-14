@@ -1,4 +1,5 @@
 #include "myevent.h"
+#include "mysys.h"
 
 //extern void myappend(QList<QString> &list,QString str);
 //extern void myappend(QList<QString> &list,QStringList getlist);
@@ -29,10 +30,14 @@ void myevent::myini(){
     }
     fin.close();
 }
-QStringList myevent::geteventstrlist(){
+QStringList myevent::geteventstrlist(int getqsv){
     myini();
     QStringList strlist;
     foreach(QString stri,myeventlist){
+        if(getqsv!=mysys::VersionUnknown){
+            QStringList tstrlist=stri.split("|").at(Extra).split(",").filter(QRegExp("^V"));
+            if(!tstrlist.isEmpty()&&!tstrlist.contains(mysys::qsv2str(getqsv))){continue;}
+        }
         strlist<<stri.split("|").at(Name);
     }
     return strlist;

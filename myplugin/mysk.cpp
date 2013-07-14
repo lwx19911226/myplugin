@@ -264,11 +264,11 @@ void mysk::iniObj(){
         QString abb=myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),geti);
         if(abb==""){continue;}
         QList<myobj *> tobjlist;
-        myobj::newConst(tobjlist,abb,parent(),true);
+        myobj::newConst(tobjlist,parent(),getsys()->qsv,abb,true);
         foreach(myobj *ip,tobjlist){ip->blockstr=myobj::enumstr(mob,btype.toUtf8(),geti);}
         avlobjlist<<tobjlist;
     }
-    myobj::newConst(avlobjlist,"",parent());
+    myobj::newConst(avlobjlist,parent(),getsys()->qsv,"");
 }
 void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr,bool b4nil){
     QList<myobj *> tlist;
@@ -394,7 +394,7 @@ QString mysk::findRemarkByName_obj(myobj *tgtobj, myfunction *pfunc, bool b4func
     if(!pfunc){return tstr;}
     if(!pfunc->rtobjlist.contains(tgtobj)){qWarning()<<"findremarkbyname_obj"<<tgtobj->name<<pfunc->name;}
     if(tstr==""){
-        tstr=pfunc->name+myfunction::str4returnvalue()+QString::number(pfunc->rtobjlist.indexOf(tgtobj)+1);
+        tstr=pfunc->funname+myfunction::str4returnvalue()+QString::number(pfunc->rtobjlist.indexOf(tgtobj)+1);
     }
     if(b4func){
         tstr+="  /from: "+pfunc->getRemark();
@@ -477,8 +477,8 @@ void mysk::sig_update(){
 void mytrs::iniObj(){
     //QStringList strlist;
     //strlist<<"trs";
-    myobj::newConst(avlobjlist,"trs",parent());
-    foreach(QString stri,myevent::geteventstrlist()){
+    myobj::newConst(avlobjlist,parent(),getsys()->qsv,"trs");
+    foreach(QString stri,myevent::geteventstrlist(getsys()->qsv)){
         myevent::getavlobjlist(stri,avlobjlist,parent());
     }
 }
@@ -522,7 +522,7 @@ QStringList mytrs::trans4avlobjlist(QString getstr){
     return mysk::trans4avlobjlist(getstr,"trs");
 }
 QStringList mytrs::eventstrlist(){
-    QStringList strlist=myevent::geteventstrlist();
+    QStringList strlist=myevent::geteventstrlist(getsys()->qsv);
     //if(cantrigger==UserDefined){strlist.prepend("CanTrigger");}
     return strlist;
 }

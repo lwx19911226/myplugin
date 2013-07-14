@@ -120,8 +120,12 @@ bool myfun::matchTaglist(QString getname, QStringList gettaglist){
         if(stri.startsWith(getname+"|")){
             QStringList taglist=stri.split("|").at(Tag).split(",");
             foreach(QString tagstri,taglist.filter(QRegExp("\\$$"))){
-                if(gettaglist.contains(tagstri)||gettaglist.contains(tagstri.mid(0,tagstri.length()-1))){}
-                else{return false;}
+                bool b=false;
+                foreach(QString tstri,tagstri.mid(0,tagstri.length()-1).split("+")){
+                    if(gettaglist.contains(tstri)||gettaglist.contains(tstri+"$")){b=true;break;}
+                    //else{return false;}
+                }
+                if(!b){return false;}
             }
             foreach(QString tagstri,gettaglist.filter(QRegExp("[^\\$]$"))){
                 if(taglist.contains(tagstri)||taglist.contains(tagstri+"$")){}

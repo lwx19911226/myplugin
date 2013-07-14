@@ -1,4 +1,5 @@
 #include "myobj.h"
+#include "mysys.h"
 
 QStringList myobj::myconstlist;
 QStringList myobj::myconsttaglist;
@@ -41,17 +42,25 @@ void myobj::myini_lang(){
     }
     QRegExp rx1(".*\\[\"(\\w+.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
     QRegExp rx2(".*\\[\":(\\w+.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
-    //QRegExp rxt(".*\\[::.*\\].*");
-    //if(rxt.exactMatch("[::1]")){qWarning()<<"130327-0";}
+    QStringList cdstrlist;
+    cdstrlist<<tr("BasicCard")<<tr("EquipCard")<<tr("TrickCard")<<tr("DelayedTrickCard");
     QString str;
     QStringList tstrlist;
     QStringList ttstrlist;
-    QStringList namefilter;
-    namefilter<<"*.lua";
-    foreach(QString stri,dir.entryList(namefilter)){
-        QFile tfin(dir.path()+"/"+stri);
+    QStringList flist;
+    QStringList tdirlist;
+    tdirlist<<dir.path();
+    while(!tdirlist.isEmpty()){
+        str=tdirlist.takeFirst();
+        QDir tdir(str);
+        foreach(QString stri,tdir.entryList(QStringList("*.lua"))){flist<<str+"/"+stri;}
+        foreach(QString stri,tdir.entryList(QStringList("*"),QDir::Dirs|QDir::NoDotAndDotDot)){tdirlist<<str+"/"+stri;}
+    }
+    foreach(QString stri,flist){
+        QFile tfin(stri);
         if(!tfin.open(QFile::ReadOnly)){
-            QMessageBox::warning(NULL,"FILE ERROR","No "+dir.path()+"/"+stri);
+            QMessageBox::warning(NULL,"FILE ERROR","No "+stri);
+            continue;
             return;
         }
         QTextStream tcin(&tfin);
@@ -65,7 +74,7 @@ void myobj::myini_lang(){
                     if(index!=-1){
                         QString getname=tstrlist.at(index).split("|").first();
                         QString gettranslation=tstrlist.at(index).split("|").last();
-                        if(rx2.cap(2).length()>10){myconstskstrlist<<tstrlist.at(index)+"|"+rx2.cap(2);}
+                        if(!rx2.cap(2).contains(QRegExp(mycode::mymdf(cdstrlist,"^").join("|")))){myconstskstrlist<<tstrlist.at(index)+"|"+rx2.cap(2);}
                         else{
                             bool b=false;
                             foreach(QString tstri,myconstlist){
@@ -164,17 +173,21 @@ QStringList myobj::transConst(QString getconststr){
     return QStringList();
 }
 
-void myobj::newConst(QList<myobj *> &list,QString getbl,QObject *getpf,bool only){
+void myobj::newConst(QList<myobj *> &list,QObject *getpf,int getqsv,QString getbl,bool onlybl){
     myini();
     myobj *pnew;
     foreach(QString stri,myconstlist){
         QStringList extrastrlist=stri.split("|").at(Extra).split(",,");
-        if(only&&!extrastrlist.contains("bl:"+getbl)){continue;}
+        if(onlybl&&!extrastrlist.contains("bl:"+getbl)){continue;}
         bool b=true;
         foreach(QString extrastri,extrastrlist){
             if(extrastri.startsWith("bl:")&&(extrastri!="bl:"+getbl)){b=false;break;}
         }
         if(!b){continue;}
+        if(getqsv!=mysys::VersionUnknown){
+            QStringList tstrlist=extrastrlist.filter(QRegExp("^V"));
+            if(!tstrlist.isEmpty()&&!tstrlist.contains(mysys::qsv2str(getqsv))){continue;}
+        }
         pnew=new myobj(getpf);
         pnew->name=stri.split("|").at(Name);
         if(stri.split("|").at(Type)==""){qWarning()<<"0227here4?";}
