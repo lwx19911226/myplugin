@@ -36,7 +36,7 @@
 >Pindian|mysplayer,mysplayer,mycard,mycard,mynum,mynum,mystr,mybool|pd.from,pd.to,pd.from_card,pd.to_card,pd.from_number,pd.to_number,pd.reason,pd.success|拼点发起者,被拼点者,拼点发起者的拼点牌,被拼点者的拼点牌,拼点发起者的点数,被拼点者的点数,拼点原因，通常是拼点技能名,拼点发起者是否赢了|local pd=data:toPindian()|时机触发者发起的拼点生效后|
 >TurnedOver|||||时机触发者翻面后|
 >ChainStateChanged|||||时机触发者横置或重置后|
->SlashEffect|mycard,mycard,mysplayer,mysplayer,mybool,mynum|effect.slash,effect.jink,effect.from,effect.to,effect.drank,effect.nature|使用的【杀】,使用的【闪】,【杀】的使用者,【杀】的目标,是否喝酒,属性|local effect=data:toSlashEffect()|时机触发者使用【杀】生效时，返回值为真将令【杀】失效|
+//>SlashEffect|mycard,mycard,mysplayer,mysplayer,mybool,mynum|effect.slash,effect.jink,effect.from,effect.to,effect.drank,effect.nature|使用的【杀】,使用的【闪】,【杀】的使用者,【杀】的目标,是否喝酒,属性|local effect=data:toSlashEffect()|时机触发者使用【杀】生效时，返回值为真将令【杀】失效|
 >SlashEffected|mycard,mycard,mysplayer,mysplayer,mybool,mynum|effect.slash,effect.jink,effect.from,effect.to,effect.drank,effect.nature|使用的【杀】,使用的【闪】,【杀】的使用者,【杀】的目标,是否喝酒,属性|local effect=data:toSlashEffect()|时机触发者受到【杀】的效果时，返回值为真将令【杀】失效|
 >SlashProceed|mycard,mycard,mysplayer,mysplayer,mybool,mynum|effect.slash,effect.jink,effect.from,effect.to,effect.drank,effect.nature|使用的【杀】,使用的【闪】,【杀】的使用者,【杀】的目标,是否喝酒,属性|local effect=data:toSlashEffect()|时机触发者使用【杀】生效后，比如强命系结算|
 >SlashHit|mycard,mycard,mysplayer,mysplayer,mybool,mynum|effect.slash,effect.jink,effect.from,effect.to,effect.drank,effect.nature|使用的【杀】,使用的【闪】,【杀】的使用者,【杀】的目标,是否喝酒,属性|local effect=data:toSlashEffect()|时机触发者使用【杀】未被【闪】抵消|

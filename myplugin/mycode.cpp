@@ -107,9 +107,8 @@ myblock *myblock::getTopBlock(){
     while(p->upperLayer){p=p->upperLayer;}
     return p;
 }
-mysk *myblock::getsk0(){
-    return static_cast<mysk *>(getTopBlock()->parent());
-}
+mysk *myblock::getsk0(){return static_cast<mysk *>(getTopBlock()->parent());}
+int myblock::getqsv0(){return getsk0()->getsys()->qsv;}
 QString myblock::getEvent(){
     myblock *p=getTopBlock();
     if(!getsk0()->eventstrlist().contains(p->name)){qWarning()<<"getevent:"<<p->name;}
@@ -133,12 +132,12 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
     name=getblockstr+","+funname+QString::number(globalint++);
     //QString tstr=myfun::getTrans(funname);
     for(int i=0;i<objlist.length();i++){
-        if(myfun::notnil(funname,i)&&!objlist.at(i)->isVerified){
+        if(myfun::notnil(funname,getqsv0(),i)&&!objlist.at(i)->isVerified){
             objlist.at(i)->isVerified=true;
             vrlist<<i;
         }
     }
-    QStringList list=myfun::get(funname);
+    QStringList list=myfun::outtypestrlist(funname,getqsv0());
     for(int i=0;i<list.length();i++){
         myobj *p=new myobj(this);
         QString typestr=myobj::gettypestr(list.at(i));
@@ -154,10 +153,10 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
         p->name=QString("%1_%2_%3").arg(funname,typestr).arg(globalint++);
         p->type=myobj::str2type(list.at(i));
         p->remark=rtrmlist.at(i);
-        p->isVerified=myfun::notnil(funname,objlist.length()+i);
+        p->isVerified=myfun::notnil(funname,getqsv0(),objlist.length()+i);
         rtobjlist.append(p);
     }
-    for(int i=0;i<myfun::getBlock_cnt(funname);i++){
+    for(int i=0;i<myfun::name2blockcnt(funname,getqsv0());i++){
         myblock *p=new myblock(this);
         p->name=name+"_"+QString::number(i+1);
         if(i<blrmlist.length()){p->remark=blrmlist.at(i);}
@@ -165,7 +164,7 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
     }
 }
 QStringList myfunction::trans(){
-    QString str=myfun::getTrans(funname);
+    QString str=myfun::name2trans(funname,getqsv0());
     QList<myobj *> list;
     list<<objlist<<rtobjlist;
     for(int i=0;i<list.length();i++){
@@ -212,7 +211,7 @@ myfunction *myfunction::findFuncByObj(myobj *getp){
 
 QString myfunction::getRemark(){
     QString tstr;
-    QString rmstr=myfun::findRemarkByName(funname);
+    QString rmstr=myfun::name2remark(funname,getqsv0());
     for(int i=0;i<objlist.length();i++){
         if(!rmstr.contains(str4parameter()+QString::number(i+1))){qWarning()<<"getremark"<<funname<<i;}
         tstr=getsk0()->findRemarkByName_obj(objlist.at(i),getsk0()->getsys()->findFuncByObj(objlist.at(i)),false);

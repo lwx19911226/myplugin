@@ -116,7 +116,7 @@ void mydemowidget::myrfr_do(){
         QString blockstr=pfunc->upperLayer->name;
         tstrlist<<myinputitem::type2str(myinputitem::func_Event)+tr(": ")+"<"+eventstr+"> "+psys->psk0->findRemarkByName_event(eventstr);
         tstrlist<<myinputitem::type2str(myinputitem::func_Block)+tr(": ")+"<"+blockstr+"> "+psys->psk0->findRemarkByName_block(blockstr);
-        tstrlist<<myinputitem::type2str(myinputitem::func_Fun)+tr(": ")+"<"+pfunc->funname+"> "+myfun::findRemarkByName(pfunc->funname);
+        tstrlist<<myinputitem::type2str(myinputitem::func_Fun)+tr(": ")+"<"+pfunc->funname+"> "+myfun::name2remark(pfunc->funname,psys->qsv);
         for(int i=0;i<pfunc->objlist.length();i++){
             myobj *pobj=pfunc->objlist.at(i);
             tstrlist<<myinputitem::type2str(myinputitem::func_Obj)+QString::number(i+1)+" "+myobj::type2str(pobj->type)+tr(": ")+"<"+pobj->name+"> "+psys->psk0->findRemarkByName_obj(pobj,psys->findFuncByObj(pobj),true);

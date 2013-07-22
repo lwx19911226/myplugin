@@ -105,14 +105,14 @@ void myinputwidget::myadd(){
     QString geteventstr=list.at(0);
     QString getblockstr=list.at(1).split("|").at(0);
     QString getfunstr=list.at(2);
-    if(myfun::need(getfunstr).length()!=list.length()-3){return;}
+    if(myfun::intypestrlist(getfunstr,pmain->psys->qsv).length()!=list.length()-3){return;}
     QList<myobj *> getobjlist;
     QStringList getrtrmlist;
     QStringList getblrmlist;
     for(int i=3;i<list.length();i++){
         myobj *pobj=pmain->psys->psk0->findObjByName(list.at(i),geteventstr);
         if(!pobj){
-            int gettype=myobj::str2type(myfun::need(getfunstr).at(i-3));
+            int gettype=myobj::str2type(myfun::intypestrlist(getfunstr,pmain->psys->qsv).at(i-3));
             if(!myobj::b4input(gettype)){qWarning()<<"myadd"<<gettype;}
             pobj=new myobj(pmain->psys);
             pobj->name=list.at(i);
@@ -122,9 +122,9 @@ void myinputwidget::myadd(){
         }
         getobjlist.append(pobj);
     }
-    int n=myfun::get(getfunstr).length();
+    int n=myfun::outtypestrlist(getfunstr,pmain->psys->qsv).length();
     for(int i=1;i<=n;i++){getrtrmlist<<p_lineedit_list.at(i)->text();}
-    for(int i=1;i<=myfun::getBlock_cnt(getfunstr);i++){getblrmlist<<p_lineedit_list.at(n+i+1)->text();}
+    for(int i=1;i<=myfun::name2blockcnt(getfunstr,pmain->psys->qsv);i++){getblrmlist<<p_lineedit_list.at(n+i+1)->text();}
     pmain->psys->psk0->addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist);
     pmain->myexport_design("tmp4design.txt");
     close();
@@ -139,7 +139,7 @@ QString myinputwidget::getRemark(myinputitem *pi){
         return pmain->psys->psk0->findRemarkByName_block(pi->getstr());
     }
     else if(i==myinputitem::func_Fun){
-        return myfun::findRemarkByName(pi->getstr());
+        return myfun::name2remark(pi->getstr(),pmain->psys->qsv);
     }
     else if(i>=myinputitem::func_Obj){
         return pmain->psys->psk0->findRemarkByName_obj(pi->getstr(),pi->getParent(myinputitem::func_Event)->getstr(),true);
@@ -179,7 +179,7 @@ void myinputwidget::changeRTR(){
     if(list.length()<myinputitem::func_Fun){return;}
     QString getfunstr=list.at(myinputitem::func_Fun-1);
     QStringList rtlist;
-    rtlist=myfun::get(getfunstr);
+    rtlist=myfun::outtypestrlist(getfunstr,pmain->psys->qsv);
     if(!rtlist.isEmpty()){
         p_label_list.at(0)->setText(tr("Remarks for return values: "));
         p_label_list.at(0)->show();
@@ -189,7 +189,7 @@ void myinputwidget::changeRTR(){
             p_lineedit_list.at(i+1)->show();
         }
     }
-    int n=myfun::getBlock_cnt(getfunstr);
+    int n=myfun::name2blockcnt(getfunstr,pmain->psys->qsv);
     if(n>0){
         int nn=rtlist.length()+1;
         p_label_list.at(nn)->setText(tr("Remarks for blocks: "));
@@ -308,7 +308,7 @@ void myinputwidget::filterItems_obj(){
         QStringList gettaglist=pmain->psys->psk0->funtaglist(ip->getParent(myinputitem::func_Event)->getstr());
         gettaglist<<myfun::remark2tag(p_combobox_filter->currentText());
         if(p0->type+1==myinputitem::func_Fun){
-            ip->visible=myfun::matchTaglist(ip->getstr(),gettaglist);
+            ip->visible=myfun::matchtaglist(ip->getstr(),pmain->psys->qsv,gettaglist);
         }
         else if(p0->type+1>=myinputitem::func_Obj){
             myobj *pt=pmain->psys->psk0->findObjByName(ip->getstr(),ip->getParent(myinputitem::func_Event)->getstr());

@@ -1,5 +1,6 @@
 #include "myfun.h"
 #include "mycode.h"
+#include "mysys.h"
 /*
 void myappend(QList<QString> &list,QString str){
     if(str==""){return;}
@@ -27,74 +28,86 @@ void myfun::myini(){
     }
     QTextStream cin(&fin);
     cin.setCodec("UTF-8");
-    QString str;
+    QString str,tstr;
     for(;;){
         if(cin.atEnd()){break;}
         str=cin.readLine();
         if(str==""){continue;}
         if(str.startsWith("//")){continue;}
         if(str.startsWith(">>")){myfuntaglist<<str.mid(2);continue;}
-        if(str.startsWith(">")&&str.count("|")==myobj::enumcnt(&staticMetaObject,"iniFormat")-1){myfunlist<<str.mid(1);continue;}
+        if(str.startsWith(">")&&str.count("|")==myobj::enumcnt(&staticMetaObject,"iniFormat")-1){
+            tstr=str.mid(1);
+            QList<int> tlist0=getqsvlist_str(tstr);
+            QList<int> tlist;
+            foreach(QString stri,name2strlist(tstr.split("|").at(Name))){
+                tlist<<getqsvlist_str(stri);
+            }
+            foreach(int i,tlist0){
+                foreach(int j,tlist){
+                    if((i==mysys::VersionUnknown)||(j==mysys::VersionUnknown)||(i==j)){qWarning()<<"myfunini"<<tstr;}
+                }
+            }
+            myfunlist<<tstr;
+            continue;
+        }
         qWarning()<<"myfunini:"<<str<<",";
     }
     fin.close();
 }
-QStringList myfun::need(QString getstr){
+QStringList myfun::name2strlist(QString getname){
+    return myfunlist.filter(QRegExp("^"+getname+"\\|"));
+}
+QString myfun::name2str(QString getname, int getqsv){
+    foreach(QString stri,name2strlist(getname)){
+        if(matchqsv_str(stri,getqsv)){return stri;}
+    }
+    return QString();
+}
+QStringList myfun::intypestrlist(QString getname,int getqsv){
     myini();
-    foreach(QString stri,myfunlist){
-        if(stri.startsWith(getstr+"|")){
-            //myappend(list,stri.split("|").at(In_Type).split(","));
-            if(stri.split("|").at(In_Type)==""){return QStringList();}
-            return stri.split("|").at(In_Type).split(",");
-        }
+    QString tstr=name2str(getname,getqsv);
+    if(!tstr.isEmpty()&&!tstr.split("|").at(In_Type).isEmpty()){
+        return tstr.split("|").at(In_Type).split(",");
     }
     return QStringList();
 }
-QStringList myfun::get(QString getstr){
+QStringList myfun::outtypestrlist(QString getname,int getqsv){
     myini();
-    foreach(QString stri,myfunlist){
-        if(stri.startsWith(getstr+"|")){
-            //myappend(list,stri.split("|").at(Out_Type).split(","));
-            if(stri.split("|").at(Out_Type)==""){return QStringList();}
-            return stri.split("|").at(Out_Type).split(",");
-        }
+    QString tstr=name2str(getname,getqsv);
+    if(!tstr.isEmpty()&&!tstr.split("|").at(Out_Type).isEmpty()){
+        return tstr.split("|").at(Out_Type).split(",");
     }
     return QStringList();
 }
 
-int myfun::getBlock_cnt(QString getstr){
+int myfun::name2blockcnt(QString getname, int getqsv){
     myini();
-    foreach(QString stri,myfunlist){
-        if(stri.startsWith(getstr+"|")){
-            return stri.split("|").at(Trans).count("%block");
-        }
-    }
+    QString tstr=name2str(getname,getqsv);
+    if(!tstr.isEmpty()){return tstr.split("|").at(Trans).count("%block");}
     return 0;
 }
-bool myfun::notnil(QString getstr, int geti){
+bool myfun::notnil(QString getname,int getqsv,int geti){
     myini();
-    QStringList strlist=myfun::need(getstr);
-    strlist<<myfun::get(getstr);
+    QStringList strlist;
+    strlist<<myfun::intypestrlist(getname,getqsv)<<myfun::outtypestrlist(getname,getqsv);
     //return myfun::getTrans(getstr).contains("<"+QString::number(geti+1)+":");
     return myobj::gettypesuffix(strlist.at(geti)).contains("~");
 }
 
-QString myfun::getTrans(QString getstr){
+QString myfun::name2trans(QString getname,int getqsv){
     myini();
-    foreach(QString stri,myfunlist){
-        if(stri.startsWith(getstr+"|")){
-            return stri.split("|").at(Trans);
-        }
-    }
+    QString tstr=name2str(getname,getqsv);
+    if(!tstr.isEmpty()){return tstr.split("|").at(Trans);}
     return QString();
 }
 
-QStringList myfun::getfunstrlist(QStringList taglist){
+QStringList myfun::getfunstrlist(int getqsv, QStringList taglist){
     myini();
     QStringList strlist;
     foreach(QString stri,myfunlist){
-        QString getname=stri.split("|").at(Name);
-        if(matchTaglist(getname,taglist)){strlist<<getname;}
+        if(!matchqsv_str(stri,getqsv)){continue;}
+        if(!matchtaglist_str(stri,taglist)){continue;}
+        strlist<<stri.split("|").at(Name);
     }
     return strlist;
 }
@@ -114,38 +127,57 @@ QString myfun::remark2tag(QString getrm){
     }
     return QString();
 }
-bool myfun::matchTaglist(QString getname, QStringList gettaglist){
+bool myfun::matchtaglist(QString getname,int getqsv, QStringList gettaglist){
     myini();
-    foreach(QString stri,myfunlist){
-        if(stri.startsWith(getname+"|")){
-            QStringList taglist=stri.split("|").at(Tag).split(",");
-            foreach(QString tagstri,taglist.filter(QRegExp("\\$$"))){
-                bool b=false;
-                foreach(QString tstri,tagstri.mid(0,tagstri.length()-1).split("+")){
-                    if(gettaglist.contains(tstri)||gettaglist.contains(tstri+"$")){b=true;break;}
-                    //else{return false;}
-                }
-                if(!b){return false;}
-            }
-            foreach(QString tagstri,gettaglist.filter(QRegExp("[^\\$]$"))){
-                if(taglist.contains(tagstri)||taglist.contains(tagstri+"$")){}
-                else{return false;}
-            }
-            return true;
+    QString tstr=name2str(getname,getqsv);
+    if(!tstr.isEmpty()){return matchtaglist_str(tstr,gettaglist);}
+    return true;
+}
+bool myfun::matchtaglist_str(QString getstr, QStringList gettaglist){
+    QStringList taglist=getstr.split("|").at(Tag).split(",");
+    foreach(QString tagstri,taglist.filter(QRegExp("\\$$"))){
+        bool b=false;
+        foreach(QString tstri,tagstri.mid(0,tagstri.length()-1).split("+")){
+            if(gettaglist.contains(tstri)||gettaglist.contains(tstri+"$")){b=true;break;}
+            //else{return false;}
         }
+        if(!b){return false;}
+    }
+    foreach(QString tagstri,gettaglist.filter(QRegExp("[^\\$]$"))){
+        if(taglist.contains(tagstri)||taglist.contains(tagstri+"$")){}
+        else{return false;}
     }
     return true;
 }
-
-QString myfun::findRemarkByName(QString getname){
-    myini();
-    foreach(QString stri,myfunlist){
-        if(stri.startsWith(getname+"|")){
-            return stri.split("|").at(Remark);
+bool myfun::matchqsv_str(QString getstr, int getqsv){
+    if(getqsv==mysys::VersionUnknown){return true;}
+    QStringList tstrlist=getstr.split("|").at(Tag).split(",").filter(QRegExp("^V"));
+    if(tstrlist.isEmpty()){return true;}
+    else{return !tstrlist.filter(mysys::qsv2str(getqsv)).isEmpty();}
+}
+QList<int> myfun::getqsvlist_str(QString getstr){
+    QList<int> tlist;
+    QStringList tstrlist=getstr.split("|").at(Tag).split(",").filter(QRegExp("^V"));
+    if(tstrlist.isEmpty()){tlist<<mysys::VersionUnknown;}
+    else if(tstrlist.length()==1){
+        QString tstr=tstrlist.first();
+        if(tstr.endsWith("$")){tstr=tstr.mid(0,tstr.length()-1);}
+        foreach(QString stri,tstr.split("+")){
+            int tqsv=mysys::str2qsv(stri);
+            if(!tlist.contains(tqsv)){tlist<<tqsv;}
         }
     }
-    return "";
+    else{qWarning()<<"getqsvlist_str"<<getstr;}
+    return tlist;
 }
+
+QString myfun::name2remark(QString getname,int getqsv){
+    myini();
+    QString tstr=name2str(getname,getqsv);
+    if(!tstr.isEmpty()){return tstr.split("|").at(Remark);}
+    return QString();
+}
+
 
 /*
 void myfun::setrt(QList<QString> &rtnamelist,QList<QString> &rtrmlist,QString geteventstr){

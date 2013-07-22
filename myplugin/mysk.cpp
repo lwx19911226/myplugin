@@ -451,7 +451,7 @@ void mysk::dotrans(QString getstr){
             if(!pobj){
                 pobj=new myobj(getsys());
                 pobj->name=tstrlist.at(i);
-                int gettype=myobj::str2type(myfun::need(getfunstr).at(i));
+                int gettype=myobj::str2type(myfun::intypestrlist(getfunstr,getsys()->qsv).at(i));
                 if(!myobj::b4input(gettype)){qWarning()<<"dotrans_b4input"<<gettype;}
                 pobj->type=gettype;
                 pobj->isVerified=true;

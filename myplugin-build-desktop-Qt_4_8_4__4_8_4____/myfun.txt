@@ -25,7 +25,7 @@
 
 
 //
->onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl,V0224+V0610$
+>onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
 >onlyExist|myplayer+mycard||if not %1 then return defaultReturn end|仅当角色或牌（参数1）存在时才发动|rt
 >ifActivation|mysplayer~||<1:>if not room:askForSkillInvoke(%1,selfskname,data) then return defaultReturn end|仅当角色（参数1）选择发动才发动|rt,ask,room$
 
@@ -102,7 +102,8 @@
 >getSubcards|mycard~|mynumlist~|<1:>%2=%1:getSubcards()|牌（参数1）的子卡ID列表（返回值1）|cd,list
 >subcardsLength|mycard~|mynum~|<1:>%2=%1:subcardsLength()|牌（参数1）的子卡数（返回值1）|cd
 >getSkillName|mycard~|mystr~|<1:>%2=%1:getSkillName()|牌（参数1）的技能名（返回值1）|cd
->match|mycard~,myplayer~,mystr~|mybool~|<1:><2:>%4=mymatch(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl
+>match|mycard~,myplayer~,mystr~|mybool~|<1:><2:>%4=mymatchV0224(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl,V0224$
+>match|mycard~,myplayer~,mystr~|mybool~|<1:><2:>%4=mymatch(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl,V0610$
 
 //action
 >getCurrent||mysplayer~|%1=room:getCurrent()|当前回合角色（返回值1）|pl,room$
@@ -133,8 +134,9 @@
 >showAllCards|mysplayer~,mysplayer||<1:>room:showAllCards(%1,%2)|令一名角色（参数1）展示所有牌，参数2为展示对象，如果不存在表示展示给所有人|pl,room$
 
 //interaction
->playerFromOthers|mysplayer~|mysplayer~|<1:>%2=room:askForPlayerChosen(%1,room:getOtherPlayers(%1),selfskname)|令一名角色（参数1）选择一名其它存活角色（返回值1）|pl,ask,room$
->askForPlayerChosen|mysplayer~,mysplayerlist~|mysplayer|<1:>%3=room:askForPlayerChosen(%1,%2,selfskname);if %3 then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），若成功选择则代码段1（否则给定角色列表为空）|pl,ask,block,room$
+>playerFromOthers|mysplayer~|mysplayer~|<1:>%2=room:askForPlayerChosen(%1,room:getOtherPlayers(%1),selfskname)|令一名角色（参数1）选择一名其它存活角色（返回值1）|pl,ask,room$,V0224$
+>askForPlayerChosen|mysplayer~,mysplayerlist~|mysplayer|<1:>%3=room:askForPlayerChosen(%1,%2,selfskname);if %3 then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），若成功选择则代码段1（否则给定角色列表为空）|pl,ask,block,room$,V0224$
+>askForPlayerChosen|mysplayer~,mysplayerlist~,mybool|mysplayer|<1:>%4=room:askForPlayerChosen(%1,%2,selfskname,nil,%3);if %4 then;%block;elseif %3 and not %2:isEmpty() then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），是否可以取消（参数3），若成功选择则代码段1，若取消则代码段2（否则给定角色列表为空）|pl,ask,block,room$,V0610$
 >askForSuit|mysplayer~|mynum~|<1:>%2=room:askForSuit(%1,selfskname)|令一名角色（参数1）选择一种花色（返回值1）|pl,ask,room$
 >askForKingdom|mysplayer~|mystr~|<1:>%2=room:askForKingdom(%1)|令一名角色（参数1）选择一个势力（返回值1）|pl,ask,room$
 >cardFromH|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isKongcheng() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"h",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）一张手牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
@@ -142,10 +144,12 @@
 >cardFromJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getJudgingArea():isEmpty() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"j",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）判定区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
 >cardFromHE|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isNude() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"he",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
 >cardFromHEJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isAllNude() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"hej",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备判定区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>askForCardChosen|mysplayer~,mysplayer~,mybool,mybool,mybool,mybool|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getCards(flags4hej(%3,%4,%5)):isEmpty() then return defaultReturn end;>%7=room:askForCardChosen(%1,%2,flags4hej(%3,%4,%5),selfskname,%6);%8=sgs.Sanguosha:getCard(%7)|令一名角色（参数1）选择一名角色（参数2）区域一张牌（返回值2）及其ID（返回值1），是否包括手牌（参数3），手牌是否可见（参数6），是否包括装备区（参数4），是否包括判定区（参数5）|pl,cd,ask,room$,V0610$
 >askForDiscard|mysplayer~,mynum~,mybool~,mybool~|mybool~|<1:if not %1 then return defaultReturn end;if not %3 and ((%4 and (%1:getCards("he"):length()<%2)) or (not %4 and (%1:getCards("h"):length()<%2))) then return defaultReturn end;>%5=room:askForDiscard(%1,selfskname,%2,%2,%3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）弃置X（参数2）张牌，是否可选不弃（参数3），是否包括装备（参数4），目标是否弃置（返回值1），若目标弃置则代码段1，否则代码段2|pl,ask,block,room$
 >askForExchange|mysplayer~,mynum~,mybool~,mybool~|mycard|<1:>%5=room:askForExchange(%1,selfskname,%2,%3,selfskname,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）选择X（参数2）张牌，返回值1为以这些牌为子卡的虚拟牌，是否包括装备（参数3），是否可选取消（参数4），如果选择了则代码段1否则代码段2，主要用于将这些牌交给某人的交换操作|pl,ask,block,room$
 >askForCard|mysplayer~,mystr~,mynum~,mybool~,mysplayer|mycard|<1:>local askcm%%=%3;if %4 then askcm%%=sgs.Card_MethodResponse;%6=room:askForCard(%1,%2,selfskname,data,askcm%%,%5,%4);if %6 then;%block;else;%block;end|令一名角色（参数1）打出牌（返回值1），模式（参数2），处理类别（参数3），是否改判（参数4），打出目标（参数5）可以不存在，如果打出则代码段1，否则代码段2|pl,cd,ask,block,room$
->askForUseCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$
+>askForUseCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$,V0224$
+>askForUseCard|mysplayer~,mystr~,mybool|mybool~|<1:>%4=room:askForUseCard(%1,%2,selfskname,-1,sgs.Card_MethodUse,%3);if %4 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否计入使用次数（参数3），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$,V0610$
 >askForUseSkillCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,"@"..%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用技能牌，视为技名（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$
 >askForUseSlashToPlayer|mysplayer~,mysplayer~,mybool~,mybool~|mybool~|<1:><2:>%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对另一名角色（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
 >askForUseSlashToPlayers|mysplayer~,mysplayerlist~,mybool~,mybool~|mybool~|<1:>%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对给定角色列表（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
@@ -155,7 +159,8 @@
 
 //
 >cloneCard|mystr~|mycard|%2=sgs.Sanguosha:cloneCard(%1,sgs.NoSuit,0)|获得一张虚拟牌（返回值1），无花色无点数，牌的对象名（参数1），比如【离间】的决斗|cd
->judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=myjudgestruct(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2，注意：目前判定模式仅支持花色和数字|pl,cd,block,room$
+>judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=myjudgestructV0224(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2，注意：目前判定模式仅支持花色和数字|pl,cd,block,room$,V0224$
+>judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=myjudgestruct(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2|pl,cd,block,room$,V0610$
 >damage|mysplayer,mysplayer~,mycard,mynum,mynum||<2:>local damage%%=sgs.DamageStruct();damage%%.from=%1;damage%%.to=%2;damage%%.card=%3;damage%%.damage=%4;damage%%.nature=%5;room:damage(damage%%)|对一名角色（参数2）造成X（参数4）点伤害，伤害来源（参数1），造成伤害的牌（参数3），伤害属性（参数5）|pl,cd,room$
 >recover|mysplayer~,mynum~,mycard,mysplayer~||<1:><4:>local rcv%%=sgs.RecoverStruct();rcv%%.recover=%2;rcv%%.card=%3;rcv%%.who=%4;room:recover(%1,rcv%%,true)|令一名角色（参数1）回复X（参数2）点体力，回复牌（参数3）可以不存在，回复来源（参数4）|pl,cd,room$
 >moveCardTo|mycard~,mysplayer,mynum~,mybool~||<1:>room:moveCardTo(%1,%2,%3,%4)|将牌（参数1）移动至位置（参数3），如果位置不为手牌装备判定区，则目标角色（参数2）不存在，是否明牌（参数4）|pl,cd,room$

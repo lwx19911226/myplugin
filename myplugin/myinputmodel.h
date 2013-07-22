@@ -38,9 +38,9 @@ public:
     myinputitem *getItem0(const QModelIndex &index) const;
 
     void myini();
-    MainWindow *getmain(){return static_cast<MainWindow *>(QObject::parent());}
-    mysys *getsys(){return getmain()->psys;}
-    mysk *getsk0(){return getsys()->psk0;}
+    MainWindow *getmain() const{return static_cast<MainWindow *>(QObject::parent());}
+    mysys *getsys() const{return getmain()->psys;}
+    mysk *getsk0() const{return getsys()->psk0;}
     //int getType(){return getmain()->p_inputwidget->type;}
     QModelIndex getIndex(myinputitem *getp,bool visibility=false){
         //if(!getp->pf){return QModelIndex();}

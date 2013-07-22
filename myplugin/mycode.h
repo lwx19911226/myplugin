@@ -69,6 +69,7 @@ public:
     virtual QString getRemark();
     myblock *getTopBlock();
     mysk *getsk0();
+    int getqsv0();
     virtual void myshow(){qWarning()<<name<<getLayer()<<blocklist.length();for(int i=0;i<blocklist.length();i++){blocklist.at(i)->myshow();}}
 };
 

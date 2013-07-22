@@ -59,12 +59,19 @@ function mymatchone(cd,player,exppattern)
 	if not b then return false end
 	if #subpatternlist==5 then return true end
 end
-function mymatch(cd,player,exppattern)
+function mymatchV0224(cd,player,exppattern)
 	local patternlist=exppattern:split("#")
 	for _,pattern in pairs(patternlist) do
 		if mymatchone(cd,player,pattern) then return true end
 	end
 	return false
+end
+function mymatch(cd,player,exppattern)
+	local judge=sgs.JudgeStruct()
+	judge.pattern=exppattern
+	judge.who=player
+	judge.good=true
+	return judge:isGood(cd)
 end
 function pattern2judgepattern(getpattern)
 	if getpattern:match("(.*):(.*):(.*)") then return getpattern end
@@ -118,11 +125,23 @@ function pattern2judgepattern(getpattern)
 end
 function myjudgestruct(getpattern,getwho,getreason,getgood)
 	local judge=sgs.JudgeStruct()
-	judge.pattern=sgs.QRegExp(pattern2judgepattern(getpattern))
+	judge.pattern=getpattern
 	judge.who=getwho
 	judge.reason=getreason
 	judge.good=getgood or true
 	return judge
+end
+function myjudgestructV0224(getpattern,getwho,getreason,getgood)
+	local judge=myjudgestruct(getpattern,getwho,getreason,getgood)
+	judge.pattern=sgs.QRegExp(pattern2judgepattern(getpattern))
+	return judge
+end
+function flags4hej(b4h,b4e,b4j)
+	local tlist={}
+	if b4h then table.insert(tlist,"h") end
+	if b4e then table.insert(tlist,"e") end
+	if b4j then table.insert(tlist,"j") end
+	return table.concat(tlist,"")
 end
 
 function addsk(sk)

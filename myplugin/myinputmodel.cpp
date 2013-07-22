@@ -1,4 +1,5 @@
 #include "myinputmodel.h"
+//#include "mainwindow.h"
 
 #define VISIBILITY true
 
@@ -113,8 +114,8 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
         pp->newChild(QVariant(">"+myinputitem::type2str(myinputitem::func_Fun)+tr(": ")),false,true);
         QStringList tstrlist=getsys()->psk0->funtaglist(geteventstr);
         tstrlist<<mysys::qsv2str(getsys()->qsv)+"$";
-        foreach(QString stri,myfun::getfunstrlist(tstrlist)){
-            pp->newChild(QVariant(stri),!myfun::need(stri).isEmpty());
+        foreach(QString stri,myfun::getfunstrlist(getsys()->qsv,tstrlist)){
+            pp->newChild(QVariant(stri),!myfun::intypestrlist(stri,getsys()->qsv).isEmpty());
         }
     }
     else if(pp->type+1>=myinputitem::func_Obj){
@@ -122,14 +123,14 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
         QString geteventstr=pp->getParent(myinputitem::func_Event)->getstr();
         QString getfunstr=pp->getParent(myinputitem::func_Fun,true)->getstr();
         QStringList strlist;
-        strlist=myfun::need(getfunstr);
+        strlist=myfun::intypestrlist(getfunstr,getsys()->qsv);
         if(!strlist.isEmpty()){
             QList<myobj *> objlist;
             int geti=pp->type+1-myinputitem::func_Obj;
             QString gettypestr=myobj::gettypestr(strlist.at(geti));
             pp->newChild(QVariant(">"+myinputitem::type2str(myinputitem::func_Obj)+QString::number(geti+1)+" "+gettypestr+tr(": ")),false,true);
             foreach(QString stri,gettypestr.split("+")){
-                getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr,!myfun::notnil(getfunstr,geti));
+                getsys()->psk0->getavlobjlist(myobj::str2type(stri),objlist,geteventstr,!myfun::notnil(getfunstr,getsys()->qsv,geti));
             }
             foreach(myobj *ip,objlist){
                 pp->newChild(QVariant(ip->name),geti<strlist.length()-1);
@@ -149,7 +150,7 @@ bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int 
     if(pi->type-myinputitem::func_Obj<0){return false;}
     //if(!pi->getParent(myinputitem::stc_Fun)){return false;}
     QStringList strlist;
-    strlist=myfun::need(pi->getParent(myinputitem::func_Fun)->getstr());
+    strlist=myfun::intypestrlist(pi->getParent(myinputitem::func_Fun)->getstr(),getsys()->qsv);
     if(!strlist.isEmpty()){
         QString getstr=strlist.at(pi->type-myinputitem::func_Obj);
         int gettype=myobj::str2type(getstr);
@@ -179,7 +180,7 @@ Qt::ItemFlags myinputmodel::flags(const QModelIndex &index) const{
         myinputitem *pi=getItem(index);
         if(pi->type-myinputitem::func_Obj<0){return false;}
         QStringList strlist;
-        strlist=myfun::need(pi->getParent(myinputitem::func_Fun)->getstr());
+        strlist=myfun::intypestrlist(pi->getParent(myinputitem::func_Fun)->getstr(),getsys()->qsv);
         if(!strlist.isEmpty()){
             QString getstr=strlist.at(pi->type-myinputitem::func_Obj);
             int gettype=myobj::str2type(getstr);
