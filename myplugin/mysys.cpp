@@ -293,15 +293,15 @@ bool mysys::delSkill(mysk *getp){
 myfunction *mysys::findFuncByObj(myobj *getp){
     //myfunction *pr=NULL;
     foreach(mydo *ip,dolist){
-        if(ip->objlist.contains(getp)){return static_cast<myfunction *>(ip->blocklist.first());}
+        if(ip->objlist.contains(getp)){return ip->getfunc();}
     }
     return NULL;
 }
 
 
 QStringList mysys::trans(){
-    //QString str="";
-    QStringList strlist;
+    QString tstr;
+    QStringList strlist,backstrlist;
     strlist<<QString("module(\"extensions.%1\",package.seeall)\nextension=sgs.Package(\"%1\")").arg(packagename);
     foreach(mygeneral *ip,glist){
         strlist<<ip->trans();
@@ -312,7 +312,7 @@ QStringList mysys::trans(){
     getsklist_noexs(tsklist);
     getsklist(exslist,mysk::ExistingSkill);
     foreach(mysk *ip,tsklist){
-        strlist<<ip->trans();
+        strlist<<ip->trans(backstrlist);
     }
 /*
     strlist<<"function addsk(sk)"<<"if not sgs.Sanguosha:getSkill(sk:objectName()) then"<<"local sklist=sgs.SkillList()"
@@ -355,6 +355,7 @@ QStringList mysys::trans(){
         strlist<<QString("addsktrans(%1_trans,\"%2\",\"%3\",\"%4\",{%5})").arg(packagename,ip->name,ip->translation,ip->description,mycode::mymdf(ip->wordslist,QString("\""),QString("\"")).join(","));
     }
     strlist<<QString("sgs.LoadTranslationTable(cmpltrans(%1_trans))").arg(packagename);
+    strlist<<backstrlist;
 
     return strlist;
 }

@@ -21,9 +21,9 @@ void myblock::addBlock(myblock *getp, QString getstr){
     }    
 }
 bool myblock::matchName(QString getstr){return getstr.startsWith(name);}
-QStringList myblock::trans(){
+QStringList myblock::trans(QStringList &back){
     QStringList strlist;
-    foreach(myblock *ip,blocklist){strlist<<ip->trans();}
+    foreach(myblock *ip,blocklist){strlist<<ip->trans(back);}
     return mycode::myindent(strlist);
 }
 int myblock::getLayer(){
@@ -163,7 +163,7 @@ void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrm
         myblock::addBlock(p);
     }
 }
-QStringList myfunction::trans(){
+QStringList myfunction::trans(QStringList &back){
     QString str=myfun::name2trans(funname,getqsv0());
     QList<myobj *> list;
     list<<objlist<<rtobjlist;
@@ -185,17 +185,24 @@ QStringList myfunction::trans(){
             str.replace(QRegExp("([^\\\\]?)%"+QString::number(i+1)),"\\1"+list[i]->trans());
         }
     }
-    QStringList strlist=str.split(";");
+    QString frontstr=str;
+    QString backstr=QString();
+    if(str.contains(";;")){
+        frontstr=str.split(";;").first();
+        backstr=str.split(";;").last();
+    }
+    if(!backstr.isEmpty()){back<<backstr.split(";");}
     QStringList tlist;
     int j=0;
-    for(int i=0;i<strlist.length();i++){
-        if(strlist.at(i)=="%block"){
-            tlist<<blocklist.at(j++)->trans();
+    foreach(QString stri,frontstr.split(";")){
+        if(stri=="%block"){
+            tlist<<blocklist.at(j++)->trans(back);
         }
-        else{tlist<<strlist.at(i);}
+        else{tlist<<stri;}
     }
     return tlist;
 }
+
 QStringList myfunction::need4block(){
     QStringList strlist;
     foreach(myblock *ip,blocklist){strlist<<ip->need4block();}

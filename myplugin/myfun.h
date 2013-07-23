@@ -26,6 +26,7 @@ public:
     static QStringList myfuntaglist;
     static int globalint;
     static void myini();
+    static QString extract_str(QString getstr,int gettype);
     static QStringList name2strlist(QString getname);
     static QString name2str(QString getname,int getqsv);
     static QStringList intypestrlist(QString getname,int getqsv);

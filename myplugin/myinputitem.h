@@ -27,6 +27,7 @@ public:
     bool visible;
 
     static QString type2str(int gettype){
+        if(gettype>func_Obj){gettype=func_Obj;}
         switch(gettype){
         case func_Event:return tr("EVENT");
         case func_Block:return tr("BLOCK");

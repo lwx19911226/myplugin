@@ -2,13 +2,14 @@
 #include "mysk.h"
 #include "mysys.h"
 mysys *mydo::getsys(){return psktgt->getsys();}
+myfunction *mydo::getfunc(){return static_cast<myfunction *>(blocklist.first());}
 QString mydo::trans4block(QString getblockstr){
     QList<mydo *> prevlist;
     getprevlist(prevlist);
     if(psktgt->eventstrlist().contains(getblockstr)){return getblockstr;}
     else{
         for(int i=0;i<prevlist.length();i++){
-            myfunction *pt=static_cast<myfunction *>(prevlist.at(i)->blocklist.first());
+            myfunction *pt=prevlist.at(i)->getfunc();
             QStringList tstrlist;
             tstrlist=pt->need4block();
             if(tstrlist.contains(getblockstr)){
@@ -64,7 +65,7 @@ QString mydo::trans(){
     QString str="";
     QStringList strlist,tstrlist;
     strlist.clear();
-    myfunction *pfunc=static_cast<myfunction *>(blocklist.first());
+    myfunction *pfunc=getfunc();
     strlist<<pfunc->getEvent();
     QString getblockstr=pfunc->upperLayer->name;
     strlist<<trans4block(getblockstr);
@@ -207,7 +208,7 @@ void mydo::dotrans(mysk *psk0, QString gettrans){
 }
 */
 QString mydo::getBlockName(int index){
-    myfunction *pt=static_cast<myfunction *>(blocklist.first());
+    myfunction *pt=getfunc();
     QStringList tstrlist;
     tstrlist=pt->need4block();
     if(index>=tstrlist.length()){qWarning()<<"getblockname"<<pt->name<<pt->funname<<index<<tstrlist.length();}

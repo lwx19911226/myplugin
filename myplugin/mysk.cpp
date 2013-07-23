@@ -482,7 +482,7 @@ void mytrs::iniObj(){
         myevent::getavlobjlist(stri,avlobjlist,parent());
     }
 }
-QStringList mytrs::trans(){
+QStringList mytrs::trans(QStringList &back){
     QStringList strlist;
     strlist<<name+"=sgs.CreateTriggerSkill{"<<QString("name=\"%1\",").arg(name);
     QStringList tstrlist;
@@ -498,7 +498,7 @@ QStringList mytrs::trans(){
         blockstrlist<<QString("if event==%1 then").arg(myevent::trans(ip->name));
         blockstrlist<<mycode::myindent(myevent::trans4eventdata(ip->name,true));
         blockstrlist<<mycode::myindent(trans4avlobjlist(ip->name));
-        blockstrlist<<ip->trans();
+        blockstrlist<<ip->trans(back);
         blockstrlist<<mycode::myindent(myevent::trans4eventdata(ip->name,false));
         blockstrlist<<"end";
         strlist<<mycode::myindent(blockstrlist);
@@ -585,7 +585,7 @@ void mytrs::propertystr_set(QString getstr){
     mysk::propertystr_set(bklist,false);
 }
 */
-QStringList myvs::trans(){
+QStringList myvs::trans(QStringList &back){
     const QMetaObject *mob=metaObject();
     QStringList strlist,tstrlist;
     myblock *pt;
@@ -603,7 +603,7 @@ QStringList myvs::trans(){
             tstrlist<<QString("local selfskname=\"%1\"").arg(name);
             tstrlist<<trans4avlobjlist(bname);
             strlist<<mycode::myindent(tstrlist);
-            strlist<<pt->trans();
+            strlist<<pt->trans(back);
             strlist<<"return false end,";
         }
         else{}
@@ -618,7 +618,7 @@ QStringList myvs::trans(){
             tstrlist<<QString("local selfskname=\"%1\"").arg(name);
             tstrlist<<trans4avlobjlist(bname);
             strlist<<mycode::myindent(tstrlist);
-            strlist<<pt->trans();
+            strlist<<pt->trans(back);
             strlist<<"end,";
         }
         else{}
@@ -635,7 +635,7 @@ QStringList myvs::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
         strlist<<"return false end,";
     }
     strlist<<"view_as=function(self,cards)";
@@ -656,7 +656,7 @@ QStringList myvs::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
         strlist<<"return false end,";
     }
     bname=myobj::enumstr(mob,"vsbType",EnabledAtResponse);
@@ -667,7 +667,7 @@ QStringList myvs::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
         strlist<<"return false end,";
     }
     if(objname_viewas==myobj::objname_nullification()){
@@ -762,7 +762,7 @@ void myvs::propertystr_set(QString getstr){
     mysk::propertystr_set(bklist,false);
 }
 */
-QStringList mydts::trans(){
+QStringList mydts::trans(QStringList &back){
     QStringList strlist,tstrlist;
     strlist<<name+"=sgs.CreateDistanceSkill{";
     strlist<<QString("name=\"%1\",").arg(name);
@@ -774,7 +774,7 @@ QStringList mydts::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
     }
     strlist<<"return 0";
     strlist<<"end,";
@@ -782,7 +782,7 @@ QStringList mydts::trans(){
     return strlist;
 }
 
-QStringList myfts::trans(){
+QStringList myfts::trans(QStringList &back){
     QStringList strlist;
     strlist<<name+"=sgs.CreateFilterSkill{";
     strlist<<QString("name=\"%1\",").arg(name);
@@ -795,7 +795,7 @@ QStringList myfts::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
     }
     strlist<<"return false";
     strlist<<"end,";
@@ -822,7 +822,7 @@ QString myfts::getCardViewAsPropertyRemark(){
 }
 void myfts::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
 
-QStringList myprs::trans(){
+QStringList myprs::trans(QStringList &back){
     QStringList strlist,tstrlist;
     strlist<<name+"=sgs.CreateProhibitSkill{";
     strlist<<QString("name=\"%1\",").arg(name);
@@ -834,7 +834,7 @@ QStringList myprs::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
     }
     else{strlist<<"return false";}
     strlist<<"end,";
@@ -842,7 +842,7 @@ QStringList myprs::trans(){
     return strlist;
 }
 
-QStringList mymcs::trans(){
+QStringList mymcs::trans(QStringList &back){
     QStringList strlist,tstrlist;
     strlist<<name+"=sgs.CreateMaxCardsSkill{";
     strlist<<QString("name=\"%1\",").arg(name);
@@ -854,7 +854,7 @@ QStringList mymcs::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
     }
     else{strlist<<"return 0";}
     strlist<<"end,";
@@ -862,7 +862,7 @@ QStringList mymcs::trans(){
     return strlist;
 }
 
-QStringList mytms::trans(){
+QStringList mytms::trans(QStringList &back){
     const QMetaObject *mob=metaObject();
     QStringList strlist,tstrlist;
     strlist<<name+"=sgs.CreateTargetModSkill{";
@@ -878,7 +878,7 @@ QStringList mytms::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
         strlist<<"end,";
     }
     bname=myobj::enumstr(mob,"tmsbType",DistanceLimit);
@@ -889,7 +889,7 @@ QStringList mytms::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
         strlist<<"end,";
     }
     bname=myobj::enumstr(mob,"tmsbType",Residue);
@@ -900,7 +900,7 @@ QStringList mytms::trans(){
         tstrlist<<default4skname();
         tstrlist<<trans4avlobjlist(bname);
         strlist<<mycode::myindent(tstrlist);
-        strlist<<pt->trans();
+        strlist<<pt->trans(back);
         strlist<<"end,";
     }
     strlist<<"}";

@@ -134,7 +134,7 @@ public:
     static QString objname_nullification(){return "nullification";}
 
     QString trans(){
-        if(type==mystrc){return QString("\"%1\"").arg(name);}
+        if(type==mystrc){return "\""+name+"\"";}
         return name;
     }
 

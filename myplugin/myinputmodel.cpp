@@ -96,7 +96,7 @@ bool myinputmodel::canFetchMore(const QModelIndex &parent) const{
 }
 
 void myinputmodel::fetchMore(const QModelIndex &parent){
-    qWarning()<<"fetchmore0";
+    //qWarning()<<"fetchmore0";
     myinputitem *pp=getItem0(parent);
     myinputitem *p=getItem(parent);
     if(pp->type+1==myinputitem::func_Block){
@@ -139,7 +139,7 @@ void myinputmodel::fetchMore(const QModelIndex &parent){
     }
     p->delAllChildren();
     myinputitem::mycpy(pp,p,true);
-    qWarning()<<"fetchmore";
+    //qWarning()<<"fetchmore";
 }
 
 bool myinputmodel::setData(const QModelIndex &index, const QVariant &value, int role){

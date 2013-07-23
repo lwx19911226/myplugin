@@ -633,7 +633,11 @@ void MainWindow::mytext_all(){
 */
 }
 void MainWindow::mytext_current(){
-    if(psys->psk0){textlist_current=psys->psk0->trans();}
+    if(psys->psk0){
+        QStringList tback;
+        textlist_current=psys->psk0->trans(tback);
+        textlist_current<<tback;
+    }
     else{textlist_current=QStringList();}
     p_textedit_current->setText(mycode::mymdf(textlist_current,QString("\n"),false).join(""));
 }

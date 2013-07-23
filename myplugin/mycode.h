@@ -57,7 +57,7 @@ public:
     virtual void addBlock(myblock *,QString);
     //virtual void addStc(myfunction *);
     bool matchName(QString getstr);
-    virtual QStringList trans();
+    virtual QStringList trans(QStringList &back);
     virtual QStringList need4block();
     myblock *findBlockByName(QString getname);
     virtual myfunction *findFuncByObj(myobj *);
@@ -83,7 +83,7 @@ public:
     QList<myobj *> objlist;
     QList<myobj *> rtobjlist;
     QList<int> vrlist;
-    QStringList trans();
+    QStringList trans(QStringList &back);
     void myini(QString geteventstr,QString getblockstr,QStringList &rtrmlist,QStringList &blrmlist);
     QStringList need4block();
     void addBlock(myblock *, QString);

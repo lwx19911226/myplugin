@@ -29,30 +29,36 @@ void myfun::myini(){
     QTextStream cin(&fin);
     cin.setCodec("UTF-8");
     QString str,tstr;
+    QList<int> tlist0,tlist;
     for(;;){
         if(cin.atEnd()){break;}
         str=cin.readLine();
         if(str==""){continue;}
         if(str.startsWith("//")){continue;}
         if(str.startsWith(">>")){myfuntaglist<<str.mid(2);continue;}
-        if(str.startsWith(">")&&str.count("|")==myobj::enumcnt(&staticMetaObject,"iniFormat")-1){
+        if(str.startsWith(">")){
             tstr=str.mid(1);
-            QList<int> tlist0=getqsvlist_str(tstr);
-            QList<int> tlist;
-            foreach(QString stri,name2strlist(tstr.split("|").at(Name))){
-                tlist<<getqsvlist_str(stri);
-            }
-            foreach(int i,tlist0){
-                foreach(int j,tlist){
-                    if((i==mysys::VersionUnknown)||(j==mysys::VersionUnknown)||(i==j)){qWarning()<<"myfunini"<<tstr;}
+            if(str.replace("\\|","\\\\").count("|")==myobj::enumcnt(&staticMetaObject,"iniFormat")-1){
+                tlist0=getqsvlist_str(tstr);
+                tlist.clear();
+                foreach(QString stri,name2strlist(tstr.split("|").at(Name))){
+                    tlist<<getqsvlist_str(stri);
                 }
+                foreach(int i,tlist0){
+                    foreach(int j,tlist){
+                        if((i==mysys::VersionUnknown)||(j==mysys::VersionUnknown)||(i==j)){qWarning()<<"myfunini"<<tstr;}
+                    }
+                }
+                myfunlist<<tstr;
+                continue;
             }
-            myfunlist<<tstr;
-            continue;
         }
         qWarning()<<"myfunini:"<<str<<",";
     }
     fin.close();
+}
+QString myfun::extract_str(QString getstr, int gettype){
+    return getstr.replace("\\|","\\\\").split("|").replaceInStrings("\\\\","|").at(gettype);
 }
 QStringList myfun::name2strlist(QString getname){
     return myfunlist.filter(QRegExp("^"+getname+"\\|"));
@@ -83,7 +89,7 @@ QStringList myfun::outtypestrlist(QString getname,int getqsv){
 int myfun::name2blockcnt(QString getname, int getqsv){
     myini();
     QString tstr=name2str(getname,getqsv);
-    if(!tstr.isEmpty()){return tstr.split("|").at(Trans).count("%block");}
+    if(!tstr.isEmpty()){return extract_str(tstr,Trans).count("%block");}
     return 0;
 }
 bool myfun::notnil(QString getname,int getqsv,int geti){
@@ -97,7 +103,9 @@ bool myfun::notnil(QString getname,int getqsv,int geti){
 QString myfun::name2trans(QString getname,int getqsv){
     myini();
     QString tstr=name2str(getname,getqsv);
-    if(!tstr.isEmpty()){return tstr.split("|").at(Trans);}
+    if(!tstr.isEmpty()){
+        return extract_str(tstr,Trans);
+    }
     return QString();
 }
 
@@ -174,7 +182,7 @@ QList<int> myfun::getqsvlist_str(QString getstr){
 QString myfun::name2remark(QString getname,int getqsv){
     myini();
     QString tstr=name2str(getname,getqsv);
-    if(!tstr.isEmpty()){return tstr.split("|").at(Remark);}
+    if(!tstr.isEmpty()){return extract_str(tstr,Remark);}
     return QString();
 }
 

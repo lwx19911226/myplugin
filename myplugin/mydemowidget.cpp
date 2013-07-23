@@ -99,7 +99,7 @@ void mydemowidget::myrfr_sk(){
         foreach(mydo *ip,psys->dolist){
             if(ip->psktgt==psys->psk0){
                 dolist4show<<ip;
-                p_listwidget->addItem(ip->blocklist.first()->getRemark());
+                p_listwidget->addItem(ip->getfunc()->getRemark());
             }
         }
     }
@@ -110,7 +110,7 @@ void mydemowidget::myrfr_do(){
     QListWidgetItem *pitem=p_listwidget->currentItem();
     if(pitem&&pitem->text()!=""){
         mydo *pdo=dolist4show.at(p_listwidget->currentRow());
-        myfunction *pfunc=static_cast<myfunction *>(pdo->blocklist.first());
+        myfunction *pfunc=pdo->getfunc();
         QStringList tstrlist;
         QString eventstr=pfunc->getEvent();
         QString blockstr=pfunc->upperLayer->name;

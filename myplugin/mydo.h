@@ -25,6 +25,7 @@ public:
     QString getBlockName(int index);
     myobj *getObj(int index);
     void getprevlist(QList<mydo *> &list);
+    myfunction *getfunc();
     mysys *getsys();
     //static void dotrans(mysk *psk0,QString gettrans);
 signals:

@@ -117,7 +117,7 @@ public:
     //virtual void rfrObj(){}
     virtual void iniObj();
     virtual myblock *iniBlock(QString getstr);
-    virtual QStringList trans()=0;
+    virtual QStringList trans(QStringList &back)=0;
     virtual QStringList trans4avlobjlist(QString getstr);
     QStringList trans4avlobjlist(QString getstr,QString abbstr);
     //QStringList trans4design();
@@ -178,7 +178,7 @@ public:
     QString getCanTriggerPropertyRemark();
     void setCanTriggerPropertyRemark(QString getstr);
     void iniObj();
-    QStringList trans();
+    QStringList trans(QStringList &back);
     QStringList trans4avlobjlist(QString getstr);
     QString findRemarkByName_event(QString getname);
 };
@@ -259,7 +259,7 @@ public:
         }
         return getname;
     }
-    QStringList trans();
+    QStringList trans(QStringList &back);
 };
 Q_DECLARE_METATYPE(myvs)
 
@@ -286,7 +286,7 @@ public:
         if(getstr==myobj::enumstr(metaObject(),"dtsbType",CorrectFunc)){strlist<<"rtn$";}
         return strlist;
     }
-    QStringList trans();
+    QStringList trans(QStringList &back);
 };
 Q_DECLARE_METATYPE(mydts)
 
@@ -328,7 +328,7 @@ public:
         if(getstr==myobj::enumstr(metaObject(),"ftsbType",ViewFilter)){strlist<<"room$"<<"rtb$";}
         return strlist;
     }
-    QStringList trans();
+    QStringList trans(QStringList &back);
 };
 Q_DECLARE_METATYPE(myfts)
 
@@ -355,7 +355,7 @@ public:
         if(getstr==myobj::enumstr(metaObject(),"prsbType",IsProhibited)){strlist<<"rtb$";}
         return strlist;
     }
-    QStringList trans();
+    QStringList trans(QStringList &back);
 };
 Q_DECLARE_METATYPE(myprs)
 
@@ -382,7 +382,7 @@ public:
         if(getstr==myobj::enumstr(metaObject(),"mcsbType",ExtraFunc)){strlist<<"rtn$";}
         return strlist;
     }
-    QStringList trans();
+    QStringList trans(QStringList &back);
 };
 Q_DECLARE_METATYPE(mymcs)
 
@@ -432,7 +432,7 @@ public:
         if(getstr==myobj::enumstr(mob,"tmsbType",Residue)){strlist<<"rtn$";}
         return strlist;
     }
-    QStringList trans();
+    QStringList trans(QStringList &back);
 };
 Q_DECLARE_METATYPE(mytms)
 
@@ -469,7 +469,7 @@ public:
     QString propertystr_get();
     void propertystr_set(QString getstr);
     QString findRemarkByName_event(QString getname){return getname;}
-    QStringList trans(){return QStringList();}
+    QStringList trans(QStringList &back){back.length();return QStringList();}
 };
 Q_DECLARE_METATYPE(myexs)
 

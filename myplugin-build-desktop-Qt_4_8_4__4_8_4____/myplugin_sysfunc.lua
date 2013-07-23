@@ -143,6 +143,32 @@ function flags4hej(b4h,b4e,b4j)
 	if b4j then table.insert(tlist,"j") end
 	return table.concat(tlist,"")
 end
+function mychoice(player,skname,chnum,iternum)
+	local i=iternum
+	local ch
+	local chlist={}
+	local chlist_r={}
+	for var=1,chnum,1 do
+		ch="choice"..i
+		i=i+1
+		chlist[var]=ch
+		chlist_r[ch]=var
+	end
+	ch=player:getRoom():askForChoice(player,skname,table.concat(chlist,"+"))
+	if ch then return chlist_r[ch] end
+	return 1
+end
+function mychoicetrans(chnum,iternum,translist)
+	local i=iternum
+	local ch
+	local trtable={}
+	for var=1,chnum,1 do
+		ch="choice"..i
+		i=i+1
+		if translist[var] then trtable[ch]=translist[var] end
+	end
+	sgs.LoadTranslationTable(trtable)
+end
 
 function addsk(sk)
 if not sgs.Sanguosha:getSkill(sk:objectName()) then
