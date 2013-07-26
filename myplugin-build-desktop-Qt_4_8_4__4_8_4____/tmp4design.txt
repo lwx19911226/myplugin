@@ -77,4 +77,4 @@
 >>>>luatuxi::EventPhaseStart|56->0|ifActivation|selfplayer||
 >>>>luatuxi::EventPhaseStart|56->0|askForUseSkillCard|selfplayer,luatuxivs|是否发动|发动,不发动
 >>>>luatuxi::EventPhaseStart|56->1|ifReturn|true,true||
->>>>sk0::GameStart|GameStart|choice2|player,摸两张牌,回复一点体力||
+>>>>sk0::GameStart|GameStart|choice|player,摸两张牌\|回复一点体力||

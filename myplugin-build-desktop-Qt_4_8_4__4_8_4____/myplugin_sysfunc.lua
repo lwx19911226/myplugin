@@ -158,16 +158,20 @@ function mychoice(player,skname,chnum,iternum)
 	if ch then return chlist_r[ch] end
 	return 1
 end
-function mychoicetrans(chnum,iternum,translist)
+function mychoicetrans(iternum,trans_str)
 	local i=iternum
 	local ch
 	local trtable={}
-	for var=1,chnum,1 do
+	local translist=string.split(trans_str,"|")
+	for var=1,#translist,1 do
 		ch="choice"..i
 		i=i+1
-		if translist[var] then trtable[ch]=translist[var] end
+		trtable[ch]=translist[var]
 	end
 	sgs.LoadTranslationTable(trtable)
+end
+function string:count(pat)
+	return select(2,string.gsub(self,pat,pat))
 end
 
 function addsk(sk)
