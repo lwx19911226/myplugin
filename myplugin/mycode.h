@@ -24,12 +24,12 @@ public:
     static QStringList myindent(QStringList getlist){
         return mymdf(getlist,QString("    "));
     }
-    static QStringList mysplit(QString getstr,bool b4r=false){
+    static QStringList mysplit(QString getstr,QString splitstr,bool b4r=false){
         QString tstr=getstr;
-        tstr.replace("\\|","\\\\");
-        QString rstr="|";
-        if(b4r){rstr="\\|";}
-        return tstr.split("|").replaceInStrings("\\\\",rstr);
+        tstr.replace("\\"+splitstr,"\\\\");
+        QString rstr=splitstr;
+        if(b4r){rstr="\\"+splitstr;}
+        return tstr.split(splitstr).replaceInStrings("\\\\",rstr);
     }
 
 signals:

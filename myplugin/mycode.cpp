@@ -167,6 +167,7 @@ QStringList myfunction::trans(QStringList &back){
     QString str=myfun::name2trans(funname,getqsv0());
     QList<myobj *> list;
     list<<objlist<<rtobjlist;
+/*
     for(int i=0;i<list.length();i++){
         QRegExp rx("<"+QString::number(i+1)+":([^>]*)>");
         if(rx.indexIn(str)!=-1){
@@ -179,6 +180,12 @@ QStringList myfunction::trans(QStringList &back){
             str.replace(rx,tstr);
         }
     }
+*/
+    foreach(int i,vrlist){
+        QString tstr=myobj::trans4notnil(list.at(i)->type,"%"+QString::number(i+1));
+        if(!tstr.isEmpty()){str=tstr+";"+str;}
+    }
+
     if(str.contains("%%")){str.replace(QRegExp("%%"),QString::number(globalint++));}
     for(int i=0;i<list.length();i++){
         if(str.contains("%"+QString::number(i+1))){

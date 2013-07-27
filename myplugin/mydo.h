@@ -17,6 +17,7 @@ public:
     mysk *psktgt;
     QList<myobj *> objlist;
     QList<myblock *> blocklist;
+    QString tagstr;
     //int type;
 
     QString trans();

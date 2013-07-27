@@ -46,11 +46,13 @@ public:
     mygeneral *findGeneralByName(QString getname);
     mysk *findSkillByName(QString getname);
     myfunction *findFuncByObj(myobj *);
+    mydo *findDoByTag(QString dotag);
     QStringList trans();
     QStringList trans4design();
 
     void undo();
     void redo();
+    void myrfr_dotag();
 
     QStringList getgstrlist(){
         QStringList strlist;

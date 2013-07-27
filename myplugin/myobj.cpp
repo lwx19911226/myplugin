@@ -40,8 +40,8 @@ void myobj::myini_lang(){
         myconstskstrlist<<"NULL";
         return;
     }
-    QRegExp rx1(".*\\[\"(\\w+.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
-    QRegExp rx2(".*\\[\":(\\w+.*)\"\\].*=.*\"(.*)[\"|\\\\].*");
+    QRegExp rx1("\\[\"(\\w+.*)\"\\].*=.*\"(.*)[\"\\\\]");
+    QRegExp rx2("\\[\":(\\w+.*)\"\\].*=.*\"(.*)[\"\\\\]");
     QStringList cdstrlist;
     cdstrlist<<tr("BasicCard")<<tr("EquipCard")<<tr("TrickCard")<<tr("DelayedTrickCard");
     QString str;
@@ -68,8 +68,8 @@ void myobj::myini_lang(){
         for(;;){
             if(tcin.atEnd()){break;}
             str=tcin.readLine();
-            if(rx2.exactMatch(str)){
-                if(ttstrlist.contains(rx2.cap(1))){
+            if(str.contains(rx2)){
+                if(ttstrlist.contains(rx2.cap(1))){                    
                     int index=tstrlist.indexOf(QRegExp("^"+rx2.cap(1)+"\\|.*"));
                     if(index!=-1){
                         QString getname=tstrlist.at(index).split("|").first();
@@ -83,7 +83,6 @@ void myobj::myini_lang(){
                             if(!b){
                                 QStringList obstrlist;
                                 obstrlist<<getname<<"mystrc"<<tr("Object Name")+tr("[")+gettranslation+tr("]")<<"ob";
-                                //qWarning()<<"130328"<<obstrlist.join("|");
                                 myconstlist<<obstrlist.join("|");
                             }
                         }
@@ -92,7 +91,7 @@ void myobj::myini_lang(){
                 }
                 else{qWarning()<<"130609"<<str;}
             }
-            else if(rx1.exactMatch(str)){
+            else if(str.contains(rx1)){
                 ttstrlist<<rx1.cap(1);
                 tstrlist<<rx1.cap(1)+"|"+rx1.cap(2);
             }

@@ -27,7 +27,7 @@ void mysys::myini(QString getpath, int getqsv){
     }
     QStringList strlist_package=strlist.filter(QRegExp("^>[^>]"));
     QStringList strlist_general=strlist.filter(QRegExp("^>>[^>]"));
-    QStringList strlist_trs=strlist.filter(QRegExp("^>>>[^>]"));
+    QStringList strlist_sk=strlist.filter(QRegExp("^>>>[^>]"));
     QStringList strlist_do=strlist.filter(QRegExp("^>>>>[^>]"));
     if(strlist_package.length()==1&&strlist_package.first().count("|")>=1){
         strlist=strlist_package.first().mid(1).split("|");
@@ -57,11 +57,11 @@ void mysys::myini(QString getpath, int getqsv){
             qWarning()<<stri;
         }
     }
-    foreach(QString stri,strlist_trs){
+    foreach(QString stri,strlist_sk){
         if(stri.count("|")>=3){
             QString tstr=stri.mid(3);
             QString getabb=tstr.split("|").at(0);
-            QString getname=tstr.split("|").at(1);
+            QString getname=tstr.split("|").at(1);            
             mysk *psk=findSkillByName(getname);
             if(!psk){
                 psk=newSkill(getname,mysk::abb2type(getabb));
@@ -72,15 +72,18 @@ void mysys::myini(QString getpath, int getqsv){
             qWarning()<<stri;
         }
     }
-
+    QRegExp rx(":([^:\\|]*):");
     foreach(QString stri,strlist_do){
-        QString skname=stri.mid(4,stri.indexOf("::")-4);
-        QString getstr=stri.mid(stri.indexOf("::")+2);
+        int index=stri.indexOf(rx);
+        QString dotag=rx.cap(1);
+        QString skname=stri.mid(4,index-4);
+        QString getstr=stri.mid(index+2+dotag.length());
         //qWarning()<<trsname<<getstr;
         mysk *psk=findSkillByName(skname);
         if(!psk){qWarning()<<"myini_design_psk"<<skname;}
-        else{psk->dotrans(getstr);}
+        else{psk->dotrans(getstr,dotag);}
     }
+    myrfr_dotag();
     qWarning()<<"design success";
     fin.close();
     sig_update();
@@ -201,7 +204,6 @@ mysk *mysys::newsk(int gettype){
     }    
     mysk *psk=NULL;
     int id=QMetaType::type(mysk::type2class(gettype).toUtf8());
-
     if(id!=0){
         psk=static_cast<mysk *>(QMetaType::construct(id));
         psk->setParent(this);
@@ -212,7 +214,7 @@ mysk *mysys::newSkill(QString getname, int gettype){
     //if(gettype==mysk::TriggerSkill){return newTrs(getname);}
     //if(gettype==mysk::ViewAsSkill){return newVs(getname);}
     mysk *psk=newsk(gettype);
-    if(!psk){qWarning()<<"newskill"<<getname<<gettype;}    
+    if(!psk){qWarning()<<"newskill"<<getname<<gettype;}
     psk0=psk;
     psk0->setName(getname);
     psk0->iniObj();
@@ -295,6 +297,15 @@ myfunction *mysys::findFuncByObj(myobj *getp){
     foreach(mydo *ip,dolist){
         if(ip->objlist.contains(getp)){return ip->getfunc();}
     }
+    return NULL;
+}
+mydo *mysys::findDoByTag(QString dotag){
+    foreach(mydo *ip,dolist){
+        if(ip->tagstr==dotag){return ip;}
+    }
+    bool b=false;
+    int index=dotag.toInt(&b);
+    if(b&&index<dolist.length()){return dolist.at(index);}
     return NULL;
 }
 
@@ -405,10 +416,12 @@ void mysys::redo(){
     //if(undolist.isEmpty()){return;}
     if(undostrlist.isEmpty()){return;}
     QString str=undostrlist.takeLast();
-    QRegExp rx("([^:]*)::([^:]*)");
-    if(rx.indexIn(str)!=-1){
-        QString skname=rx.cap(1);
-        QString tstr=rx.cap(2);qWarning()<<"redo:"<<skname<<tstr;
+    QRegExp rx(":([^:\\|]*):[^:\\|]*\\|");
+    int index=str.indexOf(rx);
+    if(index!=-1){
+        QString skname=str.mid(0,index);
+        QString dotag=rx.cap(1);
+        QString tstr=str.mid(index+2+dotag.length());qWarning()<<"redo:"<<skname<<tstr;
         mysk *psk=findSkillByName(skname);
         if(!psk){qWarning()<<"redo_psk"<<str;}
         else{
@@ -430,6 +443,11 @@ void mysys::redo(){
     avlobjlist.append(pdo->objlist);
     dolist.append(pdo);
 */
+}
+void mysys::myrfr_dotag(){
+    for(int i=0;i<dolist.length();i++){
+        dolist.at(i)->tagstr=QString::number(i);
+    }
 }
 
 /*

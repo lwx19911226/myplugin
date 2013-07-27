@@ -18,21 +18,21 @@
 //>EventPhaseProceeding
 //>EventPhaseEnd
 //>EventPhaseChanging
->DrawNCards|mynum|drawnum|摸牌阶段摸牌数|local drawnum=data:toInt();;data:setValue(drawnum);return false|时机触发者摸牌阶段摸X张牌|
+>DrawNCards|mynum|drawnum|摸牌阶段摸牌数|local drawnum=data:toInt();;return false|时机触发者摸牌阶段摸X张牌|
 //>AfterDrawNCards
->PreHpRecover|mynum,mysplayer,mycard|rcv.recover,rcv.who,rcv.card|回复体力数,回复来源,回复牌|local rcv=data:toRecover();;data:setValue(rcv);return false|时机触发者将回复体力时，返回值为真将取消这次回复|
+>PreHpRecover|mynum,mysplayer,mycard|rcv.recover,rcv.who,rcv.card|回复体力数,回复来源,回复牌|local rcv=data:toRecover();;return false|时机触发者将回复体力时，返回值为真将取消这次回复|
 >HpRecover|mynum,mysplayer,mycard|rcv.recover,rcv.who,rcv.card|回复体力数,回复来源,回复牌|local rcv=data:toRecover()|时机触发者回复体力时|
->PreHpLost|mynum|lostnum|失去体力数|local lostnum=data:toInt();;data:setValue(lostnum);return false|时机触发者将失去体力时，返回值为真将取消这次失去|
+>PreHpLost|mynum|lostnum|失去体力数|local lostnum=data:toInt();;return false|时机触发者将失去体力时，返回值为真将取消这次失去|
 >HpChanged|||||时机触发者体力发生变动时|
 >MaxHpChanged|||||时机触发者体力上限发生变动时|
 >PostHpReduced|mybool,mysplayer,mycard,mynum,mynum,mynum|isDamage,damageFrom,damageCard,damageNum,damageNature,lostNum|是否由伤害造成（否则为体力流失）,伤害来源（前提是伤害）,伤害牌（前提是伤害）,伤害点数（前提是伤害）,伤害属性（前提是伤害）,体力流失点数（前提是体力流失）|local dmg=data:toDamage();local isDamage=(dmg.to~=nil);local damageFrom,damageCard,damageNum,damageNature,lostNum;if isDamage then damageFrom,damageCard,damageNum,damageNature=dmg.from,dmg.card,dmg.damage,dmg.nature;else lostNum=data:toInt() end|时机触发者体力减少后，涉及伤害时请先判断是否由伤害造成（否则为体力流失）|
 >EventLoseSkill|mystr|skname|所失去技能名|local skname=data:toString()|时机触发者失去技能时|
 >EventAcquireSkill|mystr|skname|所获得技能名|local skname=data:toString()|时机触发者获得技能时|
 >StartJudge|mysplayer,mycard|judge.who,judge.card|判定者,判定牌|local judge=data:toJudge()|时机触发者将开始判定时|
->AskForRetrial|mysplayer,mycard|judge.who,judge.card|判定者,判定牌|local judge=data:toJudge();;data:setValue(judge);return false|改判轮询时，时机触发者为被询问者，返回值为真将中止继续轮询|
+>AskForRetrial|mysplayer,mycard|judge.who,judge.card|判定者,判定牌|local judge=data:toJudge();;return false|改判轮询时，时机触发者为被询问者，返回值为真将中止继续轮询|
 >FinishRetrial|mysplayer,mycard|judge.who,judge.card|判定者,判定牌|local judge=data:toJudge()|改判轮询结束，时机触发者为判定者|
 >FinishJudge|mysplayer,mycard|judge.who,judge.card|判定者,判定牌|local judge=data:toJudge()|时机触发者判定结束|
->PindianVerifying|mysplayer,mysplayer,mycard,mycard,mynum,mynum,mystr,mybool|pd.from,pd.to,pd.from_card,pd.to_card,pd.from_number,pd.to_number,pd.reason,pd.success|拼点发起者,被拼点者,拼点发起者的拼点牌,被拼点者的拼点牌,拼点发起者的点数,被拼点者的点数,拼点原因，通常是拼点技能名,拼点发起者是否赢了|local pd=data:toPindian();;data:setValue(pd);return false|时机触发者发起的拼点生效前|
+>PindianVerifying|mysplayer,mysplayer,mycard,mycard,mynum,mynum,mystr,mybool|pd.from,pd.to,pd.from_card,pd.to_card,pd.from_number,pd.to_number,pd.reason,pd.success|拼点发起者,被拼点者,拼点发起者的拼点牌,被拼点者的拼点牌,拼点发起者的点数,被拼点者的点数,拼点原因，通常是拼点技能名,拼点发起者是否赢了|local pd=data:toPindian();;return false|时机触发者发起的拼点生效前|
 >Pindian|mysplayer,mysplayer,mycard,mycard,mynum,mynum,mystr,mybool|pd.from,pd.to,pd.from_card,pd.to_card,pd.from_number,pd.to_number,pd.reason,pd.success|拼点发起者,被拼点者,拼点发起者的拼点牌,被拼点者的拼点牌,拼点发起者的点数,被拼点者的点数,拼点原因，通常是拼点技能名,拼点发起者是否赢了|local pd=data:toPindian()|时机触发者发起的拼点生效后|
 >TurnedOver|||||时机触发者翻面后|
 >ChainStateChanged|||||时机触发者横置或重置后|
@@ -64,7 +64,7 @@
 //Damaged,          // the moment for -- yiji..
 //DamageComplete,
 
->Predamage|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage();;data:setValue(damage);return false|时机触发者将造成伤害时|
+>Predamage|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage();;return false|时机触发者将造成伤害时|
 >Damage|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage()|时机触发者造成伤害时|
 >Damaged|mysplayer,mysplayer,mycard,mynum,mynum|damage.from,damage.to,damage.card,damage.damage,damage.nature|伤害来源,受到伤害角色,造成伤害的牌,伤害点数,伤害属性|local damage=data:toDamage()|时机触发者受到伤害时|
 

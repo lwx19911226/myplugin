@@ -587,7 +587,7 @@ void MainWindow::myrfr_tw_property(QTableWidget *ptw, int getrow, QMap<QString, 
         if(strmap.contains(hstr)){
             if(strmap.count(hstr)==1){
                 QString getstr=strmap.value(hstr);
-                QStringList tstrlist=mycode::mysplit(getstr);
+                QStringList tstrlist=mycode::mysplit(getstr,"|");
                 if(tstrlist.length()>1){myrfr_tw_cbb(ptw,getrow,i,tstrlist.first(),tstrlist);}
                 else{myrfr_tw_str(ptw,getrow,i,tstrlist.first());}
                 continue;

@@ -137,6 +137,15 @@ public:
         if(type==mystrc){return "\""+name+"\"";}
         return name;
     }
+    static QString trans4notnil(int gettype,QString tstr){
+        switch(gettype){
+        case myplayer:
+        case mysplayer:
+        case mycard:
+            return QString("if not %1 then return defaultReturn end").arg(tstr);
+        default:return QString();
+        }
+    }
 
     static void myini();
     static void myini_lang();

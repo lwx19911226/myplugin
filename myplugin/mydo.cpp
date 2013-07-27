@@ -8,12 +8,12 @@ QString mydo::trans4block(QString getblockstr){
     getprevlist(prevlist);
     if(psktgt->eventstrlist().contains(getblockstr)){return getblockstr;}
     else{
-        for(int i=0;i<prevlist.length();i++){
+        for(int i=prevlist.length()-1;i>=0;i--){
             myfunction *pt=prevlist.at(i)->getfunc();
-            QStringList tstrlist;
-            tstrlist=pt->need4block();
-            if(tstrlist.contains(getblockstr)){
-                return QString("%1->%2").arg(i).arg(tstrlist.indexOf(getblockstr));
+            int index=pt->need4block().indexOf(getblockstr);
+            if(index!=-1){
+                if(prevlist.at(i)->tagstr.isEmpty()){prevlist.at(i)->tagstr=QString::number(i);}
+                return QString("%1->%2").arg(prevlist.at(i)->tagstr).arg(index);
             }
             /*
             if(prevlist.at(i)->type==Sentence){
@@ -50,14 +50,15 @@ QString mydo::trans4block(QString getblockstr){
 QString mydo::trans4obj(myobj *getp){
     QList<mydo *> prevlist;
     getprevlist(prevlist);
-    for(int i=0;i<prevlist.length();i++){
+    for(int i=prevlist.length()-1;i>=0;i--){
         if(prevlist.at(i)->objlist.contains(getp)){
             //i
             //prevlist.at(i)->objlist.indexOf(getp)
-            return QString("%1->%2").arg(i).arg(prevlist.at(i)->objlist.indexOf(getp));
+            if(prevlist.at(i)->tagstr.isEmpty()){prevlist.at(i)->tagstr=QString::number(i);}
+            return QString("%1->%2").arg(prevlist.at(i)->tagstr).arg(prevlist.at(i)->objlist.indexOf(getp));
         }
     }    
-    return getp->name;
+    return QString(getp->name).replace(",","\\,");
 }
 
 QString mydo::trans(){
@@ -85,9 +86,10 @@ QString mydo::trans(){
         tstrlist<<ip->remark;
     }
     strlist<<tstrlist.join(",");
-    strlist.replaceInStrings(QRegExp("\\|"),QString("\\|"));
+    strlist.replaceInStrings("|","\\|");
     str+=strlist.join("|");
-    return psktgt->name+"::"+str;
+    if(tagstr.isEmpty()){tagstr=QString::number(getsys()->dolist.indexOf(this));}
+    return psktgt->name+":"+tagstr+":"+str;
     /*
     str+=type2trans(type)+":";
     if(type==Sentence){

@@ -25,16 +25,17 @@
 
 
 //
->onlySkillOwner|myplayer~||<1:>if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
+>onlySkillOwner|myplayer~||if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
 >onlyExist|myplayer+mycard||if not %1 then return defaultReturn end|仅当角色或牌（参数1）存在时才发动|rt
->ifActivation|mysplayer~||<1:>if not room:askForSkillInvoke(%1,selfskname,data) then return defaultReturn end|仅当角色（参数1）选择发动才发动|rt,ask,room$
+>ifActivation|mysplayer~||if not room:askForSkillInvoke(%1,selfskname,data) then return defaultReturn end|仅当角色（参数1）选择发动才发动|rt,ask,room$
 
 //block
 >ifTrue|mybool||if %1 then;%block;else;%block;end|如果参数1为真，则执行代码段1，否则执行代码段2|block
 >ifEqualNum|mynum,mynum||if %1==%2 then;%block;else;%block;end|如果数1（参数1）与数2（参数2）相等，则执行代码段1，否则执行代码段2|block
->eachPlayer|myplayerlist~|myplayer~|local eachPlayer%%=sgs.PlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
->eachSPlayer|mysplayerlist~|mysplayer~|local eachPlayer%%=sgs.SPlayerList();for _,eachPlayer%%_i in sgs.qlist(%1) do eachPlayer%%:append(eachPlayer%%_i) end;for _,%2 in sgs.qlist(eachPlayer%%) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl,room$
->eachNum|mynumlist~|mynum~|local eachNum%%=sgs.IntList();for _,eachNum%%_i in sgs.qlist(%1) do eachNum%%:append(eachNum%%_i) end;for _,%2 in sgs.qlist(eachNum%%) do;%block;end|对数字列表（参数1）中每一个数字（返回值1）执行代码段1的操作|block,list
+>ifEqualStr|mystr,mystr||if %1==%2 then;%block;else;%block;end|如果字串1（参数1）与字串2（参数2）相等，则执行代码段1，否则执行代码段2|block
+>eachPlayer|myplayerlist~|myplayer~|for _,%2 in ipairs(sgs.QList2Table(%1)) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl
+>eachSPlayer|mysplayerlist~|mysplayer~|for _,%2 in ipairs(sgs.QList2Table(%1)) do;%block;end|对角色列表（参数1）中每一名角色（返回值1）执行代码段1的操作|block,list,pl,room$
+>eachNum|mynumlist~|mynum~|for _,%2 in ipairs(sgs.QList2Table(%1)) do;%block;end|对数字列表（参数1）中每一个数字（返回值1）执行代码段1的操作|block,list
 //>eachCard|mycardlist|mycard|local eachCard%%=sgs.CardList();for _,eachCard%%_i in sgs.qlist(%1) do eachCard%%:append(eachCard%%_i) end;for _,%2 in sgs.qlist(eachCard%%) do;%block;end|对牌列表（参数1）中每一张牌（返回值1）执行代码段1的操作|block,list,cd
 >repeatx|mynum~|mynum~|for %2=1,%1,1 do;%block;end|重复X（参数1）次执行代码段1的操作，计数值（返回值1）从1递增至X|block,list
 
@@ -53,142 +54,155 @@
 >targetPlayer|mynum~|mysplayer|%2=targets[%1]|视为技技能牌角色目标中第X（参数1）名角色（返回值1），X从1开始|pl,targets$,room$
 
 //player property
->getHp|myplayer~|mynum~|<1:>%2=%1:getHp()|角色（参数1）当前体力值（返回值1）|pl
->getLostHp|myplayer~|mynum~|<1:>%2=%1:getLostHp()|角色（参数1）已损失体力值（返回值1）|pl
->getMaxHp|myplayer~|mynum~|<1:>%2=%1:getMaxHp()|角色（参数1）体力上限（返回值1）|pl
->isMale|myplayer~|mybool~|<1:>%2=%1:isMale()|角色（参数1）是否（返回值1）为男性|pl
->isFemale|myplayer~|mybool~|<1:>%2=%1:isFemale()|角色（参数1）是否（返回值1）为女性|pl
->getPhase|myplayer~|mynum~|<1:>%2=%1:getPhase()|角色（参数1）当前阶段（返回值1）|pl
->getHandcardNum|myplayer~|mynum~|<1:>%2=%1:getHandcardNum()|角色（参数1）当前手牌数（返回值1）|pl
->getMaxCards|myplayer~|mynum~|<1:>%2=%1:getMaxCards()|角色（参数1）当前手牌上限（返回值1）|pl
->getKingdom|myplayer~|mystr~|<1:>%2=%1:getKingdom()|角色（参数1）当前势力（返回值1）|pl
->getRole|myplayer~|mystr~|<1:>%2=%1:getRole()|角色（参数1）当前势力（返回值1）|pl
->isChained|myplayer~|mybool~|<1:>%2=%1:isChained()|角色（参数1）是否（返回值1）处于横置状态|pl
-//>getRandomHandCard|myplayer|mycard|<1:>%2=%1:getRandomHandCard()|角色（参数1）一张随机手牌（返回值1）|pl,cd
->getSeat|myplayer~|mynum~|<1:>%2=%1:getSeat()|角色（参数1）座位（返回值1）|pl
->getAttackRange|myplayer~|mynum~|<1:>%2=%1:getAttackRange()|角色（参数1）当前攻击范围值（返回值1）|pl
->inMyAttackRange|myplayer~,myplayer~|mybool~|<1:><2:>%3=%1:inMyAttackRange(%2)|角色（参数2）是否（返回值1）在角色（参数1）攻击范围内|pl
->isKongcheng|myplayer~|mybool~|<1:>%2=%1:isKongcheng()|角色（参数1）是否无手牌？（返回值1）|pl
->isNude|myplayer~|mybool~|<1:>%2=%1:isNude()|角色（参数1）是否无手牌装备？（返回值1）|pl
->isAllNude|myplayer~|mybool~|<1:>%2=%1:isAllNude()|角色（参数1）是否无手牌装备判定？（返回值1）|pl
->isAlive|myplayer~|mybool~|<1:>%2=%1:isAlive()|角色（参数1）是否存活？（返回值1）|pl
->isWounded|myplayer~|mybool~|<1:>%2=%1:isWounded()|角色（参数1）是否受伤（返回值1）|pl
->faceUp|myplayer~|mybool~|<1:>%2=%1:faceUp()|角色（参数1）是否（返回值1）正面向上|pl
->getJudgingArea|myplayer~|mycardlist~|<1:>%2=%1:getJudgingArea()|角色（参数1）当前判定区的牌列表（返回值1）|pl,cd,list
->containsTrick|myplayer~,mystr~|mybool~|<1:>%3=%1:containsTrick(%2)|角色（参数1）判定区是否（返回值1）有指定牌，牌对象名（参数2）|pl
->getEquips|myplayer~|mycardlist~|<1:>%2=%1:getEquips()|角色（参数1）当前装备区的牌列表（返回值1）|pl,cd,list
->hasEquip|myplayer~,mycard~|mybool~|<1:><2:>%3=%1:hasEquip(%2)|角色（参数1）当前装备区是否（返回值1）有牌（参数2）|pl,cd
->theSame|myplayer~,myplayer~|mybool~|<1:><2:>%3=(%1:getSeat()==%2:getSeat())|角色1（参数1）与角色2（参数2）是否为同一名角色（返回值1）|pl
->canSlash|myplayer~,myplayer~,mycard,mybool~|mybool~|<1:><2:>%5=%1:canSlash(%2,%3,not %4)|角色1（参数1）是否（返回值1）杀得到角色2（参数2），是否无视距离（参数4），参数3为指定使用的【杀】，可以不存在|pl
->canSlashWithoutCrossbow|myplayer~|mybool~|<1:>%2=%1:canSlashWithoutCrossbow()|角色（参数1）是否（返回值1）还能使用杀（不考虑连弩）|pl
->isProhibited|myplayer~,myplayer~,mycard~|mybool~|<1:><2:><3:>%4=%1:isProhibited(%2,%3)|角色1（参数1）是否（返回值1）禁止以角色2（参数2）为目标使用牌（参数3）|pl,cd
->isSkipped|mysplayer~,mynum~|mybool~|<1:>%3=%1:isSkipped(%2)|角色（参数1）的阶段（参数2）是否（返回值1）被跳过|pl,room$
->getNext|mysplayer~|mysplayer~|<1:>%2=%1:getNext()|角色（参数1）的下一名角色（返回值1）|pl,room$
->getNextAlive|mysplayer~|mysplayer~|<1:>%2=%1:getNextAlive()|角色（参数1）的下一名存活角色（返回值1）|pl,room$
->isSkillOwner|myplayer~|mybool~|<1:>%2=%1:hasSkill(selfskname)|角色（参数1）是否（返回值1）为技能拥有者|pl
+>getHp|myplayer~|mynum~|%2=%1:getHp()|角色（参数1）当前体力值（返回值1）|pl
+>getLostHp|myplayer~|mynum~|%2=%1:getLostHp()|角色（参数1）已损失体力值（返回值1）|pl
+>getMaxHp|myplayer~|mynum~|%2=%1:getMaxHp()|角色（参数1）体力上限（返回值1）|pl
+>isMale|myplayer~|mybool~|%2=%1:isMale()|角色（参数1）是否（返回值1）为男性|pl
+>isFemale|myplayer~|mybool~|%2=%1:isFemale()|角色（参数1）是否（返回值1）为女性|pl
+>getPhase|myplayer~|mynum~|%2=%1:getPhase()|角色（参数1）当前阶段（返回值1）|pl
+>getHandcardNum|myplayer~|mynum~|%2=%1:getHandcardNum()|角色（参数1）当前手牌数（返回值1）|pl
+>getMaxCards|myplayer~|mynum~|%2=%1:getMaxCards()|角色（参数1）当前手牌上限（返回值1）|pl
+>getKingdom|myplayer~|mystr~|%2=%1:getKingdom()|角色（参数1）当前势力（返回值1）|pl
+>getRole|myplayer~|mystr~|%2=%1:getRole()|角色（参数1）当前势力（返回值1）|pl
+>isChained|myplayer~|mybool~|%2=%1:isChained()|角色（参数1）是否（返回值1）处于横置状态|pl
+//>getRandomHandCard|myplayer|mycard|%2=%1:getRandomHandCard()|角色（参数1）一张随机手牌（返回值1）|pl,cd
+>getSeat|myplayer~|mynum~|%2=%1:getSeat()|角色（参数1）座位（返回值1）|pl
+>getAttackRange|myplayer~|mynum~|%2=%1:getAttackRange()|角色（参数1）当前攻击范围值（返回值1）|pl
+>inMyAttackRange|myplayer~,myplayer~|mybool~|%3=%1:inMyAttackRange(%2)|角色（参数2）是否（返回值1）在角色（参数1）攻击范围内|pl
+>isKongcheng|myplayer~|mybool~|%2=%1:isKongcheng()|角色（参数1）是否无手牌？（返回值1）|pl
+>isNude|myplayer~|mybool~|%2=%1:isNude()|角色（参数1）是否无手牌装备？（返回值1）|pl
+>isAllNude|myplayer~|mybool~|%2=%1:isAllNude()|角色（参数1）是否无手牌装备判定？（返回值1）|pl
+>isAlive|myplayer~|mybool~|%2=%1:isAlive()|角色（参数1）是否存活？（返回值1）|pl
+>isWounded|myplayer~|mybool~|%2=%1:isWounded()|角色（参数1）是否受伤（返回值1）|pl
+>faceUp|myplayer~|mybool~|%2=%1:faceUp()|角色（参数1）是否（返回值1）正面向上|pl
+>getJudgingArea|myplayer~|mycardlist~|%2=%1:getJudgingArea()|角色（参数1）当前判定区的牌列表（返回值1）|pl,cd,list
+>containsTrick|myplayer~,mystr~|mybool~|%3=%1:containsTrick(%2)|角色（参数1）判定区是否（返回值1）有指定牌，牌对象名（参数2）|pl
+>getEquips|myplayer~|mycardlist~|%2=%1:getEquips()|角色（参数1）当前装备区的牌列表（返回值1）|pl,cd,list
+>hasEquip|myplayer~,mycard~|mybool~|%3=%1:hasEquip(%2)|角色（参数1）当前装备区是否（返回值1）有牌（参数2）|pl,cd
+>theSame|myplayer~,myplayer~|mybool~|%3=(%1:objectName()==%2:objectName())|角色1（参数1）与角色2（参数2）是否为同一名角色（返回值1）|pl
+>canSlash|myplayer~,myplayer~,mycard,mybool~|mybool~|%5=%1:canSlash(%2,%3,not %4)|角色1（参数1）是否（返回值1）杀得到角色2（参数2），是否无视距离（参数4），参数3为指定使用的【杀】，可以不存在|pl
+>canSlashWithoutCrossbow|myplayer~|mybool~|%2=%1:canSlashWithoutCrossbow()|角色（参数1）是否（返回值1）还能使用杀（不考虑连弩）|pl
+>isProhibited|myplayer~,myplayer~,mycard~|mybool~|%4=%1:isProhibited(%2,%3)|角色1（参数1）是否（返回值1）禁止以角色2（参数2）为目标使用牌（参数3）|pl,cd
+>isSkipped|mysplayer~,mynum~|mybool~|%3=%1:isSkipped(%2)|角色（参数1）的阶段（参数2）是否（返回值1）被跳过|pl,room$
+>getNext|mysplayer~|mysplayer~|%2=%1:getNext()|角色（参数1）的下一名角色（返回值1）|pl,room$
+>getNextAlive|mysplayer~|mysplayer~|%2=%1:getNextAlive()|角色（参数1）的下一名存活角色（返回值1）|pl,room$
+>isSkillOwner|myplayer~|mybool~|%2=%1:hasSkill(selfskname)|角色（参数1）是否（返回值1）为技能拥有者|pl
 
 //card property
->isNDTrick|mycard~|mybool~|<1:>%2=%1:isNDTrick()|牌（参数1）是否为非延时锦囊？（返回值1）|cd
->isKindOf|mycard~,mystr~|mybool~|<1:>%3=%1:isKindOf(%2)|牌（参数1）是否为（参数2）类型？（返回值1）|cd
-//>isEquipped|mycard~|mybool~|<1:>%2=%1:isEquipped()|牌（参数1）是否在装备区（返回值1）|cd
->isRed|mycard~|mybool~|<1:>%2=%1:isRed()|牌（参数1）是否（返回值1）红色|cd
->isBlack|mycard~|mybool~|<1:>%2=%1:isBlask()|牌（参数1）是否（返回值1）黑色|cd
->sameColorWith|mycard~,mycard~|mybool~|<1:><2:>%3=%1:sameColorWith(%2)|牌1（参数1）与牌2（参数2）是否（返回值1）颜色相同|cd
->getSuit|mycard~|mynum~|<1:>%2=%1:getSuit()|牌（参数1）的花色（返回值1）|cd
->getNumber|mycard~|mynum~|<1:>%2=%1:getNumber()|牌（参数1）的点数（返回值1）|cd
->getCardPlace|mycard~|mynum~|<1:>%2=room:getCardPlace(%1:getEffectiveId())|牌（参数1）的位置（返回值1）|cd,room$
->getEffectiveId|mycard~|mynum~|<1:>%2=%1:getEffectiveId()|牌（参数1）的ID（返回值1），如果为虚拟牌则为第一张子卡ID|cd
->isVirtualCard|mycard~|mybool~|<1:>%2=%1:isVirtualCard()|牌（参数1）是否（返回值1）为虚拟牌|cd
->getSubcards|mycard~|mynumlist~|<1:>%2=%1:getSubcards()|牌（参数1）的子卡ID列表（返回值1）|cd,list
->subcardsLength|mycard~|mynum~|<1:>%2=%1:subcardsLength()|牌（参数1）的子卡数（返回值1）|cd
->getSkillName|mycard~|mystr~|<1:>%2=%1:getSkillName()|牌（参数1）的技能名（返回值1）|cd
->match|mycard~,myplayer~,mystr~|mybool~|<1:><2:>%4=mymatchV0224(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl,V0224$
->match|mycard~,myplayer~,mystr~|mybool~|<1:><2:>%4=mymatch(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl,V0610$
+>isNDTrick|mycard~|mybool~|%2=%1:isNDTrick()|牌（参数1）是否为非延时锦囊？（返回值1）|cd
+>isKindOf|mycard~,mystr~|mybool~|%3=%1:isKindOf(%2)|牌（参数1）是否为（参数2）类型？（返回值1）|cd
+//>isEquipped|mycard~|mybool~|%2=%1:isEquipped()|牌（参数1）是否在装备区（返回值1）|cd
+>isRed|mycard~|mybool~|%2=%1:isRed()|牌（参数1）是否（返回值1）红色|cd
+>isBlack|mycard~|mybool~|%2=%1:isBlask()|牌（参数1）是否（返回值1）黑色|cd
+>sameColorWith|mycard~,mycard~|mybool~|%3=%1:sameColorWith(%2)|牌1（参数1）与牌2（参数2）是否（返回值1）颜色相同|cd
+>getSuit|mycard~|mynum~|%2=%1:getSuit()|牌（参数1）的花色（返回值1）|cd
+>getNumber|mycard~|mynum~|%2=%1:getNumber()|牌（参数1）的点数（返回值1）|cd
+>getCardPlace|mycard~|mynum~|%2=room:getCardPlace(%1:getEffectiveId())|牌（参数1）的位置（返回值1）|cd,room$
+>getEffectiveId|mycard~|mynum~|%2=%1:getEffectiveId()|牌（参数1）的ID（返回值1），如果为虚拟牌则为第一张子卡ID|cd
+>isVirtualCard|mycard~|mybool~|%2=%1:isVirtualCard()|牌（参数1）是否（返回值1）为虚拟牌|cd
+>getSubcards|mycard~|mynumlist~|%2=%1:getSubcards()|牌（参数1）的子卡ID列表（返回值1）|cd,list
+>subcardsLength|mycard~|mynum~|%2=%1:subcardsLength()|牌（参数1）的子卡数（返回值1）|cd
+>getSkillName|mycard~|mystr~|%2=%1:getSkillName()|牌（参数1）的技能名（返回值1）|cd
+>match|mycard~,myplayer~,mystr~|mybool~|%4=mymatchV0224(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl,V0224$
+>match|mycard~,myplayer~,mystr~|mybool~|%4=mymatch(%1,%2,%3)|角色（参数2）的牌（参数1）是否（返回值1）匹配模式（参数3）|cd,pl,V0610$
 
 //action
 >getCurrent||mysplayer~|%1=room:getCurrent()|当前回合角色（返回值1）|pl,room$
->setHp|mysplayer~,mynum~||<1:>room:setPlayerProperty(%1,"hp",sgs.QVariant(%2))|角色（参数1）体力变为X（参数2）|pl,room$
->setMaxHp|mysplayer~,mynum~||<1:>room:setPlayerProperty(%1,"maxhp",sgs.QVariant(%2))|角色（参数1）体力上限变为X（参数2）|pl,room$
->setKingdom|mysplayer~,mystr~||<1:>room:setPlayerProperty(%1,"kingdom",sgs.QVariant(%2))|角色（参数1）势力变为参数2|pl,room$
->setRole|mysplayer~,mystr~||<1:>room:setPlayerProperty(%1,"role",sgs.QVariant(%2))|角色（参数1）身份变为参数2|pl,room$
->setChained|mysplayer~,mybool~||<1:>if %1:isChained()~=%2 then room:setPlayerProperty(%1,"chained",sgs.QVariant(%2)) end|如果角色（参数1）不处于指定状态，将角色横置或重置，参数2为真表示横置，为假表示重置|pl,room$ 
->drawCards|mysplayer~,mynum~||<1:>%1:drawCards(%2)|角色（参数1）摸X（参数2）张牌|pl,room$
->obtainCard|mysplayer~,mycard~,mybool||<1:><2:>%1:obtainCard(%2,%3)|角色（参数1）获得一张牌（参数2），是否明牌（参数3）|pl,cd,room$
->throwCard|mycard~,mysplayer||<1:>room:throwCard(%1,%2)|弃置角色（参数2）的一张牌（参数1）|pl,cd,room$
->throwAllEquips|mysplayer~||<1:>%1:throwAllEquips()|弃置角色（参数1）装备区所有牌|pl,cd,room$
->throwAllHandCards|mysplayer~||<1:>%1:throwAllHandCards()|弃置角色（参数1）所有手牌|pl,cd,room$
->throwAllHandCardsAndEquips|mysplayer~||<1:>%1:throwAllHandCardsAndEquips()|弃置角色（参数1）手牌与装备区所有牌|pl,cd,room$
->throwAllCards|mysplayer~||<1:>%1:throwAllCards()|弃置角色（参数1）区域所有牌|pl,cd,room$
->turnOver|mysplayer~||<1:>%1:turnOver()|角色（参数1）翻面|pl,room$
->loseHp|mysplayer~,mynum~||<1:>room:loseHp(%1,%2)|角色（参数1）失去X（参数2）点体力|pl,room$
->loseMaxHp|mysplayer~,mynum~||<1:>room:loseMaxHp(%1,%2)|角色（参数1）失去X（参数2）点体力上限|pl,room$
->detachSkillFromPlayer|mysplayer~,mystr~||<1:>room:detachSkillFromPlayer(%1,%2)|角色（参数1）失去技能，技能名（参数2）|pl,sk,room$
->acquireSkill|mysplayer~,mystr~||<1:>room:acquireSkill(%1,%2)|角色（参数1）获得技能，技能名（参数2）|pl,sk,room$
->useCard|mycard~,mysplayer~,mysplayerlist~,mybool||<1:><2:>local use%%=sgs.CardUseStruct();use%%.card=%1;use%%.from=%2;for _,use%%_i in sgs.qlist(%3) do use%%.to:append(use%%_i) end;room:useCard(use%%,%4)|令一名角色（参数2）使用一张牌（参数1），使用目标列表（参数3），是否计入使用次数（参数4）|pl,cd,list,room$
->pindian|mysplayer~,mysplayer~,mycard|mybool~|<1:if not %1 then return defaultReturn end;if %1:isKongcheng() then return defaultReturn end;><2:if not %2 then return defaultReturn end;if %2:isKongcheng() then return defaultReturn end;>%4=%1:pindian(%2,selfskname,%3);if %4 then;%block;else;%block;end|令角色1（参数1）与角色2（参数2）拼点，可以限定角色拼点牌为参数3，也可以不存在，返回值1为真表示角色1赢，则代码段1，否则表示角色1没赢，则代码段2|pl,cd,block,room$
->skip|mysplayer~,mynum~||<1:>if not %1:isSkipped(%2) then %1:skip(%2) end|若角色（参数1）的阶段（参数2）还未被跳过，则令角色跳过阶段|pl,room$
->gainAnExtraTurn|mysplayer~||<1:>%1:gainAnExtraTurn()|令角色（参数1）获得一个额外回合|pl,room$
->swapSeat|mysplayer~,mysplayer~||<1:><2:>room:swapSeat(%1,%2)|交换角色1（参数1）与角色2（参数2）的座位|pl,room$
->showCardId|mysplayer~,mynum~,mysplayer||<1:>room:showCard(%1,%2,%3)|令一名角色（参数1）展示一张牌，牌的ID（参数2），参数3为展示对象，如果不存在表示展示给所有人|pl,room$
->showCard|mysplayer~,mycard~,mysplayer||<1:><2:>room:showCard(%1,%2:getEffectiveId(),%3)|令一名角色（参数1）展示一张牌（参数2），参数3为展示对象，如果不存在表示展示给所有人|pl,cd,room$
->showAllCards|mysplayer~,mysplayer||<1:>room:showAllCards(%1,%2)|令一名角色（参数1）展示所有牌，参数2为展示对象，如果不存在表示展示给所有人|pl,room$
+>setHp|mysplayer~,mynum~||room:setPlayerProperty(%1,"hp",sgs.QVariant(%2))|角色（参数1）体力变为X（参数2）|pl,room$
+>setMaxHp|mysplayer~,mynum~||room:setPlayerProperty(%1,"maxhp",sgs.QVariant(%2))|角色（参数1）体力上限变为X（参数2）|pl,room$
+>setKingdom|mysplayer~,mystr~||room:setPlayerProperty(%1,"kingdom",sgs.QVariant(%2))|角色（参数1）势力变为参数2|pl,room$
+>setRole|mysplayer~,mystr~||room:setPlayerProperty(%1,"role",sgs.QVariant(%2))|角色（参数1）身份变为参数2|pl,room$
+>setChained|mysplayer~,mybool~||if %1:isChained()~=%2 then room:setPlayerProperty(%1,"chained",sgs.QVariant(%2)) end|如果角色（参数1）不处于指定状态，将角色横置或重置，参数2为真表示横置，为假表示重置|pl,room$ 
+>drawCards|mysplayer~,mynum~||%1:drawCards(%2)|角色（参数1）摸X（参数2）张牌|pl,room$
+>obtainCard|mysplayer~,mycard~,mybool~||%1:obtainCard(%2,%3)|角色（参数1）获得一张牌（参数2），是否明牌（参数3）|pl,cd,room$
+>throwCard|mycard~,mysplayer||room:throwCard(%1,%2)|弃置角色（参数2）的一张牌（参数1）|pl,cd,room$
+>throwAllEquips|mysplayer~||%1:throwAllEquips()|弃置角色（参数1）装备区所有牌|pl,cd,room$
+>throwAllHandCards|mysplayer~||%1:throwAllHandCards()|弃置角色（参数1）所有手牌|pl,cd,room$
+>throwAllHandCardsAndEquips|mysplayer~||%1:throwAllHandCardsAndEquips()|弃置角色（参数1）手牌与装备区所有牌|pl,cd,room$
+>throwAllCards|mysplayer~||%1:throwAllCards()|弃置角色（参数1）区域所有牌|pl,cd,room$
+>turnOver|mysplayer~||%1:turnOver()|角色（参数1）翻面|pl,room$
+>loseHp|mysplayer~,mynum~||room:loseHp(%1,%2)|角色（参数1）失去X（参数2）点体力|pl,room$
+>loseMaxHp|mysplayer~,mynum~||room:loseMaxHp(%1,%2)|角色（参数1）失去X（参数2）点体力上限|pl,room$
+>detachSkillFromPlayer|mysplayer~,mystr~||room:detachSkillFromPlayer(%1,%2)|角色（参数1）失去技能，技能名（参数2）|pl,sk,room$
+>acquireSkill|mysplayer~,mystr~||room:acquireSkill(%1,%2)|角色（参数1）获得技能，技能名（参数2）|pl,sk,room$
+>useCard|mycard~,mysplayer~,mysplayerlist~,mybool||local use%%=sgs.CardUseStruct();use%%.card=%1;use%%.from=%2;for _,use%%_i in sgs.qlist(%3) do use%%.to:append(use%%_i) end;room:useCard(use%%,%4)|令一名角色（参数2）使用一张牌（参数1），使用目标列表（参数3），是否计入使用次数（参数4）|pl,cd,list,room$
+>pindian|mysplayer~,mysplayer~,mycard|mybool~|if %1:isKongcheng() then return defaultReturn end;if %2:isKongcheng() then return defaultReturn end;%4=%1:pindian(%2,selfskname,%3);if %4 then;%block;else;%block;end|令角色1（参数1）与角色2（参数2）拼点，可以限定角色拼点牌为参数3，也可以不存在，返回值1为真表示角色1赢，则代码段1，否则表示角色1没赢，则代码段2|pl,cd,block,room$
+>skip|mysplayer~,mynum~||if not %1:isSkipped(%2) then %1:skip(%2) end|若角色（参数1）的阶段（参数2）还未被跳过，则令角色跳过阶段|pl,room$
+>gainAnExtraTurn|mysplayer~||%1:gainAnExtraTurn()|令角色（参数1）获得一个额外回合|pl,room$
+>swapSeat|mysplayer~,mysplayer~||room:swapSeat(%1,%2)|交换角色1（参数1）与角色2（参数2）的座位|pl,room$
+>showCardId|mysplayer~,mynum~,mysplayer||room:showCard(%1,%2,%3)|令一名角色（参数1）展示一张牌，牌的ID（参数2），参数3为展示对象，如果不存在表示展示给所有人|pl,room$
+>showCard|mysplayer~,mycard~,mysplayer||room:showCard(%1,%2:getEffectiveId(),%3)|令一名角色（参数1）展示一张牌（参数2），参数3为展示对象，如果不存在表示展示给所有人|pl,cd,room$
+>showAllCards|mysplayer~,mysplayer||room:showAllCards(%1,%2)|令一名角色（参数1）展示所有牌，参数2为展示对象，如果不存在表示展示给所有人|pl,room$
 
 //interaction
->playerFromOthers|mysplayer~|mysplayer~|<1:>%2=room:askForPlayerChosen(%1,room:getOtherPlayers(%1),selfskname)|令一名角色（参数1）选择一名其它存活角色（返回值1）|pl,ask,room$,V0224$
->askForPlayerChosen|mysplayer~,mysplayerlist~|mysplayer|<1:>%3=room:askForPlayerChosen(%1,%2,selfskname);if %3 then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），若成功选择则代码段1（否则给定角色列表为空）|pl,ask,block,room$,V0224$
->askForPlayerChosen|mysplayer~,mysplayerlist~,mybool|mysplayer|<1:>%4=room:askForPlayerChosen(%1,%2,selfskname,nil,%3);if %4 then;%block;elseif %3 and not %2:isEmpty() then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），是否可以取消（参数3），若成功选择则代码段1，若取消则代码段2（否则给定角色列表为空）|pl,ask,block,room$,V0610$
->askForSuit|mysplayer~|mynum~|<1:>%2=room:askForSuit(%1,selfskname)|令一名角色（参数1）选择一种花色（返回值1）|pl,ask,room$
->askForKingdom|mysplayer~|mystr~|<1:>%2=room:askForKingdom(%1)|令一名角色（参数1）选择一个势力（返回值1）|pl,ask,room$
->choice|mysplayer~,mystr~|mynum~|<1:>%3=mychoice(%1,selfskname,string.count(%2,"\|")+1,%%);;mychoicetrans(%%,%2)|令一名角色（参数1）选择一项，各选项翻译以“\|”分隔（参数2）举例“摸两张牌\|回复一点体力”，所选选项序数（返回值1）从1开始|pl,ask,room$
->cardFromH|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isKongcheng() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"h",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）一张手牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->cardFromE|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getEquips():isEmpty() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"e",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）装备区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->cardFromJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getJudgingArea():isEmpty() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"j",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）判定区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->cardFromHE|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isNude() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"he",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->cardFromHEJ|mysplayer~,mysplayer~|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:isAllNude() then return defaultReturn end;>%3=room:askForCardChosen(%1,%2,"hej",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备判定区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
->askForCardChosen|mysplayer~,mysplayer~,mybool,mybool,mybool,mybool|mynum~,mycard~|<1:><2:if not %2 then return defaultReturn end;if %2:getCards(flags4hej(%3,%4,%5)):isEmpty() then return defaultReturn end;>if not (%3 or %4 or %5) then return defaultReturn end;%7=room:askForCardChosen(%1,%2,flags4hej(%3,%4,%5),selfskname,%6);%8=sgs.Sanguosha:getCard(%7)|令一名角色（参数1）选择一名角色（参数2）区域一张牌（返回值2）及其ID（返回值1），是否包括手牌（参数3），手牌是否可见（参数6），是否包括装备区（参数4），是否包括判定区（参数5）|pl,cd,ask,room$,V0610$
->askForDiscard|mysplayer~,mynum~,mybool~,mybool~|mybool~|<1:if not %1 then return defaultReturn end;if not %3 and ((%4 and (%1:getCards("he"):length()<%2)) or (not %4 and (%1:getCards("h"):length()<%2))) then return defaultReturn end;>%5=room:askForDiscard(%1,selfskname,%2,%2,%3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）弃置X（参数2）张牌，是否可选不弃（参数3），是否包括装备（参数4），目标是否弃置（返回值1），若目标弃置则代码段1，否则代码段2|pl,ask,block,room$
->askForExchange|mysplayer~,mynum~,mybool~,mybool~|mycard|<1:>%5=room:askForExchange(%1,selfskname,%2,%3,selfskname,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）选择X（参数2）张牌，返回值1为以这些牌为子卡的虚拟牌，是否包括装备（参数3），是否可选取消（参数4），如果选择了则代码段1否则代码段2，主要用于将这些牌交给某人的交换操作|pl,ask,block,room$
->askForCard|mysplayer~,mystr~,mynum~,mybool~,mysplayer|mycard|<1:>local askcm%%=%3;if %4 then askcm%%=sgs.Card_MethodResponse;%6=room:askForCard(%1,%2,selfskname,data,askcm%%,%5,%4);if %6 then;%block;else;%block;end|令一名角色（参数1）打出牌（返回值1），模式（参数2），处理类别（参数3），是否改判（参数4），打出目标（参数5）可以不存在，如果打出则代码段1，否则代码段2|pl,cd,ask,block,room$
->askForUseCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$,V0224$
->askForUseCard|mysplayer~,mystr~,mybool|mybool~|<1:>%4=room:askForUseCard(%1,%2,selfskname,-1,sgs.Card_MethodUse,%3);if %4 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否计入使用次数（参数3），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$,V0610$
->askForUseSkillCard|mysplayer~,mystr~|mybool~|<1:>%3=room:askForUseCard(%1,"@"..%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用技能牌，视为技名（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$
->askForUseSlashToPlayer|mysplayer~,mysplayer~,mybool~,mybool~|mybool~|<1:><2:>%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对另一名角色（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
->askForUseSlashToPlayers|mysplayer~,mysplayerlist~,mybool~,mybool~|mybool~|<1:>%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对给定角色列表（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
->cardFromList|mysplayer~,mynumlist~,mybool|mycard|<1:>room:fillAG(%2,%1);local cardFromList%%=room:askForAG(%1,%2,%3,selfskname);%1:invoke("clearAG");if cardFromList%%>=0 then;%4=sgs.Sanguosha:getCard(cardFromList%%);%block;end|令一名角色（参数1）通过五谷选择框从牌列表中选择一张牌（返回值1），牌ID列表（参数2），是否可以不选（参数3），若成功选择则代码段1|pl,cd,ask,block,room$
->askForGuanxing|mysplayer~,mynumlist~,mybool||<1:>room:askForGuanxing(%1,%2,%3)|令角色（参数1）将牌以任意顺序置于牌堆顶和底，牌的ID列表（参数2），若参数3为真，则只置于顶|pl,cd,ask,room$
->guanxingx|mysplayer~,mynum~,mybool||<1:>room:askForGuanxing(%1,room:getNCards(%2,false),false)|令角色（参数1）将牌堆顶X（参数2）张牌以任意顺序置于牌堆顶和底，若参数3为真，则只置于顶|pl,ask,room$
+>playerFromOthers|mysplayer~|mysplayer~|%2=room:askForPlayerChosen(%1,room:getOtherPlayers(%1),selfskname)|令一名角色（参数1）选择一名其它存活角色（返回值1）|pl,ask,room$,V0224$
+>askForPlayerChosen|mysplayer~,mysplayerlist~|mysplayer|%3=room:askForPlayerChosen(%1,%2,selfskname);if %3 then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），若成功选择则代码段1（否则给定角色列表为空）|pl,ask,block,room$,V0224$
+>askForPlayerChosen|mysplayer~,mysplayerlist~,mybool|mysplayer|%4=room:askForPlayerChosen(%1,%2,selfskname,nil,%3);if %4 then;%block;elseif %3 and not %2:isEmpty() then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），是否可以取消（参数3），若成功选择则代码段1，若取消则代码段2（否则给定角色列表为空）|pl,ask,block,room$,V0610$
+>askForSuit|mysplayer~|mynum~|%2=room:askForSuit(%1,selfskname)|令一名角色（参数1）选择一种花色（返回值1）|pl,ask,room$
+>askForKingdom|mysplayer~|mystr~|%2=room:askForKingdom(%1)|令一名角色（参数1）选择一个势力（返回值1）|pl,ask,room$
+>choice|mysplayer~,mystr~|mynum~|%3=mychoice(%1,selfskname,string.count(%2,"\|")+1,%%);;mychoicetrans(%%,%2)|令一名角色（参数1）选择一项，各选项翻译以“\|”分隔（参数2）举例“摸两张牌\|回复一点体力”，所选选项序数（返回值1）从1开始|pl,ask,room$
+>cardFromH|mysplayer~,mysplayer~|mynum~,mycard~|if %2:isKongcheng() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"h",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）一张手牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromE|mysplayer~,mysplayer~|mynum~,mycard~|if %2:getEquips():isEmpty() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"e",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）装备区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromJ|mysplayer~,mysplayer~|mynum~,mycard~|if %2:getJudgingArea():isEmpty() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"j",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）判定区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromHE|mysplayer~,mysplayer~|mynum~,mycard~|if %2:isNude() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"he",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>cardFromHEJ|mysplayer~,mysplayer~|mynum~,mycard~|if %2:isAllNude() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"hej",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）手牌装备判定区里一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
+>askForCardChosen|mysplayer~,mysplayer~,mybool,mybool,mybool,mybool|mynum~,mycard~|if not (%3 or %4 or %5) then return defaultReturn end;if %2:getCards(flags4hej(%3,%4,%5)):isEmpty() then return defaultReturn end;%7=room:askForCardChosen(%1,%2,flags4hej(%3,%4,%5),selfskname,%6);%8=sgs.Sanguosha:getCard(%7)|令一名角色（参数1）选择一名角色（参数2）区域一张牌（返回值2）及其ID（返回值1），是否包括手牌（参数3），手牌是否可见（参数6），是否包括装备区（参数4），是否包括判定区（参数5）|pl,cd,ask,room$,V0610$
+>askForDiscard|mysplayer~,mynum~,mybool~,mybool~|mybool~|if not %3 and (%1:getCards(flags4hej(true,%4,false)):length()<%2) then return defaultReturn end;%5=room:askForDiscard(%1,selfskname,%2,%2,%3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）弃置X（参数2）张牌，是否可选不弃（参数3），是否包括装备（参数4），目标是否弃置（返回值1），若目标弃置则代码段1，否则代码段2|pl,ask,block,room$
+>askForExchange|mysplayer~,mynum~,mybool~,mybool~|mycard|if not %3 and (%1:getCards(flags4hej(true,%4,false)):length()<%2) then return defaultReturn end;%5=room:askForExchange(%1,selfskname,%2,%3,selfskname,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）选择X（参数2）张牌，返回值1为以这些牌为子卡的虚拟牌，是否包括装备（参数3），是否可选取消（参数4），如果选择了则代码段1否则代码段2，主要用于将这些牌交给某人的交换操作|pl,ask,block,room$
+>askForCard|mysplayer~,mystr~,mynum~,mybool~,mysplayer|mycard|local askcm%%=%3;if %4 then askcm%%=sgs.Card_MethodResponse;%6=room:askForCard(%1,%2,selfskname,data,askcm%%,%5,%4);if %6 then;%block;else;%block;end|令一名角色（参数1）打出牌（返回值1），模式（参数2），处理类别（参数3），是否改判（参数4），打出目标（参数5）可以不存在，如果打出则代码段1，否则代码段2|pl,cd,ask,block,room$
+>askForUseCard|mysplayer~,mystr~|mybool~|%3=room:askForUseCard(%1,%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$,V0224$
+>askForUseCard|mysplayer~,mystr~,mybool|mybool~|%4=room:askForUseCard(%1,%2,selfskname,-1,sgs.Card_MethodUse,%3);if %4 then;%block;else;%block;end|令一名角色（参数1）使用牌，模式（参数2），是否计入使用次数（参数3），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$,V0610$
+>askForUseSkillCard|mysplayer~,mystr~|mybool~|%3=room:askForUseCard(%1,"@"..%2,selfskname);if %3 then;%block;else;%block;end|令一名角色（参数1）使用技能牌，视为技名（参数2），是否使用（返回值1），如果使用则代码段1，否则代码段2|pl,ask,block,room$
+>askForUseSlashToPlayer|mysplayer~,mysplayer~,mybool~,mybool~|mybool~|%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对另一名角色（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
+>askForUseSlashToPlayers|mysplayer~,mysplayerlist~,mybool~,mybool~|mybool~|%5=room:askForUseSlashTo(%1,%2,selfskname,not %3,%4);if %5 then;%block;else;%block;end|令一名角色（参数1）对给定角色列表（参数2）使用一张【杀】，是否无视距离（参数3），是否禁止多目标（参数4），如果使用【杀】则代码段1，否则代码段2|pl,ask,block,room$
+>cardFromList|mysplayer~,mynumlist~,mybool|mycard|room:fillAG(%2,%1);local cardFromList%%=room:askForAG(%1,%2,%3,selfskname);%1:invoke("clearAG");if cardFromList%%>=0 then;%4=sgs.Sanguosha:getCard(cardFromList%%);%block;end|令一名角色（参数1）通过五谷选择框从牌列表中选择一张牌（返回值1），牌ID列表（参数2），是否可以不选（参数3），若成功选择则代码段1|pl,cd,ask,block,room$
+>askForGuanxing|mysplayer~,mynumlist~,mybool||room:askForGuanxing(%1,%2,%3)|令角色（参数1）将牌以任意顺序置于牌堆顶和底，牌的ID列表（参数2），若参数3为真，则只置于顶|pl,cd,ask,room$
+>guanxingx|mysplayer~,mynum~,mybool||room:askForGuanxing(%1,room:getNCards(%2,false),false)|令角色（参数1）将牌堆顶X（参数2）张牌以任意顺序置于牌堆顶和底，若参数3为真，则只置于顶|pl,ask,room$
 
 //
->cloneCard|mystr~|mycard|%2=sgs.Sanguosha:cloneCard(%1,sgs.NoSuit,0)|获得一张虚拟牌（返回值1），无花色无点数，牌的对象名（参数1），比如【离间】的决斗|cd
->judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=myjudgestructV0224(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2，注意：目前判定模式仅支持花色和数字|pl,cd,block,room$,V0224$
->judge|mystr~,mysplayer~,mybool|mybool~,mycard~|<2:>local judge%%=myjudgestruct(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2|pl,cd,block,room$,V0610$
->damage|mysplayer,mysplayer~,mycard,mynum,mynum||<2:>local damage%%=sgs.DamageStruct();damage%%.from=%1;damage%%.to=%2;damage%%.card=%3;damage%%.damage=%4;damage%%.nature=%5;room:damage(damage%%)|对一名角色（参数2）造成X（参数4）点伤害，伤害来源（参数1），造成伤害的牌（参数3），伤害属性（参数5）|pl,cd,room$
->recover|mysplayer~,mynum~,mycard,mysplayer~||<1:><4:>local rcv%%=sgs.RecoverStruct();rcv%%.recover=%2;rcv%%.card=%3;rcv%%.who=%4;room:recover(%1,rcv%%,true)|令一名角色（参数1）回复X（参数2）点体力，回复牌（参数3）可以不存在，回复来源（参数4）|pl,cd,room$
->moveCardTo|mycard~,mysplayer,mynum~,mybool~||<1:>room:moveCardTo(%1,%2,%3,%4)|将牌（参数1）移动至位置（参数3），如果位置不为手牌装备判定区，则目标角色（参数2）不存在，是否明牌（参数4）|pl,cd,room$
+>cloneCard|mystr~|mycard|%2=sgs.Sanguosha:cloneCard(%1,sgs.Card_NoSuit,0)|获得一张虚拟牌（返回值1），无花色无点数，牌的对象名（参数1），比如【离间】的决斗|cd
+>judge|mystr~,mysplayer~,mybool|mybool~,mycard~|local judge%%=myjudgestructV0224(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2，注意：目前判定模式仅支持花色和数字|pl,cd,block,room$,V0224$
+>judge|mystr~,mysplayer~,mybool|mybool~,mycard~|local judge%%=myjudgestruct(%1,%2,selfskname,%3);room:judge(judge%%);%4=judge%%:isGood();%5=judge%%.card;if judge%%:isGood() then;%block;else;%block;end|进行一次判定，判定模式（参数1），判定角色（参数2），判定生效对判定者是否有利（参数3），判定是否生效（返回值1），判定牌（返回值2），判定结果有利则代码段1，不利则代码段2|pl,cd,block,room$,V0610$
+>damage|mysplayer,mysplayer~,mycard,mynum,mynum||local damage%%=sgs.DamageStruct();damage%%.from=%1;damage%%.to=%2;damage%%.card=%3;damage%%.damage=%4;damage%%.nature=%5;room:damage(damage%%)|对一名角色（参数2）造成X（参数4）点伤害，伤害来源（参数1），造成伤害的牌（参数3），伤害属性（参数5）|pl,cd,room$
+>recover|mysplayer~,mynum~,mycard,mysplayer~||local rcv%%=sgs.RecoverStruct();rcv%%.recover=%2;rcv%%.card=%3;rcv%%.who=%4;room:recover(%1,rcv%%,true)|令一名角色（参数1）回复X（参数2）点体力，回复牌（参数3）可以不存在，回复来源（参数4）|pl,cd,room$
+>moveCardTo|mycard~,mysplayer,mynum~,mybool~||room:moveCardTo(%1,%2,%3,%4)|将牌（参数1）移动至位置（参数3），如果位置不为手牌装备判定区，则目标角色（参数2）不存在，是否明牌（参数4）|pl,cd,room$
 >slashResult|mycard||room:slashResult(effect,%1)|结算【杀】的使用，抵消的【闪】（参数1）可以不存在，于SlashProceed时机针对强命系修改【闪】，比如【铁骑】为不存在，【无双】为虚拟【闪】|pl,cd,room$,SlashProceed$
->retrial|mycard~,mysplayer~,mybool~||<1:><2:>room:retrial(%1,%2,judge,selfskname,%3)|改判，新判定牌（参数1），改判者（参数2），如果参数3为真表示替换判定牌，否则为代替判定牌，用于AskForRetrial时机|pl,cd,room$,AskForRetrial$
->filterCards|mysplayer~||<1:>room:filterCards(%1,%1:getCards("he"),true)|更新角色（参数1）的锁定视为效果，适用于动态获得锁定视为技后|pl,room$
->setFixedDistance|myplayer~,myplayer~,mynum~||<1:><2:>room:setFixedDistance(%1,%2,%3)|令角色1（参数1）到角色2（参数2）的距离锁定为X（参数3），如果X为-1则表示恢复默认距离|pl,room$
+>retrial|mycard~,mysplayer~,mybool~||room:retrial(%1,%2,judge,selfskname,%3)|改判，新判定牌（参数1），改判者（参数2），如果参数3为真表示替换判定牌，否则为代替判定牌，用于AskForRetrial时机|pl,cd,room$,AskForRetrial$
+>filterCards|mysplayer~||room:filterCards(%1,%1:getCards("he"),true)|更新角色（参数1）的锁定视为效果，适用于动态获得锁定视为技后|pl,room$
+>setFixedDistance|myplayer~,myplayer~,mynum~||room:setFixedDistance(%1,%2,%3)|令角色1（参数1）到角色2（参数2）的距离锁定为X（参数3），如果X为-1则表示恢复默认距离|pl,room$
+>setDrawNum|mynum~||data:setValue(%1)|令角色摸牌数为数1（参数1），用于DrawNCards时机|DrawNCards$
+>setDamage|mysplayer,mysplayer~,mycard,mynum,mynum||local damage%%=sgs.DamageStruct();damage%%.from=%1;damage%%.to=%2;damage%%.card=%3;damage%%.damage=%4;damage%%.nature=%5;data:setValue(damage%%)|令将造成的伤害为对一名角色（参数2）造成X（参数4）点伤害，伤害来源（参数1），造成伤害的牌（参数3），伤害属性（参数5），用于Predamage时机|Predamage$
+>setRecover|mysplayer~,mynum~,mycard,mysplayer~||local rcv%%=sgs.RecoverStruct();rcv%%.recover=%2;rcv%%.card=%3;rcv%%.who=%4;data:setValue(rcv%%)|令将造成的回复为一名角色（参数1）回复X（参数2）点体力，回复牌（参数3）可以不存在，回复来源（参数4），用于PreHpRecover时机|PreHpRecover$
+>setLostNum|mynum~||data:setValue(%1)|令损失体力数为数1（参数1），用于PreHpLost时机|PreHpLost$
+>setPindian|mysplayer~,mysplayer~,mycard~,mycard~,mynum~,mynum~,mystr~||local pd%%=sgs.PindianStruct();pd%%.from=%1;pd%%.to=%2;pd%%.from_card=%3;pd%%.to_card=%4;pd%%.from_number=%5;pd%%.to_number=%6;pd%%.reason=%7;data:setValue(pd%%)|修改拼点结算，拼点发起者（参数1），被拼点者（参数2），拼点发起者的拼点牌（参数3），被拼点者的拼点牌（参数4），拼点发起者的点数（参数5），被拼点者的点数（参数6），拼点原因（参数7）通常是拼点技能名，用于PindianVerifying时机|PindianVerifying$
 
 //temp data
->flagOn|mysplayer~|mystrc$~|<1:>room:setPlayerFlag(%1,%2)|为角色（参数1）添加flag（返回值1）直至回合结束|pl,data,room$
->flagOff|mysplayer~,mystr~||<1:>room:setPlayerFlag(%1,"-"..%2)|为角色（参数1）除去flag（参数2）|pl,data,room$
->hasFlag|myplayer~,mystr~|mybool~|<1:>%3=%1:hasFlag(%2)|角色（参数1）是否（返回值1）具有flag（参数2）|pl,data
->wakeMark|mysplayer~||<1:>if %1:getMark("@waked")==0 then %1:gainMark("@waked") end|令角色（参数1）获得觉醒标记|pl,data,room$
->markOn|mysplayer~,mynum~,mybool~|mystrc$~|<1:>local mark%%="";if %3 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%4,%2)|角色（参数1）标记（返回值1）初始化为X（参数2），标记是否可见（参数3）|pl,data,room$
->getMark|myplayer~,mystr~,mybool~|mynum~|<1:>local mark%%="";if %3 then mark%%="@" end;%4=%1:getMark(mark%%..%2)|角色（参数1）当前标记（参数2）数（返回值1），标记是否可见（参数3）|pl,data
->setMark|mysplayer~,mystr~,mynum~,mybool~||<1:>local mark%%="";if %4 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%2,%3)|设置角色（参数1）标记（参数2）数为X（参数3），标记是否可见（参数4）|pl,data,room$
->addMark|mysplayer~,mystr~,mynum~,mybool~||<1:>local mark%%="";if %4 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%2,%1:getMark(mark%%..%2)+%3)|角色（参数1）标记（参数2）增加X（参数3），标记是否可见（参数4）|pl,data,room$
->pileOn|mysplayer~|mystrc$~|<1:>%1:removePileByName(%2)|角色（参数1）特殊牌堆初始化，特殊牌堆名（返回值1）|pl,data,room$
->addToPile|mysplayer~,mystr~,mycard~,mybool~||<1:><3:>%1:addToPile(%2,%3,%4)|角色（参数1）特殊牌堆添加牌（参数3），特殊牌堆名（参数2），是否可见（参数4）|pl,data,room$
->getPile|myplayer~,mystr~|mynumlist|<1:>%3=%1:getPile(%2)|角色（参数1）特殊牌堆ID列表（返回值1），特殊牌堆名（参数2）|pl,data
->removePile|mysplayer~,mystr~||<1:>%1:removePileByName(%2)|角色（参数1）清空特殊牌堆，特殊牌堆名（参数2）|pl,data,room$
+>flagOn|mysplayer~|mystrc$~|room:setPlayerFlag(%1,%2)|为角色（参数1）添加flag（返回值1）直至回合结束|pl,data,room$
+>flagOff|mysplayer~,mystr~||room:setPlayerFlag(%1,"-"..%2)|为角色（参数1）除去flag（参数2）|pl,data,room$
+>hasFlag|myplayer~,mystr~|mybool~|%3=%1:hasFlag(%2)|角色（参数1）是否（返回值1）具有flag（参数2）|pl,data
+>wakeMark|mysplayer~||if %1:getMark("@waked")==0 then %1:gainMark("@waked") end|令角色（参数1）获得觉醒标记|pl,data,room$
+>markOn|mysplayer~,mynum~,mybool~|mystrc$~|local mark%%="";if %3 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%4,%2)|角色（参数1）标记（返回值1）初始化为X（参数2），标记是否可见（参数3）|pl,data,room$
+>getMark|myplayer~,mystr~,mybool~|mynum~|local mark%%="";if %3 then mark%%="@" end;%4=%1:getMark(mark%%..%2)|角色（参数1）当前标记（参数2）数（返回值1），标记是否可见（参数3）|pl,data
+>setMark|mysplayer~,mystr~,mynum~,mybool~||local mark%%="";if %4 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%2,%3)|设置角色（参数1）标记（参数2）数为X（参数3），标记是否可见（参数4）|pl,data,room$
+>addMark|mysplayer~,mystr~,mynum~,mybool~||local mark%%="";if %4 then mark%%="@" end;room:setPlayerMark(%1,mark%%..%2,%1:getMark(mark%%..%2)+%3)|角色（参数1）标记（参数2）增加X（参数3），标记是否可见（参数4）|pl,data,room$
+>pileOn|mysplayer~|mystrc$~|%1:removePileByName(%2)|角色（参数1）特殊牌堆初始化，特殊牌堆名（返回值1）|pl,data,room$
+>addToPile|mysplayer~,mystr~,mycard~,mybool~||%1:addToPile(%2,%3,%4)|角色（参数1）特殊牌堆添加牌（参数3），特殊牌堆名（参数2），是否可见（参数4）|pl,data,room$
+>getPile|myplayer~,mystr~|mynumlist|%3=%1:getPile(%2)|角色（参数1）特殊牌堆ID列表（返回值1），特殊牌堆名（参数2）|pl,data
+>removePile|mysplayer~,mystr~||%1:removePileByName(%2)|角色（参数1）清空特殊牌堆，特殊牌堆名（参数2）|pl,data,room$
 
 //calculation
 >max2|mynum~,mynum~|mynum~|%3=math.max(%1,%2)|数1（参数1）和数2（参数2）的较大值（返回值1）|cal
 >min2|mynum~,mynum~|mynum~|%3=math.min(%1,%2)|数1（参数1）和数2（参数2）的较小值（返回值1）|cal
->selfAdd|mynum~,mynum~||%1=%1+%2|令数1（参数1）增加数2（参数2）|cal
->selfMinus|mynum~,mynum~||%1=%1-%2|令数1（参数1）减少数2（参数2）|cal
+//>selfAdd|mynum~,mynum~||%1=%1+%2|令数1（参数1）增加数2（参数2）|cal
+//>selfMinus|mynum~,mynum~||%1=%1-%2|令数1（参数1）减少数2（参数2）|cal
+>abs|mynum~|mynum~|%2=math.abs(%1)|数1（参数1）的绝对值（返回值1）|cal
+>plus2|mynum~,mynum~|mynum~|%3=%1+%2|数1（参数1）加数2（参数2），结果（返回值1）|cal
+>minus2|mynum~,mynum~|mynum~|%3=%1-%2|数1（参数1）减数2（参数2），结果（返回值1）|cal
+>multiply2|mynum~,mynum~|mynum~|%3=%1*%2|数1（参数1）乘数2（参数2），结果（返回值1）|cal
+>divide2|mynum~,mynum~|mynum~|%3=%1/%2|数1（参数1）除以数2（参数2），结果（返回值1）|cal
+>power2|mynum~,mynum~|mynum~|%3=math.pow(%1,%2)|数1（参数1）的数2（参数2）次幂，结果（返回值1）|cal
+>divideint2|mynum~,mynum~|mynum~,mynum~|%3,%4=math.modf(%1/%2),math.fmod(%1,%2)|整数除法，数1（参数1）除以数2（参数2），结果（返回值1），余数（返回值2）|cal
+>not|mybool|mybool|%2=(not %1)|布尔值1（参数1）取反（返回值1）|cal
 >and2|mybool,mybool|mybool|%3=(%1 and %2)|布尔值1（参数1）与布尔值2（参数2），结果（返回值1）|cal
 >or2|mybool,mybool|mybool|%3=(%1 or %2)|布尔值1（参数1）或布尔值2（参数2），结果（返回值1）|cal
 >moreThan|mynum~,mynum~|mybool~|%3=(%1>%2)|数1（参数1）是否（返回值1）大于数2（参数2）|cal
@@ -198,9 +212,9 @@
 
 //list
 >listlength|mylist~|mynum~|%2=%1:length()|列表（参数1）长度（返回值1）|list
->splayerlistappend|mysplayerlist~,mysplayer~||<2:>%1:append(%2)|角色列表（参数1）末尾添加角色（参数2）|pl,list,room$
+>splayerlistappend|mysplayerlist~,mysplayer~||%1:append(%2)|角色列表（参数1）末尾添加角色（参数2）|pl,list,room$
 >numlistcontains|mynumlist~,mynum~|mybool~|%3=%1:contains(%2)|数字列表（参数1）是否（返回值1）包含数字（参数2）|list
->getOtherPlayers|mysplayer~,mybool~|mysplayerlist~|<1:>%3=room:getOtherPlayers(%1,%2)|除角色（参数1）外，其余角色列表（返回值1），是否包括死亡角色（参数2）|pl,list,room$
+>getOtherPlayers|mysplayer~,mybool~|mysplayerlist~|%3=room:getOtherPlayers(%1,%2)|除角色（参数1）外，其余角色列表（返回值1），是否包括死亡角色（参数2）|pl,list,room$
 >getAllPlayers|mybool~|mysplayerlist~|%2=room:getAllPlayers(%1)|所有角色列表（返回值1），是否包含死亡角色（参数1）|pl,list,room$
 //>getAlivePlayers||mysplayerlist~|%1=room:getAlivePlayers()|存活角色列表（返回值1）|pl,list,room$
 >getDiscardPile||mynumlist~|%1=room:getDiscardPile()|弃牌堆ID列表（返回值1）|cd,list,room$
@@ -210,4 +224,4 @@
 //>numlistx|mynum|mynumlist|%2=sgs.IntList();for var%%=1,%1,1 do %2:append(var%%) end|数字1至X（参数1）列表（返回值1）|
 
 //debug
->playerSpeak|mysplayer~||<1:>%1:speak(selfskname..","..%1:objectName()..","..%1:getSeat())|令角色（参数1）说出技能名角色名和座位，可用于调试程序是否执行|pl,debug,room$
+>playerSpeak|mysplayer~||%1:speak(selfskname..","..%1:objectName()..","..%1:getSeat())|令角色（参数1）说出技能名角色名和座位，可用于调试程序是否执行|pl,debug,room$

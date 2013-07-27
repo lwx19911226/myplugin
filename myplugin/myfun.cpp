@@ -58,7 +58,8 @@ void myfun::myini(){
     fin.close();
 }
 QString myfun::extract_str(QString getstr, int gettype){
-    return getstr.replace("\\|","\\\\").split("|").replaceInStrings("\\\\","|").at(gettype);
+    return mycode::mysplit(getstr,"|").at(gettype);
+    //return getstr.replace("\\|","\\\\").split("|").replaceInStrings("\\\\","|").at(gettype);
 }
 QStringList myfun::name2strlist(QString getname){
     return myfunlist.filter(QRegExp("^"+getname+"\\|"));
@@ -85,6 +86,19 @@ QStringList myfun::outtypestrlist(QString getname,int getqsv){
     }
     return QStringList();
 }
+QStringList myfun::inouttypestrlist(QString getname, int getqsv){
+    myini();
+    QString tstr=name2str(getname,getqsv);
+    QStringList rlist;
+    if(!tstr.isEmpty()){
+        QStringList tstrlist=tstr.split("|");
+        QString tstr1=tstrlist.at(In_Type);
+        QString tstr2=tstrlist.at(Out_Type);
+        if(!tstr1.isEmpty()){rlist<<tstr1.split(",");}
+        if(!tstr2.isEmpty()){rlist<<tstr2.split(",");}
+    }
+    return rlist;
+}
 
 int myfun::name2blockcnt(QString getname, int getqsv){
     myini();
@@ -94,10 +108,10 @@ int myfun::name2blockcnt(QString getname, int getqsv){
 }
 bool myfun::notnil(QString getname,int getqsv,int geti){
     myini();
-    QStringList strlist;
-    strlist<<myfun::intypestrlist(getname,getqsv)<<myfun::outtypestrlist(getname,getqsv);
+    //QStringList strlist;
+    //strlist<<myfun::intypestrlist(getname,getqsv)<<myfun::outtypestrlist(getname,getqsv);
     //return myfun::getTrans(getstr).contains("<"+QString::number(geti+1)+":");
-    return myobj::gettypesuffix(strlist.at(geti)).contains("~");
+    return myobj::gettypesuffix(inouttypestrlist(getname,getqsv).at(geti)).contains("~");
 }
 
 QString myfun::name2trans(QString getname,int getqsv){

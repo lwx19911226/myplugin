@@ -211,7 +211,7 @@ void mysk::propertystr_set(QStringList getstrlist, bool front){
 }
 */
 bool mysk::propertystr_dvd(QString getstr,QString &getabb,QStringList &frlist, QStringList &midlist, QStringList &bklist){
-    QStringList strlist=mycode::mysplit(getstr,true);
+    QStringList strlist=mycode::mysplit(getstr,"|",true);
     getabb=strlist.takeFirst();
     int i1,i2;
     for(i2=strlist.length()-1;i2>=0;i2--){
@@ -327,7 +327,8 @@ void mysk::addusdobjlist(QList<myobj *> &list){
 */
 void mysk::addFunction(QString geteventstr, QString getblockstr,
                        QString getfunstr, QList<myobj *> &getobjlist,
-                       QStringList &getrtrmlist, QStringList &getblrmlist,bool b4redo){
+                       QStringList &getrtrmlist, QStringList &getblrmlist,
+                       bool b4redo, QString dotag){
     myfunction *pfunc=new myfunction(this);
     pfunc->funname=getfunstr;
     pfunc->objlist<<getobjlist;
@@ -338,6 +339,7 @@ void mysk::addFunction(QString geteventstr, QString getblockstr,
 
     mydo *pdo=new mydo(this);
     pdo->psktgt=this;
+    pdo->tagstr=dotag;
     pdo->objlist<<pfunc->rtobjlist;
     pdo->blocklist.append(pfunc);
     getsys()->dolist<<pdo;
@@ -418,39 +420,46 @@ QStringList mysk::trans4design(){
     return strlist;
 }
 */
-void mysk::dotrans(QString getstr){
-    qWarning()<<"dotrans"<<name<<getstr;
+void mysk::dotrans(QString getstr, QString dotag){
+    qWarning()<<"dotrans"<<name<<getstr<<dotag;
     //QString tstr=getstr;
     //tstr.replace("\\|","\\\\");
     //QStringList strlist=tstr.split("|");
     //strlist.replaceInStrings("\\\\","|");
-    QStringList strlist=mycode::mysplit(getstr);
+    QStringList strlist=mycode::mysplit(getstr,"|");
     QString geteventstr=strlist.first();
-    QString getblockstr;
+    QString getblockstr,tstr;
+    int index=-1;
+    mydo *tdo=NULL;
     if(eventstrlist().contains(strlist.at(1))){getblockstr=strlist.at(1);}
     else{
-        int index1=strlist.at(1).split("->").first().toInt();
-        int index2=strlist.at(1).split("->").last().toInt();
-        getblockstr=getsys()->dolist.at(index1)->getBlockName(index2);
+        tstr=strlist.at(1);
+        index=tstr.indexOf("->");
+        if(index==-1){qWarning()<<"dotrans0727"<<getstr;}
+        tdo=getsys()->findDoByTag(tstr.mid(0,index));
+        if(!tdo){qWarning()<<"dotrans0727"<<getstr;}
+        int index2=tstr.mid(index+2).toInt();
+        getblockstr=tdo->getBlockName(index2);
     }
     QString getfunstr=strlist.at(2);
     QList<myobj *> getobjlist;
-    QStringList tstrlist;
-    tstrlist.clear();
-    tstrlist=strlist.at(3).split(",");
-    if(strlist.at(3)==""){tstrlist.clear();}
-    for(int i=0;i<tstrlist.length();i++){
-        myobj *pobj=NULL;
-        if(tstrlist.at(i).contains("->")){
-            int index1=tstrlist.at(i).split("->").first().toInt();
-            int index2=tstrlist.at(i).split("->").last().toInt();
-            pobj=getsys()->dolist.at(index1)->getObj(index2);
+    QStringList tstrlist=mycode::mysplit(strlist.at(3),",");
+    myobj *pobj=NULL;
+    if(strlist.at(3).isEmpty()){tstrlist.clear();}
+    for(int i=0;i<tstrlist.length();i++){        
+        tstr=tstrlist.at(i);
+        if(tstr.contains("->")){
+            index=tstr.indexOf("->");
+            tdo=getsys()->findDoByTag(tstr.mid(0,index));
+            if(!tdo){qWarning()<<"dotrans0727"<<getstr;}
+            int index2=tstr.mid(index+2).toInt();
+            pobj=tdo->getObj(index2);
         }
         else{
-            pobj=findObjByName(tstrlist.at(i),geteventstr);
+            pobj=findObjByName(tstr,geteventstr);
             if(!pobj){
                 pobj=new myobj(getsys());
-                pobj->name=tstrlist.at(i);
+                pobj->name=tstr;
                 int gettype=myobj::str2type(myfun::intypestrlist(getfunstr,getsys()->qsv).at(i));
                 if(!myobj::b4input(gettype)){qWarning()<<"dotrans_b4input"<<gettype;}
                 pobj->type=gettype;
@@ -465,7 +474,7 @@ void mysk::dotrans(QString getstr){
     getrtrmlist<<strlist.at(4).split(",");
     QStringList getblrmlist;
     if(strlist.length()>=6){getblrmlist<<strlist.at(5).split(",");}
-    addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist,true);
+    addFunction(geteventstr,getblockstr,getfunstr,getobjlist,getrtrmlist,getblrmlist,true,dotag);
 }
 mysys *mysk::getsys(){
     return static_cast<mysys *>(parent());

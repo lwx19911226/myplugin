@@ -32,6 +32,7 @@ public:
     static QStringList intypestrlist(QString getname,int getqsv);
     //static QString need(QString,int);
     static QStringList outtypestrlist(QString getname,int getqsv);
+    static QStringList inouttypestrlist(QString getname,int getqsv);
     static int name2blockcnt(QString getname,int getqsv);
     static bool notnil(QString getname,int getqsv,int geti);
     static QString name2trans(QString getname,int getqsv);

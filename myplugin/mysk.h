@@ -103,8 +103,9 @@ public:
     //void addusdobjlist(QList<myobj *> &list);
     //void addusdobjlist(myobj *getp);
     void addFunction(QString geteventstr,QString getblockstr,
-                             QString getfunstr,QList<myobj *> &getobjlist,
-                             QStringList &getrtrmlist,QStringList &getblrmlist,bool b4redo=false);
+                     QString getfunstr,QList<myobj *> &getobjlist,
+                     QStringList &getrtrmlist,QStringList &getblrmlist,
+                     bool b4redo=false,QString dotag=QString());
     void undo();
     void redo();
     bool removeObj(myobj *getp);    
@@ -121,7 +122,7 @@ public:
     virtual QStringList trans4avlobjlist(QString getstr);
     QStringList trans4avlobjlist(QString getstr,QString abbstr);
     //QStringList trans4design();
-    void dotrans(QString getstr);
+    void dotrans(QString getstr,QString dotag=QString());
     virtual QStringList funtaglist(QString getstr){qWarning()<<"funtaglist:"<<getstr;return QStringList();}
     virtual QStringList eventstrlist();
     virtual QStringList blockstrlist(QString getstr);

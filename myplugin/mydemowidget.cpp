@@ -92,7 +92,7 @@ void mydemowidget::myrfr_sk(){
         QMap<QString,QString> strmap;
         psys->psk0->propertymap_get(strmap,true);
         foreach(QString stri,psys->psk0->propertystrlist()){
-            tstrlist<<stri+tr(": ")+mycode::mysplit(strmap.value(stri)).first();
+            tstrlist<<stri+tr(": ")+mycode::mysplit(strmap.value(stri),"|").first();
         }
         tstrlist.prepend(tr("Skill Category")+tr(": ")+mysk::type2str(psys->psk0->getType()));
         p_textedit_sk->setText(tstrlist.join("\n"));
