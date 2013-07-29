@@ -43,6 +43,7 @@ public:
 
     QStringList getSel();
     QString getRemark(myinputitem *pi);
+    bool visible_cbb(myinputitem *pi);
 signals:
     
 public slots:
@@ -55,7 +56,7 @@ public slots:
     void changeRTR();
     //void changeColumnViewWidths();
     void filterItems();
-    void filterItems_obj();
+    //void filterItems_obj();
     void myscroll(const QModelIndex &);
     void mytest(const QModelIndex &);
 };

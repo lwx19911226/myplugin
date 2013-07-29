@@ -62,6 +62,7 @@ public:
     QLineEdit *p_lineedit_packagename,*p_lineedit_packagetrans;
     QTabWidget *p_tabwidget1,*p_tabwidget2;
     QTreeWidget *p_treewidget;
+    QListWidget *p_listwidget_do;
     //QTableWidget *p_tablewidget_g,*p_tablewidget_trs,*p_tablewidget_vs;
     QLabel *p_label_skname;
     QPushButton *p_pushbutton_undo,*p_pushbutton_redo;
@@ -84,6 +85,7 @@ public:
     void mytext_all();
     void mytext_current();
     void mytree();
+    void mylist_do();
     void myexport_design(QString);
     void itemsel_sk(QTableWidget *ptw);
     void itemchanged_cbb_sk(QComboBox *pcbb);

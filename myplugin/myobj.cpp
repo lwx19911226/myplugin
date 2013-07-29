@@ -13,20 +13,30 @@ void myobj::myini(){
         }
         QTextStream cin(&fin);
         cin.setCodec("UTF-8");
-        QString str;
+        QString str,tstr;
+        QStringList tstrlist;
         for(;;){
             if(cin.atEnd()){break;}
             str=cin.readLine();
             if(str==""){continue;}
             if(str.startsWith("//")){continue;}
             if(str.startsWith(">>")){myconsttaglist<<str.mid(2);continue;}
-            if(str.startsWith(">")&&(str.count("|")==enumcnt(&staticMetaObject,"iniFormat")-1)){myconstlist<<str.mid(1);continue;}
+            if(str.startsWith(">")&&(str.count("|")==enumcnt(&staticMetaObject,"iniFormat")-1)){
+                tstr=str.mid(1);
+                tstrlist.clear();
+                foreach(QString stri,myconstlist.filter("^"+tstr.split("|").at(Name)+"\\|")){
+                    tstrlist<<getblabb_str(stri);
+                }
+                if(tstrlist.contains(getblabb_str(tstr))){qWarning()<<"myconstini"<<tstr;}
+                myconstlist<<tstr;
+                continue;
+            }
             qWarning()<<"myconstini:"<<str<<",";
         }
         fin.close();
         myini_lang();
         myini_cl();
-        QStringList tstrlist;
+
         tstrlist<<tr("TriggerSkill")<<tr("ViewAsSkill")<<tr("DistanceSkill")<<tr("FilterSkill")<<tr("ProhibitSkill")
                <<tr("MaxCardsSkill")<<tr("TargetModSkill")<<tr("ExistingSkill")<<tr("Name")<<tr("Translation")<<tr("Kingdom")<<tr("Sex")
               <<tr("HP")<<tr("Title")<<tr("Word")<<tr("Owner")<<tr("Description")<<tr("Words")<<tr("Subtype")<<tr("CardsNum")
@@ -80,7 +90,7 @@ void myobj::myini_lang(){
                             foreach(QString tstri,myconstlist){
                                 if(tstri.startsWith(getname+"|")){b=true;break;}
                             }
-                            if(!b){
+                            if(name2str(getname,QString()).isEmpty()){
                                 QStringList obstrlist;
                                 obstrlist<<getname<<"mystrc"<<tr("Object Name")+tr("[")+gettranslation+tr("]")<<"ob";
                                 myconstlist<<obstrlist.join("|");
@@ -104,7 +114,7 @@ void myobj::myini_cl(){
     QStringList oblist=getconstlist_tag("ob");
     foreach(QString stri,oblist){
         QRegExp rxt(".*"+tr("[")+"(.*)"+tr("]")+".*");
-        QString trm=name2remark(stri);
+        QString trm=name2remark(stri,QString());
         if(rxt.exactMatch(trm)){
             trm=tr("Class Name")+tr("[")+rxt.cap(1)+tr("]")+tr(", ")+tr("Pattern for any ")+rxt.cap(1);
         }
@@ -132,7 +142,7 @@ void myobj::myini_cl(){
         myconstlist<<clstrlist.join("|");
     }
 }
-
+/*
 QString myobj::isConst(QString getstr, QString abbstr){
     myini();
     foreach(QString stri,myconstlist){
@@ -146,6 +156,7 @@ QString myobj::isConst(QString getstr, QString abbstr){
     }
     return QString();
 }
+*/
 QStringList myobj::transConst(QString getstr, QString abbstr){
     myini();
     foreach(QString stri,myconstlist){
@@ -201,10 +212,7 @@ QStringList myobj::getconstlist_tag(QString gettag){
     myini();
     QStringList strlist;
     foreach(QString stri,myconstlist){
-        QString getname=stri.split("|").at(Name);
-        if(matchTag(getname,gettag)){
-            strlist<<getname;
-        }
+        if(matchtag_str(stri,gettag)){strlist<<stri.split("|").at(Name);}
     }
     return strlist;
 }
@@ -212,10 +220,7 @@ QStringList myobj::getconstrmlist_tag(QString gettag){
     myini();
     QStringList strlist;
     foreach(QString stri,myconstlist){
-        QString getrm=stri.split("|").at(Remark);
-        if(matchTag(stri.split("|").at(Name),gettag)){
-            strlist<<getrm;
-        }
+        if(matchtag_str(stri,gettag)){strlist<<stri.split("|").at(Remark);}
     }
     return strlist;
 }
@@ -227,6 +232,25 @@ QStringList myobj::getconsttaglist(){
     }
     return strlist;
 }
+QString myobj::getblabb_str(QString getstr){
+    foreach(QString stri,getstr.split("|").at(Extra).split(",,")){
+        if(stri.startsWith("bl:")){return stri.mid(3);}
+    }
+    return QString();
+}
+
+QString myobj::name2str(QString getname, QString abbstr){
+    myini();
+    QStringList tstrlist=myconstlist.filter(QRegExp("^"+getname+"\\|"));
+    foreach(QString stri,tstrlist){
+        if(getblabb_str(stri)==abbstr){return stri;}
+    }
+    foreach(QString stri,tstrlist){
+        if(getblabb_str(stri).isEmpty()){return stri;}
+    }
+    return QString();
+}
+
 QString myobj::remark2name(QString getrm){
     myini();
     foreach(QString stri,myconstlist){
@@ -234,12 +258,9 @@ QString myobj::remark2name(QString getrm){
     }
     return QString();
 }
-QString myobj::name2remark(QString getname){
+QString myobj::name2remark(QString getname,QString abbstr){
     myini();
-    foreach(QString stri,myconstlist){
-        if(stri.split("|").at(Name)==getname){return stri.split("|").at(Remark);}
-    }
-    return QString();
+    return name2str(getname,abbstr).split("|").at(Remark);
 }
 QString myobj::remark2tag(QString getrm){
     myini();
@@ -248,14 +269,8 @@ QString myobj::remark2tag(QString getrm){
     }
     return QString();
 }
-bool myobj::matchTag(QString getname, QString gettag){
-    myini();
-    foreach(QString stri,myconstlist){
-        if(stri.startsWith(getname+"|")){
-            return stri.split("|").at(Extra).split(",,").contains(gettag);
-        }
-    }
-    return true;
+bool myobj::matchtag_str(QString getstr, QString gettag){
+    return getstr.split("|").at(Extra).split(",,").contains(gettag);
 }
 
 QString myobj::enumstr(const QMetaObject *mob,QByteArray getname,int getint){

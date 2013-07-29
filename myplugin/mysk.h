@@ -112,6 +112,7 @@ public:
     myobj *findObjByName(QString getname,QString getstr);
     myblock *findBlockByName(QString);    
     virtual QString findRemarkByName_event(QString getname){return getname;}
+    virtual QStringList findRemarkByName_eventobj(QString getname);
     QString findRemarkByName_block(QString getname);
     QString findRemarkByName_obj(QString getname,QString getstr,bool b4func);
     QString findRemarkByName_obj(myobj *tgtobj,myfunction *pfunc, bool b4func);
@@ -119,6 +120,7 @@ public:
     virtual void iniObj();
     virtual myblock *iniBlock(QString getstr);
     virtual QStringList trans(QStringList &back)=0;
+    virtual QString block2abb(QString getstr);
     virtual QStringList trans4avlobjlist(QString getstr);
     QStringList trans4avlobjlist(QString getstr,QString abbstr);
     //QStringList trans4design();
@@ -182,6 +184,8 @@ public:
     QStringList trans(QStringList &back);
     QStringList trans4avlobjlist(QString getstr);
     QString findRemarkByName_event(QString getname);
+    QString block2abb(QString getstr);
+    QStringList findRemarkByName_eventobj(QString getname);
 };
 Q_DECLARE_METATYPE(mytrs)
 

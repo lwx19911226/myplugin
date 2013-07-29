@@ -16,6 +16,7 @@
 >>>vs|luatuxivs|突袭|luazhl|0|SkillCard|2|:偷|$
 >>>exs|liegong|luacc|liegong
 >>>trs|sk0||无|NotFrequent|SkillOwnerAlive|:|$
+>>>tms|myluapaoxiao|咆哮|无|Slash|:无限杀|$
 >>>>luajianxiong:0:Damaged|Damaged|onlySkillOwner|player||
 >>>>luajianxiong:1:Damaged|Damaged|getCardPlace|damage.card|伤害牌的位置|
 >>>>luajianxiong:2:Damaged|Damaged|ifEqualNum|1->0,sgs.Player_PlaceTable||伤害牌位于面板,伤害牌不位于面板
@@ -81,3 +82,5 @@
 >>>>luatuxi:62:EventPhaseStart|61->0|ifReturn|true,true||
 >>>>sk0:63:GameStart|GameStart|choice|player,摸两张牌\|回复一点体力||
 >>>>sk0:64:GameStart|GameStart|ifEqualNum|63->0,2||,
+>>>>myluapaoxiao:65:Residue|Residue|onlySkillOwner|from||
+>>>>myluapaoxiao:66:Residue|Residue|ifReturnNum|true,1000||

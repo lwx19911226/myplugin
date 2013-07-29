@@ -15,7 +15,7 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
 
     p_combobox_filter=new QComboBox(this);
     p_combobox_filter->hide();    
-    QObject::connect(p_combobox_filter,SIGNAL(currentIndexChanged(QString)),this,SLOT(filterItems_obj()));
+    QObject::connect(p_combobox_filter,SIGNAL(currentIndexChanged(QString)),this,SLOT(filterItems()));
 
     QHBoxLayout *p_hboxlayout=new QHBoxLayout;    
     p_hboxlayout->addLayout(p_formlayout);
@@ -161,6 +161,9 @@ void myinputwidget::showRemark(){
     if(!pi){return;}
     if(pi&&(pi->type==0||myinputitem::spstr(pi->getstr()))){return;}
     while(pi->pf){
+        if(pi->type==myinputitem::func_Event){
+            strlist=mycode::myindent(pmain->psys->psk0->findRemarkByName_eventobj(pi->getstr()))+strlist;
+        }
         strlist.prepend(myinputitem::type2str(pi->type)+tr(": ")+"<"+pi->getstr()+"> "+getRemark(pi));
         //strlist.prepend(QString("%1 : %2").arg(pi->getstr()).arg(getRemark(pi)));
         pi=pi->pf;
@@ -265,6 +268,31 @@ void myinputwidget::changeColumnViewWidths(){
     p_columnview->setColumnWidths(widthlist);
 }
 */
+bool myinputwidget::visible_cbb(myinputitem *pi){
+    if(pi->type<myinputitem::func_Fun){return true;}
+    if(p_combobox_filter->currentText()==tr("ALL")){return true;}
+    QString geteventstr=pi->getParent(myinputitem::func_Event,true)->getstr();
+    QString getabbstr=pmain->psys->psk0->block2abb(geteventstr);
+    if(pi->type==myinputitem::func_Fun){
+        QStringList gettaglist=pmain->psys->psk0->funtaglist(geteventstr);
+        gettaglist<<myfun::remark2tag(p_combobox_filter->currentText());
+        return myfun::matchtaglist(pi->getstr(),pmain->psys->qsv,gettaglist);
+    }
+    else if(pi->type>=myinputitem::func_Obj){
+        myobj *pt=pmain->psys->psk0->findObjByName(pi->getstr(),geteventstr);
+        if(pt){
+            QString tstr=myobj::name2str(pt->name,getabbstr);
+            bool b=!tstr.isEmpty();
+            if(p_combobox_filter->currentText()==tr("Const")){return b;}
+            else if(p_combobox_filter->currentText()==tr("Variable")){return !b;}
+            else if(b){return myobj::matchtag_str(tstr,myobj::remark2tag(p_combobox_filter->currentText()));}
+            else{return false;}
+        }
+    }
+    qWarning()<<"visible_cbb"<<pi->getstr();
+    return true;
+}
+
 void myinputwidget::filterItems(){
     if(!b4filter){return;}
     QRegExp reg(".*"+p_lineedit_filter->text()+".*",Qt::CaseInsensitive);
@@ -281,15 +309,21 @@ void myinputwidget::filterItems(){
     if(p->type>myinputitem::func_Start){p_columnview->setCurrentIndex(p_inputmodel->getIndex(p,true));}
     else{p_columnview->setCurrentIndex(QModelIndex());}
     //qWarning()<<"filteritem";
+    QString geteventstr=p0->getParent(myinputitem::func_Event,true)->getstr();
+    QString getabbstr=pmain->psys->psk0->block2abb(geteventstr);
+    bool b1=true,b2=true;
     foreach(myinputitem *ip,p0->pchlist){
         if(myinputitem::spstr(ip->getstr())){continue;}
-        ip->visible=reg.exactMatch(ip->getstr())||reg.exactMatch(getRemark(ip));
+        b1=reg.exactMatch(ip->getstr())||reg.exactMatch(getRemark(ip));
+        b2=visible_cbb(ip);
+        ip->visible=b1&&b2;
     }
     p->delAllChildren();
     myinputitem::mycpy(p0,p,true);
     if(!p->pchlist.isEmpty()){myscroll(p_inputmodel->getIndex(p->pchlist.first()));}
     p_columnview->show();
 }
+/*
 void myinputwidget::filterItems_obj(){
     if(!b4filter){return;}
     myinputitem *pi0=p_inputmodel->getItem0(p_columnview->currentIndex());
@@ -298,7 +332,9 @@ void myinputwidget::filterItems_obj(){
     myinputitem *p0,*p;
     if(pi->pchlist.isEmpty()){p0=pi0->pf;p=pi->pf;}
     else{p0=pi0;p=pi;}
-    if(p0->type+1<myinputitem::func_Fun){return;}    
+    if(p0->type+1<myinputitem::func_Fun){return;}
+    QString geteventstr=p0->getParent(myinputitem::func_Event,true)->getstr();
+    QString getabbstr=pmain->psys->psk0->block2abb(geteventstr);
     p_columnview->hide();
     p_columnview->setCurrentIndex(p_inputmodel->getIndex(p,true));
     //qWarning()<<"filteritem_const";
@@ -319,7 +355,7 @@ void myinputwidget::filterItems_obj(){
                 }
                 if(p_combobox_filter->currentText()==tr("Const")){ip->visible=b;}
                 else if(p_combobox_filter->currentText()==tr("Variable")){ip->visible=!b;}
-                else{ip->visible=myobj::matchTag(ip->getstr(),myobj::remark2tag(p_combobox_filter->currentText()));}
+                else{ip->visible=myobj::matchtag_str(myobj::name2str(ip->getstr(),getabbstr),myobj::remark2tag(p_combobox_filter->currentText()));}
             }
         }
     }    
@@ -328,11 +364,12 @@ void myinputwidget::filterItems_obj(){
     if(!p->pchlist.isEmpty()){myscroll(p_inputmodel->getIndex(p->pchlist.first()));}
     p_columnview->show();
 }
-
+*/
 void myinputwidget::myscroll(const QModelIndex &index){
     p_columnview->scrollTo(index);
 }
 
 void myinputwidget::mytest(const QModelIndex &index){
-    qWarning()<<p_inputmodel->getItem0(index)->getstr();
+    //qWarning()<<p_inputmodel->getItem0(index)->getstr();
+    index.isValid();
 }

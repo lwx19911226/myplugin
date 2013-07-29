@@ -160,13 +160,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QStringList tstrlist;
     tstrlist<<tr("Name")<<tr("Type")<<tr("Description");
     p_treewidget->setHeaderLabels(tstrlist);
+    p_listwidget_do=new QListWidget;
     //mytext();
     p_tabwidget2=new QTabWidget(ui->centralWidget);
-    //p_tabwidget2->setTabPosition(QTabWidget::West);
-    p_tabwidget2->addTab(p_textedit_all,tr("Full"));
-    p_tabwidget2->addTab(p_textedit_current,tr("Current Skill"));
-    p_tabwidget2->addTab(p_treewidget,tr("Block Tree"));
+    //p_tabwidget2->setTabPosition(QTabWidget::West);    
 
+    p_tabwidget2->addTab(p_listwidget_do,tr("Procedure"));
+    p_tabwidget2->addTab(p_treewidget,tr("Block Tree"));
+    p_tabwidget2->addTab(p_textedit_current,tr("LUA Code - Current Skill"));
+    p_tabwidget2->addTab(p_textedit_all,tr("LUA Code - Full"));
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout;
     p_vboxlayout->addLayout(p_hboxlayout1);
@@ -514,6 +516,7 @@ void MainWindow::myrfr(){
     p_pushbutton_redo->setEnabled(!psys->undostrlist.isEmpty());
     b4rfr=true;
     if(p_tabwidget2->currentWidget()==p_treewidget){mytree();}
+    else if(p_tabwidget2->currentWidget()==p_listwidget_do){mylist_do();}
     else if(p_tabwidget2->currentWidget()==p_textedit_all){mytext_all();}
     else if(p_tabwidget2->currentWidget()==p_textedit_current){mytext_current();}
 
@@ -652,6 +655,16 @@ void MainWindow::mytree(){
     p_treewidget->expandAll();
     for(int i=0;i<p_treewidget->columnCount();i++){
         p_treewidget->resizeColumnToContents(i);
+    }
+}
+
+void MainWindow::mylist_do(){
+    p_listwidget_do->clear();
+    if(!psys->psk0){return;}
+    foreach(mydo *ip,psys->dolist){
+        if(ip->psktgt==psys->psk0){
+            p_listwidget_do->addItem(ip->getfunc()->getRemark());
+        }
     }
 }
 

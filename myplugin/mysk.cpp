@@ -284,19 +284,25 @@ void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr,bool b
     }
 }
 
-QStringList mysk::trans4avlobjlist(QString getstr){
+QString mysk::block2abb(QString getstr){
     const QMetaObject *mob=metaObject();
     int btype=myobj::enumint(mob,enumname_btype(getType()).toUtf8(),getstr);
-    QString abbstr=myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),btype);
-    return trans4avlobjlist(getstr,abbstr);
+    return myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),btype);
+}
+
+QStringList mysk::trans4avlobjlist(QString getstr){
+    //const QMetaObject *mob=metaObject();
+    //int btype=myobj::enumint(mob,enumname_btype(getType()).toUtf8(),getstr);
+    //QString abbstr=myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),btype);
+    return trans4avlobjlist(getstr,block2abb(getstr));
 }
 QStringList mysk::trans4avlobjlist(QString getstr, QString abbstr){
     QStringList strlist;
     foreach(myobj *ip,avlobjlist){
         if(ip->blockstr!=getstr){continue;}
         if(ip->noDeclaration){continue;}
-        QString getconststr=myobj::isConst(ip->name,abbstr);
-        if(getconststr!=""){
+        QString getconststr=myobj::name2str(ip->name,abbstr);
+        if(!getconststr.isEmpty()){
             strlist<<myobj::transConst(getconststr);
             continue;
         }
@@ -376,6 +382,13 @@ myblock *mysk::findBlockByName(QString getname){
         if(pr){return pr;}
     }
     return NULL;
+}
+QStringList mysk::findRemarkByName_eventobj(QString getname){
+    QStringList strlist;
+    foreach(QString stri,myobj::getconstlist_tag("bl:"+block2abb(getname))){
+        strlist<<tr("EVENT")+tr("OBJECT")+tr(": ")+"<"+stri+"> "+findRemarkByName_obj(stri,getname,false);
+    }
+    return strlist;
 }
 QString mysk::findRemarkByName_block(QString getname){
     if(eventstrlist().contains(getname)){return tr("Default Block");}
@@ -546,6 +559,29 @@ QString mytrs::findRemarkByName_event(QString getname){
 */
     return myevent::findRemarkByName(getname);
 }
+QString mytrs::block2abb(QString getstr){
+    getstr.isEmpty();
+    return QString();
+}
+QStringList mytrs::findRemarkByName_eventobj(QString getname){
+    QString tstr;
+    QStringList strlist;
+    foreach(QString stri,myevent::myeventlist){
+        if(stri.startsWith(getname+"|")){
+            tstr=stri.split("|").at(myevent::Data_Name);
+            if(tstr.isEmpty()){break;}
+            QStringList objnamelist=tstr.split(",");
+            QStringList objrmlist=stri.split("|").at(myevent::Data_Remark).split(",");
+            for(int i=0;i<objnamelist.length();i++){
+                tstr=QString();
+                if(i<objrmlist.length()){tstr=objrmlist.at(i);}
+                strlist<<tr("EVENT")+tr("OBJECT")+tr(": ")+"<"+objnamelist.at(i)+"> "+tstr;
+            }
+        }
+    }
+    return strlist;
+}
+
 QString mytrs::getSubtypeProperty(){
     QStringList strlist=subtypestrlist();
     QString str=subtype2str(subtype);
@@ -716,7 +752,7 @@ QString myvs::getCardViewAsPropertyRemark(){
     strlist.prepend(tr("SkillCard"));
     QString tstr;
     if(objname_viewas=="SkillCard"){tstr=tr("SkillCard");}
-    else{tstr=myobj::name2remark(objname_viewas);}
+    else{tstr=myobj::name2remark(objname_viewas,QString());}
     str2first(strlist,tstr);
     return strlist.join("|");
 }
@@ -826,7 +862,7 @@ QString myfts::getCardViewAsProperty(){
 void myfts::setCardViewAsProperty(QString getstr){objname_viewas=getstr;}
 QString myfts::getCardViewAsPropertyRemark(){
     QStringList strlist=myobj::getconstrmlist_tag("ob");
-    str2first(strlist,myobj::name2remark(objname_viewas));
+    str2first(strlist,myobj::name2remark(objname_viewas,QString()));
     return strlist.join("|");
 }
 void myfts::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
@@ -933,7 +969,7 @@ void mytms::setPatternProperty(QString getstr){
 QString mytms::getPatternPropertyRemark(){
     QString tstr=pattern;
     tstr.replace("|","\\|");
-    QString trm=myobj::name2remark(tstr);
+    QString trm=myobj::name2remark(tstr,QString());
     if(trm!=""){tstr=trm;}
     QStringList tstrlist=myobj::getconstrmlist_tag("pt");
     tstrlist.removeOne(tstr);

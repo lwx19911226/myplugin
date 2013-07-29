@@ -117,10 +117,10 @@ public:
         return QString();
     }
     static QString suitstr(QString getstr){
-        if(getstr.contains(QRegExp("Spade"))){return "spade";}
-        if(getstr.contains(QRegExp("Club"))){return "club";}
-        if(getstr.contains(QRegExp("Heart"))){return "heart";}
-        if(getstr.contains(QRegExp("Diamond"))){return "diamond";}
+        if(getstr.contains("Spade")){return "spade";}
+        if(getstr.contains("Club")){return "club";}
+        if(getstr.contains("Heart")){return "heart";}
+        if(getstr.contains("Diamond")){return "diamond";}
         return getstr;
     }
     static QString num2str(int getnum){
@@ -150,17 +150,19 @@ public:
     static void myini();
     static void myini_lang();
     static void myini_cl();
-    static QString isConst(QString getstr,QString abbstr);
+    //static QString isConst(QString getstr,QString abbstr);
     static QStringList transConst(QString getstr,QString abbstr);
     static QStringList transConst(QString getconststr);
     static void newConst(QList<myobj *> &list,QObject *getpf,int getqsv,QString getbl,bool onlybl=false);
     static QStringList getconstlist_tag(QString);
     static QStringList getconstrmlist_tag(QString);
     static QStringList getconsttaglist();
+    static QString name2str(QString getname,QString abbstr);
+    static QString getblabb_str(QString getstr);
     static QString remark2name(QString);
-    static QString name2remark(QString);
+    static QString name2remark(QString, QString abbstr);
     static QString remark2tag(QString);
-    static bool matchTag(QString getname,QString gettag);
+    static bool matchtag_str(QString getstr,QString gettag);
     static bool mycmp(const QString &s1,const QString &s2){
         return s1.split("|").first().toLower()<s2.split("|").first().toLower();
     }
