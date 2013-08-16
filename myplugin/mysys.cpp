@@ -3,10 +3,7 @@ int mysys::globalint=0;
 void mysys::myini(QString getpath, int getqsv){
     //funstrlist=myfun::getfunstrlist();
     //eventstrlist=myevent::geteventstrlist();    
-    qsv=getqsv;
-    myobj::myini();
-    myfun::myini();
-    myevent::myini();
+    qsv=getqsv;    
     //myini_design(getpath);
     qWarning()<<getpath;
     QFile fin(getpath);
@@ -45,6 +42,11 @@ void mysys::myini(QString getpath, int getqsv){
         qWarning()<<strlist_package;
         return;
     }
+
+    myobj::myini(qsv);
+    myfun::myini();
+    myevent::myini();
+
     foreach(QString stri,strlist_general){
         if(stri.count("|")>=4){
             QString tstr=stri.mid(2);
@@ -292,7 +294,7 @@ bool mysys::delSkill(mysk *getp){
     sig_update();
     return true;
 }
-myfunction *mysys::findFuncByObj(myobj *getp){
+myfunction *mysys::findFuncByRTObj(myobj *getp){
     //myfunction *pr=NULL;
     foreach(mydo *ip,dolist){
         if(ip->objlist.contains(getp)){return ip->getfunc();}
@@ -317,8 +319,8 @@ QStringList mysys::trans(){
     foreach(mygeneral *ip,glist){
         strlist<<ip->trans();
     }
-    strlist<<"dofile \"lua/sgs_ex.lua\"";
-    strlist<<"dofile \"lua/myplugin_sysfunc.lua\"";
+    strlist<<"require(\"lua.sgs_ex\")";
+    strlist<<"require(\"lua.myplugin_sysfunc\")";
     QList<mysk *> tsklist,exslist;
     getsklist_noexs(tsklist);
     getsklist(exslist,mysk::ExistingSkill);

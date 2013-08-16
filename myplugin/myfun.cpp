@@ -62,7 +62,8 @@ QString myfun::extract_str(QString getstr, int gettype){
     //return getstr.replace("\\|","\\\\").split("|").replaceInStrings("\\\\","|").at(gettype);
 }
 QStringList myfun::name2strlist(QString getname){
-    return myfunlist.filter(QRegExp("^"+getname+"\\|"));
+    return mycode::myfilter_sw(myfunlist,getname+"|");
+    //return myfunlist.filter(QRegExp("^"+getname+"\\|"));
 }
 QString myfun::name2str(QString getname, int getqsv){
     foreach(QString stri,name2strlist(getname)){

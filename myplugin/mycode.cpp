@@ -127,6 +127,12 @@ QString myblock::getRemark(){
     }
     return tstr;
 }
+bool myblock::isObjUsed(myobj *getp){
+    foreach(myblock *ip,blocklist){
+        if(ip->isObjUsed(getp)){return true;}
+    }
+    return false;
+}
 
 void myfunction::myini(QString geteventstr,QString getblockstr,QStringList &rtrmlist, QStringList &blrmlist){
     name=getblockstr+","+funname+QString::number(globalint++);
@@ -228,7 +234,7 @@ QString myfunction::getRemark(){
     QString rmstr=myfun::name2remark(funname,getqsv0());
     for(int i=0;i<objlist.length();i++){
         if(!rmstr.contains(str4parameter()+QString::number(i+1))){qWarning()<<"getremark"<<funname<<i;}
-        tstr=getsk0()->findRemarkByName_obj(objlist.at(i),getsk0()->getsys()->findFuncByObj(objlist.at(i)),false);
+        tstr=getsk0()->findRemarkByName_obj(objlist.at(i),getsk0()->getsys()->findFuncByRTObj(objlist.at(i)),false);
         if(tstr.contains(str4parameter())){tstr.replace(str4parameter(),str4parameter()+" ");}
         if(tstr.contains(str4returnvalue())){tstr.replace(str4returnvalue(),str4returnvalue()+" ");}
         rmstr.replace(str4parameter()+QString::number(i+1),
@@ -246,6 +252,10 @@ QString myfunction::getRemark(){
     rmstr.replace(str4parameter()+" ",str4parameter());
     rmstr.replace(str4returnvalue()+" ",str4returnvalue());
     return rmstr;
+}
+bool myfunction::isObjUsed(myobj *getp){
+    if(objlist.contains(getp)){return true;}
+    return myblock::isObjUsed(getp);
 }
 
 /*

@@ -109,7 +109,7 @@ QString myevent::findRemarkByName(QString getname){
             return stri.split("|").at(Remark);
         }
     }
-    return "";
+    return QString();
 }
 bool myevent::isEvent(QString getname){
     myini();

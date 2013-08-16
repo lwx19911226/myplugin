@@ -9,7 +9,7 @@ class mysknwidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit mysknwidget(MainWindow *getMain,QWidget *parent = 0);
+    explicit mysknwidget(MainWindow *getmain,QWidget *parent = 0);
     
     QTableWidget *p_tablewidget;
     MainWindow *pmain;

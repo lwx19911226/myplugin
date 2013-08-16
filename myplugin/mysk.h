@@ -121,8 +121,8 @@ public:
     virtual myblock *iniBlock(QString getstr);
     virtual QStringList trans(QStringList &back)=0;
     virtual QString block2abb(QString getstr);
-    virtual QStringList trans4avlobjlist(QString getstr);
-    QStringList trans4avlobjlist(QString getstr,QString abbstr);
+    virtual QStringList trans4avlobjlist(myblock *pblock);
+    QStringList trans4avlobjlist(myblock *pblock,QString abbstr);
     //QStringList trans4design();
     void dotrans(QString getstr,QString dotag=QString());
     virtual QStringList funtaglist(QString getstr){qWarning()<<"funtaglist:"<<getstr;return QStringList();}
@@ -182,7 +182,7 @@ public:
     void setCanTriggerPropertyRemark(QString getstr);
     void iniObj();
     QStringList trans(QStringList &back);
-    QStringList trans4avlobjlist(QString getstr);
+    QStringList trans4avlobjlist(myblock *pblock);
     QString findRemarkByName_event(QString getname);
     QString block2abb(QString getstr);
     QStringList findRemarkByName_eventobj(QString getname);
@@ -201,7 +201,7 @@ class myvs:public mysk
     Q_PROPERTY(QString TargetPlayersNumProperty READ getTargetPlayersNumProperty WRITE setTargetPlayersNumProperty)
 public:
     explicit myvs(QObject *parent=0):mysk(parent){
-        vsn=0;objname_viewas=myobj::getconstlist_tag("ob").first();tgtn=1;
+        vsn=0;objname_viewas=myobj::objname_skillcard();tgtn=1;
     }
     int getType(){return ViewAsSkill;}    
     enum vsProperty{CardsNum=11,CardViewAs=12,TargetPlayersNum=13};
@@ -237,30 +237,30 @@ public:
     QString findRemarkByName_event(QString getname){
         const QMetaObject *mob=metaObject();
         if(getname==myobj::enumstr(mob,"vsbType",ViewFilter)){
-            return tr("We use this function to check which card can be selected. ")
-                    +tr("Return true means the card to select is selectable. ")
-                    +tr("For example, we can only choose a red card when we use Wusheng; ")
-                    +tr("we can only choose a spade handcard when we use Luanji and select a spade handcard before.");
+            return tr("It checks which card can be selected. ")
+                    +tr("Returning true means the card to select is selectable. ")
+                    +tr("For example, only a red card can be chosen when using Wusheng; ")
+                    +tr("only a spade handcard can be chosen when using Luanji and selecting a spade handcard before.");
         }
         if(getname==myobj::enumstr(mob,"vsbType",EnabledAtPlay)){
-            return tr("We use this function to check if the skill can be used in Phase Play. ")
-                    +tr("Return true means the skill is usable. ")
-                    +tr("For example, before we use Fanjian, we can use it in Phase Play. ");
+            return tr("It checks if the skill can be used in Phase Play. ")
+                    +tr("Returning true means the skill is usable. ")
+                    +tr("For example, Fanjian is usable in Phase Play before used. ");
         }
         if(getname==myobj::enumstr(mob,"vsbType",EnabledAtResponse)){
-            return tr("We use this function to check if the skill can be used to respond. ")
-                    +tr("Return true means the skill is usable. ")
-                    +tr("For example, we can use Wusheng when we want to respond a slash. ");
+            return tr("It checks if the skill can be used to respond. ")
+                    +tr("Returning true means the skill is usable. ")
+                    +tr("For example, Wusheng can be used to respond a Slash. ");
         }
         if(getname==myobj::enumstr(mob,"vsbType",PlayerFilter)){
-            return tr("We use this function to check which player can be selected by the skillcard. ")
-                    +tr("Return true means the player to select is selectable. ")
-                    +tr("Warning: it is only valid when you view it as a skillcard. ")
-                    +tr("For example, we can only choose a wounded Male when we use Jieyin; ")
-                    +tr("we cannot choose two players with the handcard disparity over our total cards. ");
+            return tr("It checks which player can be selected by the skillcard. ")
+                    +tr("Returning true means the player to select is selectable. ")
+                    +tr("Warning: it is only valid if it is viewed as a skillcard. ")
+                    +tr("For example, when using Jieyin, only a wounded Male can be chosen; ")
+                    +tr("when using Dimeng, the second player cannot be chosen if the handcard number disparity between the two targets is over the number of the owner's total cards. ");
         }
         if(getname==myobj::enumstr(mob,"vsbType",SkillCardUse)){
-            return tr("We use this function to define the behavior of the skillcard. ");
+            return tr("It defines the behavior of the skillcard. ");
         }
         return getname;
     }
@@ -280,9 +280,9 @@ public:
     enum dtsbAbb{dts_cf=CorrectFunc};
     QString findRemarkByName_event(QString getname){
         if(getname==myobj::enumstr(metaObject(),"dtsbType",CorrectFunc)){
-            return tr("We use this function to calculate the additional value of distance. ")
-                    +tr("Return value is the additional value beyond the geographical distance. ")
-                    +tr("For example, with Mashu, when we calculate the distance from us to others, the additional value is -1. ");
+            return tr("It calculates the additional value of distance. ")
+                    +tr("The return value is the additional value beyond the geographical distance. ")
+                    +tr("For example, with Mashu, when calculating the distance from the owner to others, the additional value is -1. ");
         }
         return getname;
     }
@@ -305,7 +305,7 @@ class myfts:public mysk
     Q_PROPERTY(QString CardViewAsPropertyRemark READ getCardViewAsPropertyRemark WRITE setCardViewAsPropertyRemark)
 public:
     explicit myfts(QObject *parent=0):mysk(parent){
-        objname_viewas=myobj::getconstlist_tag("ob").first();
+        objname_viewas=myobj::objname_default();
     }
     int getType(){return FilterSkill;}
     enum ftsbType{ViewFilter=1};
@@ -322,9 +322,9 @@ public:
     void setCardViewAsPropertyRemark(QString getstr);
     QString findRemarkByName_event(QString getname){
         if(getname==myobj::enumstr(metaObject(),"ftsbType",ViewFilter)){
-            return tr("We use this function to check which card should be filtered. ")
-                    +tr("Return true means the card should be filtered. ")
-                    +tr("For example, with Hongyan, all spade cards in our places should be filtered as heart cards. ");
+            return tr("It checks which card should be filtered. ")
+                    +tr("Returning true means the card should be filtered. ")
+                    +tr("For example, with Hongyan, all spade cards in the owner's places should be filtered as heart cards. ");
         }
         return getname;
     }
@@ -349,9 +349,9 @@ public:
     enum prsbAbb{prs_ip=IsProhibited};
     QString findRemarkByName_event(QString getname){
         if(getname==myobj::enumstr(metaObject(),"prsbType",IsProhibited)){
-            return tr("We use this function to check when the target should be prohibited. ")
-                    +tr("Return true means the target should be prohibited. ")
-                    +tr("For example, with Kongcheng, when the user use Duel, we cannot be chosen as the target. ");
+            return tr("It checks when the target should be prohibited. ")
+                    +tr("Returning true means the target should be prohibited. ")
+                    +tr("For example, with Kongcheng, when someone uses Duel, the owner cannot be chosen as a target. ");
         }
         return getname;
     }
@@ -376,9 +376,9 @@ public:
     enum mcsbAbb{mcs_ef=ExtraFunc};
     QString findRemarkByName_event(QString getname){
         if(getname==myobj::enumstr(metaObject(),"mcsbType",ExtraFunc)){
-            return tr("We use this function to calculate the additional number of maxcards. ")
-                    +tr("Return value is the additional number beyond the general maxcards. ")
-                    +tr("For example, with Xueyi, our additional number of maxcards is 2*X, X is the number of Qun except us. ");
+            return tr("It calculates the additional number of maxcards. ")
+                    +tr("The return value is the additional number beyond the general maxcards. ")
+                    +tr("For example, with Xueyi, the additional number of maxcards is 2*X, and X is equal to the number of Qun players except the owner. ");
         }
         return getname;
     }
@@ -400,7 +400,7 @@ class mytms:public mysk
     Q_PROPERTY(QString PatternProperty READ getPatternProperty WRITE setPatternProperty)
     Q_PROPERTY(QString PatternPropertyRemark READ getPatternPropertyRemark WRITE setPatternPropertyRemark)
 public:
-    explicit mytms(QObject *parent=0):mysk(parent){pattern="Slash";}
+    explicit mytms(QObject *parent=0):mysk(parent){pattern=myobj::ptname_default();}
     int getType(){return TargetModSkill;}
     enum tmsbType{ExtraTarget=0,DistanceLimit=1,Residue=2};
     enum tmsbAbb{tms_et=ExtraTarget,tms_dl=DistanceLimit,tms_r=Residue};
@@ -413,19 +413,19 @@ public:
     QString findRemarkByName_event(QString getname){
         const QMetaObject *mob=metaObject();
         if(getname==myobj::enumstr(mob,"tmsbType",ExtraTarget)){
-            return tr("We use this function to calculate the additional number of targets. ")
-                    +tr("Return value is the additional number. ")
-                    +tr("For example, with Tianyi successing, the additional number of targets of Slash is 1. ");
+            return tr("It calculates the additional number of targets. ")
+                    +tr("The return value is the additional number. ")
+                    +tr("For example, with the success of Tianyi, the additional number of Slash targets is 1. ");
         }
         if(getname==myobj::enumstr(mob,"tmsbType",DistanceLimit)){
-            return tr("We use this function to calculate the additional distance beyond the limitation. ")
-                    +tr("Return value is the additional distance beyond the limitation. ")
+            return tr("It calculates the additional distance beyond the limitation. ")
+                    +tr("The return value is the additional distance beyond the limitation. ")
                     +tr("For example, with Duanliang, the additional distance for SupplyShortage is 1. ");
         }
         if(getname==myobj::enumstr(mob,"tmsbType",Residue)){
-            return tr("We use this function to calculate the additional times for use beyond the limitation. ")
-                    +tr("Return value is the additional times for use beyond the limitation. ")
-                    +tr("For example, with Tianyi successing, the additional times for use Slash is 1. ");
+            return tr("It calculates the additional times for using beyond the limitation. ")
+                    +tr("The return value is the additional times for using beyond the limitation. ")
+                    +tr("For example, with the success of Tianyi, the additional times for using Slash is 1. ");
         }
         return getname;
     }
@@ -450,7 +450,7 @@ class myexs:public mysk
 public:
     explicit myexs(QObject *parent=0):mysk(parent){
         tgtsk=NULL;
-        skname=myobj::myconstskstrlist.first().split("|").first();
+        skname=myobj::skname_default();
     }
     int getType(){return ExistingSkill;}
     enum exsProperty{SKName=11};

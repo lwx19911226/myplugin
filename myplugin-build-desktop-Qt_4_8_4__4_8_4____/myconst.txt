@@ -27,44 +27,50 @@
 
 >selfplayer|mysplayer|触发技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:trs
 >player|mysplayer|触发技时机触发者|bl:trs
->defaultReturn|mybool|触发技默认返回值|tr:local %1=false,,bl:trs
+>defaultReturn|mybool|触发技默认返回值|tr:local %1=false,,bl:trs,,tr
 >sgs.Self|myplayer|视为技拥有者|bl:vs_vf
 >to_select|mycard|视为技将选的一张牌|bl:vs_vf
 >#selected|mynum|视为技已选牌数|bl:vs_vf
->defaultReturn|mybool|视为技判断选牌默认返回值|tr:local %1=false,,bl:vs_vf
+>defaultReturn|mybool|视为技判断选牌默认返回值|tr:local %1=false,,bl:vs_vf,,tr
 >sgs.Self|myplayer|视为技拥有者|bl:vs_ep
->defaultReturn|mybool|视为技判断出牌阶段是否允许使用默认返回值|tr:local %1=false,,bl:vs_ep
+>defaultReturn|mybool|视为技判断出牌阶段是否允许使用默认返回值|tr:local %1=false,,bl:vs_ep,,tr
 >sgs.Self|myplayer|视为技拥有者|bl:vs_er
->defaultReturn|mybool|视为技判断响应时是否允许使用默认返回值|tr:local %1=false,,bl:vs_er
->selfcard|mycard|视为技技能牌|tr:local %1=self,,bl:vs_pf
+>defaultReturn|mybool|视为技判断响应时是否允许使用默认返回值|tr:local %1=false,,bl:vs_er,,tr
+>selfcard|mycard|视为技技能牌|tr:local %1=self,,bl:vs_pf,,tr
 >to_select|myplayer|视为技将选的一名角色|bl:vs_pf
 >#targets|mynum|视为技已选角色数|bl:vs_pf
 >sgs.Self|myplayer|视为技拥有者|bl:vs_pf
->defaultReturn|mybool|视为技判断选角色默认返回值|tr:local %1=false,,bl:vs_pf
->selfcard|mycard|视为技技能牌|tr:local %1=self,,bl:vs_scu
->selfplayer|mysplayer|视为技拥有者|tr:local %1=source,,bl:vs_scu
+>defaultReturn|mybool|视为技判断选角色默认返回值|tr:local %1=false,,bl:vs_pf,,tr
+>selfcard|mycard|视为技技能牌|tr:local %1=self,,bl:vs_scu,,tr
+>selfplayer|mysplayer|视为技拥有者|tr:local %1=source,,bl:vs_scu,,tr
 >#targets|mynum|视为技已选角色数|bl:vs_scu
->defaultReturn|all|视为技技能牌使用默认返回值|tr:local %1,,bl:vs_scu
+>defaultReturn|all|视为技技能牌使用默认返回值|tr:local %1,,bl:vs_scu,,tr
 >from|myplayer|距离技距离计算起始角色|bl:dts_cf
 >players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:dts_cf
 >to|myplayer|距离技距离计算终止角色|bl:dts_cf
->defaultReturn|mynum|距离技默认返回值|tr:local %1=0,,bl:dts_cf
+>defaultReturn|mynum|距离技默认返回值|tr:local %1=0,,bl:dts_cf,,tr
 >to_select|mycard|锁定视为技所判断的牌|bl:fts_vf
->place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf
->selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:fts_vf
->defaultReturn|mybool|锁定视为技默认返回值|tr:local %1=false,,bl:fts_vf
+>place|mynum|锁定视为技所判断的牌的位置|tr:local %1=room:getCardPlace(to_select:getEffectiveId()),,bl:fts_vf,,tr
+>selfplayer|mysplayer|锁定视为技拥有者|tr:local %1=room:findPlayerBySkillName(selfskname),,bl:fts_vf,,tr
+>defaultReturn|mybool|锁定视为技默认返回值|tr:local %1=false,,bl:fts_vf,,tr
 >from|myplayer|禁止技目标牌使用者|bl:prs_ip
 >to|myplayer|禁止技目标牌使用对象|bl:prs_ip
 >card|mycard|禁止技目标牌|bl:prs_ip
->defaultReturn|mybool|禁止技默认返回值|tr:local %1=false,,bl:prs_ip
+>defaultReturn|mybool|禁止技默认返回值|tr:local %1=false,,bl:prs_ip,,tr
 >target|myplayer|额外手牌上限技目标|bl:mcs_ef
->defaultReturn|mynum|额外手牌上限技默认返回值|tr:local %1=0,,bl:mcs_ef
->from|myplayer|目标技额外目标使用者|bl:tms_et
->defaultReturn|mynum|目标技额外目标默认返回值|tr:local %1=0,,bl:tms_et
->from|myplayer|目标技额外使用次数使用者|bl:tms_r
->defaultReturn|mynum|目标技额外使用次数默认返回值|tr:local %1=0,,bl:tms_r
->from|myplayer|目标技额外使用距离使用者|bl:tms_dl
->defaultReturn|mynum|目标技额外使用距离默认返回值|tr:local %1=0,,bl:tms_dl
+>defaultReturn|mynum|额外手牌上限技默认返回值|tr:local %1=0,,bl:mcs_ef,,tr
+>from|myplayer|目标技，牌的使用者|bl:tms_et
+>card|mycard|目标技，所使用的牌|bl:tms_et
+>defaultReturn|mynum|目标技额外目标默认返回值|tr:local %1=0,,bl:tms_et,,tr
+>players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:tms_et
+>from|myplayer|目标技，牌的使用者|bl:tms_r
+>card|mycard|目标技，所使用的牌|bl:tms_r
+>defaultReturn|mynum|目标技额外使用次数默认返回值|tr:local %1=0,,bl:tms_r,,tr
+>players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:tms_r
+>from|myplayer|目标技，牌的使用者|bl:tms_dl
+>card|mycard|目标技，所使用的牌|bl:tms_dl
+>defaultReturn|mynum|目标技额外使用距离默认返回值|tr:local %1=0,,bl:tms_dl,,tr
+>players|myplayerlist|全部角色列表|tr:local %1=from:getSiblings();%1:append(from),,bl:tms_dl
 >true|mybool|TRUE|
 >false|mybool|FALSE|
 >nil|all|不存在|

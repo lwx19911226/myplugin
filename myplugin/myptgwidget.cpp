@@ -1,14 +1,15 @@
 #include "myptgwidget.h"
 
-myptgwidget::myptgwidget(QWidget *parent) :
+myptgwidget::myptgwidget(MainWindow *getmain, QWidget *parent) :
     QWidget(parent)
 {
     setWindowTitle(tr("Pattern Generator"));
-    QStringList cllist=myobj::getconstlist_tag("cl");
-    QStringList suitlist=myobj::getconstlist_tag("suit");
+    pmain=getmain;
+    QStringList cllist=myobj::getconstrmlist_tag(pmain->psys->qsv,"cl");
+    QStringList suitlist=myobj::getconstrmlist_tag(pmain->psys->qsv,"suit");
     p_tablewidget=new QTableWidget(this);
-    int rowmax=qMax(qMax(13,cllist.length()),suitlist.length());
-    p_tablewidget->setRowCount(rowmax);
+    //int rowmax=qMax(qMax(13,cllist.length()),suitlist.length());
+    p_tablewidget->setRowCount(qMax(13,cllist.length()));
     p_tablewidget->setColumnCount(6);
     QStringList headerlist;
     headerlist<<tr("")<<tr("Class")<<tr("")<<tr("Suit")<<tr("Number")<<tr("Place");
@@ -27,8 +28,8 @@ myptgwidget::myptgwidget(QWidget *parent) :
     for(int i=0;i<13;i++){
         p_tablewidget->setItem(i,4,new QTableWidgetItem(QString::number(i+1)));
     }
-    p_tablewidget->setItem(0,5,new QTableWidgetItem("hand"));
-    p_tablewidget->setItem(1,5,new QTableWidgetItem("equipped"));
+    p_tablewidget->setItem(0,5,new QTableWidgetItem(tr("hand")));
+    p_tablewidget->setItem(1,5,new QTableWidgetItem(tr("equipped")));
     p_tablewidget->setSelectionMode(QAbstractItemView::MultiSelection);
     p_tablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     p_tablewidget->resizeColumnsToContents();
@@ -56,7 +57,7 @@ myptgwidget::myptgwidget(QWidget *parent) :
     p_lineedit=new QLineEdit(this);
     p_lineedit->setReadOnly(true);
     QFormLayout *p_formlayout=new QFormLayout;
-    p_formlayout->addRow(tr("Result:"),p_lineedit);
+    p_formlayout->addRow(tr("Result")+tr(": "),p_lineedit);
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout(this);
     p_vboxlayout->addWidget(p_tablewidget);
@@ -78,6 +79,7 @@ void myptgwidget::mygenerate(){
     }
 
     if(p_checkbox_judge->isChecked()){
+        /*
         QStringList suitstrlist,numstrlist;
         foreach(QTableWidgetItem *ip,psuitlist){suitstrlist<<myobj::suitstr(ip->text());}
         foreach(QTableWidgetItem *ip,pnumlist){numstrlist<<myobj::num2str(ip->text().toInt());}
@@ -88,6 +90,7 @@ void myptgwidget::mygenerate(){
         else{str4num=numstrlist.join("|");}
         ptstrlist.clear();
         ptstrlist<<QString("(.*):(%1):(%2)").arg(str4suit,str4num);
+        */
     }
     else{
         QStringList strlist;
@@ -96,7 +99,7 @@ void myptgwidget::mygenerate(){
             QStringList tstrlist;
             foreach(QTableWidgetItem *ip,pcllist){
                 QCheckBox *pcheckbox=static_cast<QCheckBox *>(p_tablewidget->cellWidget(ip->row(),0));
-                QString str=ip->text();
+                QString str=myobj::remark2name(ip->text());
                 if(pcheckbox->isChecked()){
                     str="^"+str;
                 }
@@ -109,7 +112,7 @@ void myptgwidget::mygenerate(){
             QStringList tstrlist;
             foreach(QTableWidgetItem *ip,psuitlist){
                 QCheckBox *pcheckbox=static_cast<QCheckBox *>(p_tablewidget->cellWidget(ip->row(),2));
-                QString str=myobj::suitstr(ip->text());
+                QString str=myobj::suitstr(myobj::remark2name(ip->text()));
                 if(pcheckbox->isChecked()){
                     str="^"+str;
                 }
@@ -128,8 +131,12 @@ void myptgwidget::mygenerate(){
         if(pplacelist.isEmpty()){}
         else{
             QStringList tstrlist;
+            QString str;
             foreach(QTableWidgetItem *ip,pplacelist){
-                tstrlist<<ip->text();
+                str=ip->text();
+                if(str==tr("hand")){str="hand";}
+                else if(str==tr("equipped")){str="equipped";}
+                tstrlist<<str;
             }
             strlist<<tstrlist.join(",");
         }

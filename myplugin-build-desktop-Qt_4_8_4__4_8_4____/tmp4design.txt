@@ -17,6 +17,7 @@
 >>>exs|liegong|luacc|liegong
 >>>trs|sk0||无|NotFrequent|SkillOwnerAlive|:|$
 >>>tms|myluapaoxiao|咆哮|无|Slash|:无限杀|$
+>>>tms|sk1||无|Slash|:|$
 >>>>luajianxiong:0:Damaged|Damaged|onlySkillOwner|player||
 >>>>luajianxiong:1:Damaged|Damaged|getCardPlace|damage.card|伤害牌的位置|
 >>>>luajianxiong:2:Damaged|Damaged|ifEqualNum|1->0,sgs.Player_PlaceTable||伤害牌位于面板,伤害牌不位于面板
@@ -84,3 +85,6 @@
 >>>>sk0:64:GameStart|GameStart|ifEqualNum|63->0,2||,
 >>>>myluapaoxiao:65:Residue|Residue|onlySkillOwner|from||
 >>>>myluapaoxiao:66:Residue|Residue|ifReturnNum|true,1000||
+>>>>sk1:67:Residue|Residue|findSkillOwner|from,true|技能拥有者|技能拥有者存在,技能拥有者不存在
+>>>>sk1:68:Residue|67->0|distanceTo|from,67->0|与技能拥有者的距离|
+>>>>sk1:69:Residue|67->0|ifReturnNum|true,68->0||

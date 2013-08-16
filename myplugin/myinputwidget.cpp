@@ -9,9 +9,9 @@ myinputwidget::myinputwidget(MainWindow *getpmain,QWidget *parent):QWidget(paren
 
     p_lineedit_filter=new QLineEdit(this);
     QObject::connect(p_lineedit_filter,SIGNAL(textEdited(QString)),this,SLOT(filterItems()));
-    QLabel *p_label0=new QLabel(tr("Current Skill:")+" "+pmain->psys->psk0->name+" | "+pmain->psys->psk0->translation,this);
+    QLabel *p_label0=new QLabel(tr("Current Skill")+tr(": ")+" "+pmain->psys->psk0->name+" | "+pmain->psys->psk0->translation,this);
     QFormLayout *p_formlayout=new QFormLayout;
-    p_formlayout->addRow(tr("Filter:"),p_lineedit_filter);
+    p_formlayout->addRow(tr("Filter")+tr(": "),p_lineedit_filter);
 
     p_combobox_filter=new QComboBox(this);
     p_combobox_filter->hide();    
@@ -168,7 +168,7 @@ void myinputwidget::showRemark(){
         //strlist.prepend(QString("%1 : %2").arg(pi->getstr()).arg(getRemark(pi)));
         pi=pi->pf;
     }
-    strlist.prepend(tr("Remarks: "));
+    strlist.prepend(tr("Remarks")+tr(": "));
     p_textedit->setText(strlist.join("\n"));
     //qWarning()<<"showremark";
 }
@@ -184,10 +184,10 @@ void myinputwidget::changeRTR(){
     QStringList rtlist;
     rtlist=myfun::outtypestrlist(getfunstr,pmain->psys->qsv);
     if(!rtlist.isEmpty()){
-        p_label_list.at(0)->setText(tr("Remarks for return values: "));
+        p_label_list.at(0)->setText(tr("Remarks for return values")+tr(": "));
         p_label_list.at(0)->show();
         for(int i=0;i<rtlist.length();i++){
-            p_label_list.at(i+1)->setText(tr("ReturnValue")+QString::number(i+1)+" "+myobj::gettypestr(rtlist.at(i))+tr(": "));
+            p_label_list.at(i+1)->setText(tr("Return Value")+QString::number(i+1)+" "+myobj::gettypestr(rtlist.at(i))+tr(": "));
             p_label_list.at(i+1)->show();
             p_lineedit_list.at(i+1)->show();
         }
@@ -195,7 +195,7 @@ void myinputwidget::changeRTR(){
     int n=myfun::name2blockcnt(getfunstr,pmain->psys->qsv);
     if(n>0){
         int nn=rtlist.length()+1;
-        p_label_list.at(nn)->setText(tr("Remarks for blocks: "));
+        p_label_list.at(nn)->setText(tr("Remarks for blocks")+tr(": "));
         p_label_list.at(nn)->show();
         for(int i=0;i<n;i++){
             p_label_list.at(nn+i+1)->setText(tr("Block")+QString::number(i+1)+tr(": "));
@@ -281,7 +281,7 @@ bool myinputwidget::visible_cbb(myinputitem *pi){
     else if(pi->type>=myinputitem::func_Obj){
         myobj *pt=pmain->psys->psk0->findObjByName(pi->getstr(),geteventstr);
         if(pt){
-            QString tstr=myobj::name2str(pt->name,getabbstr);
+            QString tstr=myobj::name2str(pt->name,pmain->psys->qsv,getabbstr);
             bool b=!tstr.isEmpty();
             if(p_combobox_filter->currentText()==tr("Const")){return b;}
             else if(p_combobox_filter->currentText()==tr("Variable")){return !b;}

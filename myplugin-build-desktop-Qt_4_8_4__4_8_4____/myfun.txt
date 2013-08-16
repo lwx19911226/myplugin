@@ -25,9 +25,10 @@
 
 
 //
->onlySkillOwner|myplayer~||if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl
+>onlySkillOwner|myplayer~||if not %1:hasSkill(selfskname) then return defaultReturn end|仅当角色（参数1）为技能拥有者时才发动|rt,pl,sk
 >onlyExist|myplayer+mycard||if not %1 then return defaultReturn end|仅当角色或牌（参数1）存在时才发动|rt
 >ifActivation|mysplayer~||if not room:askForSkillInvoke(%1,selfskname,data) then return defaultReturn end|仅当角色（参数1）选择发动才发动|rt,ask,room$
+>findSkillOwner|myplayer~,mybool~|myplayer|%3=myfindskowner(%1,selfskname,%2);if %3 then;%block;else;%block;end|技能拥有者（返回值1），可能不存在；场上任一名角色（参数1），是否仅考虑存活角色（参数2），如果技能拥有者存在，则代码段1，否则代码段2|block,sk
 
 //block
 >ifTrue|mybool||if %1 then;%block;else;%block;end|如果参数1为真，则执行代码段1，否则执行代码段2|block
@@ -80,13 +81,14 @@
 >getEquips|myplayer~|mycardlist~|%2=%1:getEquips()|角色（参数1）当前装备区的牌列表（返回值1）|pl,cd,list
 >hasEquip|myplayer~,mycard~|mybool~|%3=%1:hasEquip(%2)|角色（参数1）当前装备区是否（返回值1）有牌（参数2）|pl,cd
 >theSame|myplayer~,myplayer~|mybool~|%3=(%1:objectName()==%2:objectName())|角色1（参数1）与角色2（参数2）是否为同一名角色（返回值1）|pl
+>distanceTo|myplayer~,myplayer~|mynum~|%3=%1:distanceTo(%2)|角色1（参数1）到角色2（参数2）的距离（返回值1）|pl
 >canSlash|myplayer~,myplayer~,mycard,mybool~|mybool~|%5=%1:canSlash(%2,%3,not %4)|角色1（参数1）是否（返回值1）杀得到角色2（参数2），是否无视距离（参数4），参数3为指定使用的【杀】，可以不存在|pl
 >canSlashWithoutCrossbow|myplayer~|mybool~|%2=%1:canSlashWithoutCrossbow()|角色（参数1）是否（返回值1）还能使用杀（不考虑连弩）|pl
 >isProhibited|myplayer~,myplayer~,mycard~|mybool~|%4=%1:isProhibited(%2,%3)|角色1（参数1）是否（返回值1）禁止以角色2（参数2）为目标使用牌（参数3）|pl,cd
 >isSkipped|mysplayer~,mynum~|mybool~|%3=%1:isSkipped(%2)|角色（参数1）的阶段（参数2）是否（返回值1）被跳过|pl,room$
 >getNext|mysplayer~|mysplayer~|%2=%1:getNext()|角色（参数1）的下一名角色（返回值1）|pl,room$
 >getNextAlive|mysplayer~|mysplayer~|%2=%1:getNextAlive()|角色（参数1）的下一名存活角色（返回值1）|pl,room$
->isSkillOwner|myplayer~|mybool~|%2=%1:hasSkill(selfskname)|角色（参数1）是否（返回值1）为技能拥有者|pl
+>isSkillOwner|myplayer~|mybool~|%2=%1:hasSkill(selfskname)|角色（参数1）是否（返回值1）为技能拥有者|pl,sk
 
 //card property
 >isNDTrick|mycard~|mybool~|%2=%1:isNDTrick()|牌（参数1）是否为非延时锦囊？（返回值1）|cd
@@ -140,7 +142,7 @@
 >askForPlayerChosen|mysplayer~,mysplayerlist~,mybool|mysplayer|%4=room:askForPlayerChosen(%1,%2,selfskname,nil,%3);if %4 then;%block;elseif %3 and not %2:isEmpty() then;%block;end|令一名角色（参数1）于给定角色列表（参数2）中选择一名角色（返回值1），是否可以取消（参数3），若成功选择则代码段1，若取消则代码段2（否则给定角色列表为空）|pl,ask,block,room$,V0610$
 >askForSuit|mysplayer~|mynum~|%2=room:askForSuit(%1,selfskname)|令一名角色（参数1）选择一种花色（返回值1）|pl,ask,room$
 >askForKingdom|mysplayer~|mystr~|%2=room:askForKingdom(%1)|令一名角色（参数1）选择一个势力（返回值1）|pl,ask,room$
->choice|mysplayer~,mystr~|mynum~|%3=mychoice(%1,selfskname,string.count(%2,"\|")+1,%%);;mychoicetrans(%%,%2)|令一名角色（参数1）选择一项，各选项翻译以“\|”分隔（参数2）举例“摸两张牌\|回复一点体力”，所选选项序数（返回值1）从1开始|pl,ask,room$
+>choice|mysplayer~,mystr~|mynum~|%3=mychoice(%1,selfskname,%2);;mychoicetrans(%2)|令一名角色（参数1）选择一项，各选项翻译以“\|”分隔（参数2）举例“摸两张牌\|回复一点体力”，所选选项序数（返回值1）从1开始|pl,ask,room$
 >cardFromH|mysplayer~,mysplayer~|mynum~,mycard~|if %2:isKongcheng() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"h",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）一张手牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
 >cardFromE|mysplayer~,mysplayer~|mynum~,mycard~|if %2:getEquips():isEmpty() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"e",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）装备区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$
 >cardFromJ|mysplayer~,mysplayer~|mynum~,mycard~|if %2:getJudgingArea():isEmpty() then return defaultReturn end;%3=room:askForCardChosen(%1,%2,"j",selfskname);%4=sgs.Sanguosha:getCard(%3)|令一名角色（参数1）选择一名角色（参数2）判定区一张牌（返回值2）及其ID（返回值1）|pl,cd,ask,room$

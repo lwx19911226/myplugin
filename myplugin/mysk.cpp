@@ -268,7 +268,7 @@ void mysk::iniObj(){
         foreach(myobj *ip,tobjlist){ip->blockstr=myobj::enumstr(mob,btype.toUtf8(),geti);}
         avlobjlist<<tobjlist;
     }
-    myobj::newConst(avlobjlist,parent(),getsys()->qsv,"");
+    myobj::newConst(avlobjlist,parent(),getsys()->qsv,QString(),true);
 }
 void mysk::getavlobjlist(int gettype, QList<myobj *> &list,QString getstr,bool b4nil){
     QList<myobj *> tlist;
@@ -290,20 +290,32 @@ QString mysk::block2abb(QString getstr){
     return myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),btype);
 }
 
-QStringList mysk::trans4avlobjlist(QString getstr){
+QStringList mysk::trans4avlobjlist(myblock *pblock){
     //const QMetaObject *mob=metaObject();
     //int btype=myobj::enumint(mob,enumname_btype(getType()).toUtf8(),getstr);
     //QString abbstr=myobj::enumstr(mob,enumname_babb(getType()).toUtf8(),btype);
-    return trans4avlobjlist(getstr,block2abb(getstr));
+    QString getstr;
+    if(pblock){getstr=pblock->name;}
+    return trans4avlobjlist(pblock,block2abb(getstr));
 }
-QStringList mysk::trans4avlobjlist(QString getstr, QString abbstr){
+QStringList mysk::trans4avlobjlist(myblock *pblock, QString abbstr){
     QStringList strlist;
+    QString getstr;
+    if(pblock){getstr=pblock->name;}
     foreach(myobj *ip,avlobjlist){
         if(ip->blockstr!=getstr){continue;}
         if(ip->noDeclaration){continue;}
-        QString getconststr=myobj::name2str(ip->name,abbstr);
+        QString getconststr=myobj::name2str(ip->name,getsys()->qsv,abbstr);
         if(!getconststr.isEmpty()){
-            strlist<<myobj::transConst(getconststr);
+            bool b=false;
+            if(myobj::needtransconst_str(getconststr)){b=true;}
+            else if(pblock){b=pblock->isObjUsed(ip);}
+            else{
+                foreach(myblock *ipblock,blocklist){
+                    if(ipblock->isObjUsed(ip)){b=true;break;}
+                }
+            }
+            if(b){strlist<<myobj::transconst_str(getconststr);}
             continue;
         }
         strlist<<QString("local %1").arg(ip->name);
@@ -385,7 +397,7 @@ myblock *mysk::findBlockByName(QString getname){
 }
 QStringList mysk::findRemarkByName_eventobj(QString getname){
     QStringList strlist;
-    foreach(QString stri,myobj::getconstlist_tag("bl:"+block2abb(getname))){
+    foreach(QString stri,myobj::getconstlist_tag(getsys()->qsv,"bl:"+block2abb(getname))){
         strlist<<tr("EVENT")+tr("OBJECT")+tr(": ")+"<"+stri+"> "+findRemarkByName_obj(stri,getname,false);
     }
     return strlist;
@@ -401,7 +413,7 @@ QString mysk::findRemarkByName_block(QString getname){
 QString mysk::findRemarkByName_obj(QString getname,QString getstr,bool b4func){
     myobj *pt=findObjByName(getname,getstr);
     if(!pt){qWarning()<<"findremarkbyname_obj"<<getname;return QString();}
-    myfunction *pfunc=getsys()->findFuncByObj(pt);
+    myfunction *pfunc=getsys()->findFuncByRTObj(pt);
     return findRemarkByName_obj(pt,pfunc,b4func);
 }
 QString mysk::findRemarkByName_obj(myobj *tgtobj, myfunction *pfunc, bool b4func){
@@ -499,7 +511,7 @@ void mysk::sig_update(){
 void mytrs::iniObj(){
     //QStringList strlist;
     //strlist<<"trs";
-    myobj::newConst(avlobjlist,parent(),getsys()->qsv,"trs");
+    myobj::newConst(avlobjlist,parent(),getsys()->qsv,"trs",false);
     foreach(QString stri,myevent::geteventstrlist(getsys()->qsv)){
         myevent::getavlobjlist(stri,avlobjlist,parent());
     }
@@ -514,12 +526,12 @@ QStringList mytrs::trans(QStringList &back){
     strlist<<"on_trigger=function(self,event,player,data)";
     strlist<<"local room=player:getRoom()";
     strlist<<default4skname();
-    strlist<<trans4avlobjlist("");
+    strlist<<trans4avlobjlist(NULL);
     foreach(myblock *ip,blocklist){
         QStringList blockstrlist;
         blockstrlist<<QString("if event==%1 then").arg(myevent::trans(ip->name));
         blockstrlist<<mycode::myindent(myevent::trans4eventdata(ip->name,true));
-        blockstrlist<<mycode::myindent(trans4avlobjlist(ip->name));
+        blockstrlist<<mycode::myindent(trans4avlobjlist(ip));
         blockstrlist<<ip->trans(back);
         blockstrlist<<mycode::myindent(myevent::trans4eventdata(ip->name,false));
         blockstrlist<<"end";
@@ -540,8 +552,8 @@ QStringList mytrs::trans(QStringList &back){
     strlist<<"end,\n}";
     return strlist;
 }
-QStringList mytrs::trans4avlobjlist(QString getstr){
-    return mysk::trans4avlobjlist(getstr,"trs");
+QStringList mytrs::trans4avlobjlist(myblock *pblock){
+    return mysk::trans4avlobjlist(pblock,"trs");
 }
 QStringList mytrs::eventstrlist(){
     QStringList strlist=myevent::geteventstrlist(getsys()->qsv);
@@ -635,7 +647,7 @@ QStringList myvs::trans(QStringList &back){
     QStringList strlist,tstrlist;
     myblock *pt;
     QString bname;
-    if(objname_viewas=="SkillCard"){
+    if(objname_viewas==myobj::objname_skillcard()){
         strlist<<name+"_card=sgs.CreateSkillCard{";
         strlist<<QString("name=\"%1\",").arg(name);
         strlist<<"target_fixed=false,";
@@ -646,7 +658,7 @@ QStringList myvs::trans(QStringList &back){
             strlist<<"filter=function(self,targets,to_select)";
             tstrlist.clear();
             tstrlist<<QString("local selfskname=\"%1\"").arg(name);
-            tstrlist<<trans4avlobjlist(bname);
+            tstrlist<<trans4avlobjlist(pt);
             strlist<<mycode::myindent(tstrlist);
             strlist<<pt->trans(back);
             strlist<<"return false end,";
@@ -661,7 +673,7 @@ QStringList myvs::trans(QStringList &back){
             strlist<<"on_use=function(self,room,source,targets)";
             tstrlist.clear();
             tstrlist<<QString("local selfskname=\"%1\"").arg(name);
-            tstrlist<<trans4avlobjlist(bname);
+            tstrlist<<trans4avlobjlist(pt);
             strlist<<mycode::myindent(tstrlist);
             strlist<<pt->trans(back);
             strlist<<"end,";
@@ -678,7 +690,7 @@ QStringList myvs::trans(QStringList &back){
         strlist<<"view_filter=function(self,selected,to_select)";
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
         strlist<<"return false end,";
@@ -686,7 +698,7 @@ QStringList myvs::trans(QStringList &back){
     strlist<<"view_as=function(self,cards)";
     if(vsn<10){strlist<<"if #cards~="+QString::number(vsn)+" then return nil end";}
     QString tstr;
-    if(objname_viewas=="SkillCard"){tstr=QString("local a_card=%1_card:clone()").arg(name);}
+    if(objname_viewas==myobj::objname_skillcard()){tstr=QString("local a_card=%1_card:clone()").arg(name);}
     else{tstr=QString("local a_card=sgs.Sanguosha:cloneCard(\"%1\",sgs.Card_SuitToBeDecided,0)").arg(objname_viewas);}
     strlist<<tstr;
     strlist<<"for var=1,#cards,1 do a_card:addSubcard(cards[var]) end";
@@ -699,7 +711,7 @@ QStringList myvs::trans(QStringList &back){
         strlist<<"enabled_at_play=function(self,player)";
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
         strlist<<"return false end,";
@@ -710,7 +722,7 @@ QStringList myvs::trans(QStringList &back){
         strlist<<"enabled_at_response=function(self,player,pattern)";
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
         strlist<<"return false end,";
@@ -741,23 +753,23 @@ void myvs::setTargetPlayersNumProperty(QString getstr){
     if(b){tgtn=getn;}
 }
 QString myvs::getCardViewAsProperty(){
-    QStringList strlist=myobj::getconstlist_tag("ob");
-    strlist.prepend("SkillCard");
+    QStringList strlist=myobj::getconstlist_tag(getsys()->qsv,"ob");
+    strlist.prepend(myobj::objname_skillcard());
     str2first(strlist,objname_viewas);
     return strlist.join("|");
 }
 void myvs::setCardViewAsProperty(QString getstr){objname_viewas=getstr;}
 QString myvs::getCardViewAsPropertyRemark(){
-    QStringList strlist=myobj::getconstrmlist_tag("ob");
-    strlist.prepend(tr("SkillCard"));
+    QStringList strlist=myobj::getconstrmlist_tag(getsys()->qsv,"ob");
+    strlist.prepend(tr(myobj::objname_skillcard().toUtf8()));
     QString tstr;
-    if(objname_viewas=="SkillCard"){tstr=tr("SkillCard");}
-    else{tstr=myobj::name2remark(objname_viewas,QString());}
+    if(objname_viewas==myobj::objname_skillcard()){tstr=tr(myobj::objname_skillcard().toUtf8());}
+    else{tstr=myobj::name2remark(objname_viewas,getsys()->qsv,QString());}
     str2first(strlist,tstr);
     return strlist.join("|");
 }
 void myvs::setCardViewAsPropertyRemark(QString getstr){
-    if(getstr==tr("SkillCard")){objname_viewas="SkillCard";}
+    if(getstr==tr(myobj::objname_skillcard().toUtf8())){objname_viewas=myobj::objname_skillcard();}
     else{objname_viewas=myobj::remark2name(getstr);}
 }
 /*
@@ -817,7 +829,7 @@ QStringList mydts::trans(QStringList &back){
     if(pt&&!pt->blocklist.isEmpty()){
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
     }
@@ -838,7 +850,7 @@ QStringList myfts::trans(QStringList &back){
         QStringList tstrlist;
         tstrlist<<"local room=sgs.Sanguosha:currentRoom()";
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
     }
@@ -855,14 +867,14 @@ QStringList myfts::trans(QStringList &back){
     return strlist;
 }
 QString myfts::getCardViewAsProperty(){
-    QStringList strlist=myobj::getconstlist_tag("ob");
+    QStringList strlist=myobj::getconstlist_tag(getsys()->qsv,"ob");
     str2first(strlist,objname_viewas);
     return strlist.join("|");
 }
 void myfts::setCardViewAsProperty(QString getstr){objname_viewas=getstr;}
 QString myfts::getCardViewAsPropertyRemark(){
-    QStringList strlist=myobj::getconstrmlist_tag("ob");
-    str2first(strlist,myobj::name2remark(objname_viewas,QString()));
+    QStringList strlist=myobj::getconstrmlist_tag(getsys()->qsv,"ob");
+    str2first(strlist,myobj::name2remark(objname_viewas,getsys()->qsv,QString()));
     return strlist.join("|");
 }
 void myfts::setCardViewAsPropertyRemark(QString getstr){objname_viewas=myobj::remark2name(getstr);}
@@ -877,7 +889,7 @@ QStringList myprs::trans(QStringList &back){
     if(pt&&!pt->blocklist.isEmpty()){
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
     }
@@ -897,7 +909,7 @@ QStringList mymcs::trans(QStringList &back){
     if(pt&&!pt->blocklist.isEmpty()){
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
     }
@@ -918,10 +930,10 @@ QStringList mytms::trans(QStringList &back){
     bname=myobj::enumstr(mob,"tmsbType",ExtraTarget);
     pt=findBlockByName(bname);
     if(pt&&!pt->blocklist.isEmpty()){
-        strlist<<"extra_target_func=function(self,player)";
+        strlist<<"extra_target_func=function(self,from,card)";
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
         strlist<<"end,";
@@ -929,10 +941,10 @@ QStringList mytms::trans(QStringList &back){
     bname=myobj::enumstr(mob,"tmsbType",DistanceLimit);
     pt=findBlockByName(bname);
     if(pt&&!pt->blocklist.isEmpty()){
-        strlist<<"distance_limit_func=function(self,player)";
+        strlist<<"distance_limit_func=function(self,from,card)";
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
         strlist<<"end,";
@@ -940,10 +952,10 @@ QStringList mytms::trans(QStringList &back){
     bname=myobj::enumstr(mob,"tmsbType",Residue);
     pt=findBlockByName(bname);
     if(pt&&!pt->blocklist.isEmpty()){
-        strlist<<"residue_func=function(self,player)";
+        strlist<<"residue_func=function(self,from,card)";
         tstrlist.clear();
         tstrlist<<default4skname();
-        tstrlist<<trans4avlobjlist(bname);
+        tstrlist<<trans4avlobjlist(pt);
         strlist<<mycode::myindent(tstrlist);
         strlist<<pt->trans(back);
         strlist<<"end,";
@@ -955,7 +967,7 @@ QStringList mytms::trans(QStringList &back){
 QString mytms::getPatternProperty(){
     QString tstr=pattern;
     tstr.replace("|","\\|");
-    QStringList tstrlist=myobj::getconstlist_tag("pt");
+    QStringList tstrlist=myobj::getconstlist_tag(getsys()->qsv,"pt");
     tstrlist.removeOne(tstr);
     tstrlist.prepend("");
     tstrlist.prepend(tstr);
@@ -969,9 +981,9 @@ void mytms::setPatternProperty(QString getstr){
 QString mytms::getPatternPropertyRemark(){
     QString tstr=pattern;
     tstr.replace("|","\\|");
-    QString trm=myobj::name2remark(tstr,QString());
+    QString trm=myobj::name2remark(tstr,getsys()->qsv,QString());
     if(trm!=""){tstr=trm;}
-    QStringList tstrlist=myobj::getconstrmlist_tag("pt");
+    QStringList tstrlist=myobj::getconstrmlist_tag(getsys()->qsv,"pt");
     tstrlist.removeOne(tstr);
     tstrlist.prepend("");
     tstrlist.prepend(tstr);

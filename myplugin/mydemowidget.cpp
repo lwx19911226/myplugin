@@ -119,11 +119,11 @@ void mydemowidget::myrfr_do(){
         tstrlist<<myinputitem::type2str(myinputitem::func_Fun)+tr(": ")+"<"+pfunc->funname+"> "+myfun::name2remark(pfunc->funname,psys->qsv);
         for(int i=0;i<pfunc->objlist.length();i++){
             myobj *pobj=pfunc->objlist.at(i);
-            tstrlist<<myinputitem::type2str(myinputitem::func_Obj)+QString::number(i+1)+" "+myobj::type2str(pobj->type)+tr(": ")+"<"+pobj->name+"> "+psys->psk0->findRemarkByName_obj(pobj,psys->findFuncByObj(pobj),true);
+            tstrlist<<myinputitem::type2str(myinputitem::func_Obj)+QString::number(i+1)+" "+myobj::type2str(pobj->type)+tr(": ")+"<"+pobj->name+"> "+psys->psk0->findRemarkByName_obj(pobj,psys->findFuncByRTObj(pobj),true);
         }
         for(int i=0;i<pfunc->rtobjlist.length();i++){
             myobj *pobj=pfunc->rtobjlist.at(i);
-            tstrlist<<tr("ReturnValue")+QString::number(i+1)+tr(": ")+pobj->remark;
+            tstrlist<<tr("Return Value")+QString::number(i+1)+tr(": ")+pobj->remark;
         }
         for(int i=0;i<pfunc->blocklist.length();i++){
             myblock *pblock=pfunc->blocklist.at(i);

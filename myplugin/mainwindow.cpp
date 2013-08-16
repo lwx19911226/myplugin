@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     p_label_skname=new QLabel(ui->centralWidget);
     QFormLayout *p_formlayout1=new QFormLayout;
-    p_formlayout1->addRow(tr("Current Skill:"),p_label_skname);
+    p_formlayout1->addRow(tr("Current Skill")+tr(": "),p_label_skname);
 
     QPushButton *p_pushbutton_new=new QPushButton(tr("New"),ui->centralWidget);
     //p_pushbutton_new->setText(tr("New"));
@@ -167,8 +167,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     p_tabwidget2->addTab(p_listwidget_do,tr("Procedure"));
     p_tabwidget2->addTab(p_treewidget,tr("Block Tree"));
-    p_tabwidget2->addTab(p_textedit_current,tr("LUA Code - Current Skill"));
-    p_tabwidget2->addTab(p_textedit_all,tr("LUA Code - Full"));
+    p_tabwidget2->addTab(p_textedit_current,tr("LUA(Current Skill)"));
+    p_tabwidget2->addTab(p_textedit_all,tr("LUA(Full)"));
 
     QVBoxLayout *p_vboxlayout=new QVBoxLayout;
     p_vboxlayout->addLayout(p_hboxlayout1);
@@ -706,7 +706,7 @@ void MainWindow::mydemo(){
     p_demowidget->activateWindow();
 }
 void MainWindow::myptg(){
-    myptgwidget *p_ptgwidget=new myptgwidget;
+    myptgwidget *p_ptgwidget=new myptgwidget(this);
     p_ptgwidget->resize(QApplication::desktop()->screenGeometry().width()*0.5,QApplication::desktop()->screenGeometry().height()*0.5);
     p_ptgwidget->show();
 }

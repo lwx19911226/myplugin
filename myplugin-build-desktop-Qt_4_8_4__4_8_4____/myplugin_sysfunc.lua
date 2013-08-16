@@ -1,3 +1,5 @@
+sgs.myplugintable=sgs.myplugintable or {}
+
 function mymatchone(cd,player,exppattern)
 	if exppattern:match(".*#.*") then return false end
 	local subpatternlist=exppattern:split("|")
@@ -137,89 +139,120 @@ function myjudgestructV0224(getpattern,getwho,getreason,getgood)
 	return judge
 end
 function flags4hej(b4h,b4e,b4j)
-	local tlist={}
-	if b4h then table.insert(tlist,"h") end
-	if b4e then table.insert(tlist,"e") end
-	if b4j then table.insert(tlist,"j") end
-	return table.concat(tlist,"")
-end
-function mychoice(player,skname,chnum,iternum)
-	local i=iternum
-	local ch
-	local chlist={}
-	local chlist_r={}
-	for var=1,chnum,1 do
-		ch="choice"..i
-		i=i+1
-		chlist[var]=ch
-		chlist_r[ch]=var
-	end
-	ch=player:getRoom():askForChoice(player,skname,table.concat(chlist,"+"))
-	if ch then return chlist_r[ch] end
-	return 1
-end
-function mychoicetrans(iternum,trans_str)
-	local i=iternum
-	local ch
-	local trtable={}
-	local translist=string.split(trans_str,"|")
-	for var=1,#translist,1 do
-		ch="choice"..i
-		i=i+1
-		trtable[ch]=translist[var]
-	end
-	sgs.LoadTranslationTable(trtable)
+	if not (b4h or b4e or b4j) then sgs.Alert("myplugin_flags4hej") end
+	local str=""
+	if b4h then str=str.."h" end
+	if b4e then str=str.."e" end
+	if b4j then str=str.."j" end
+	return str
 end
 function string:count(pat)
 	return select(2,string.gsub(self,pat,pat))
 end
+function table:value2key(getvalue,default)
+	local t={}
+	for k,v in pairs(self) do
+		if v==getvalue then table.insert(t,k) end
+	end
+	if #t==1 then return t[1] end
+	return default
+end
+function mychoice_ini()
+	sgs.myplugintable.mychoice=sgs.myplugintable.mychoice or {}
+	return sgs.myplugintable.mychoice
+end
+function mychoice_trstr2i(trstr)
+	return table.value2key(mychoice_ini(),trstr,nil)
+end
+function mychoice_contains(trstr)
+	return (mychoice_trstr2i(trstr)~=nil)
+end
+function mychoice_set(trstr)
+	if mychoice_contains(trstr) then return end
+	table.insert(mychoice_ini(),trstr)
+end
+function mychoice_trstr2trtable(trstr)
+	local translist=string.split(trstr,"|")	
+	local i=mychoice_trstr2i(trstr)
+	if not i then sgs.Alert("myplugin_mychoice") end
+	local trtable={}
+	local chlist={}
+	local ch
+	for var=1,#translist,1 do
+		ch="mychoice"..i.."_"..var
+		trtable[ch]=translist[var]
+		chlist[var]=ch
+	end
+	return trtable,chlist
+end
+function mychoice(player,skname,trstr)
+	if not mychoice_contains(trstr) then sgs.Alert("myplugin_mychoice") end
+	local chlist=select(2,mychoice_trstr2trtable(trstr))
+	local ch=player:getRoom():askForChoice(player,skname,table.concat(chlist,"+"))
+	if ch then return table.value2key(chlist,ch,1) end
+	return 1
+end
+function mychoicetrans(trstr)
+	if mychoice_contains(trstr) then return end
+	mychoice_set(trstr)
+	sgs.LoadTranslationTable(mychoice_trstr2trtable(trstr))
+end
+function myfindskowner(player,skname,b4alive)
+	if player:hasSkill(skname) and not (b4alive and player:isDead()) then return player end
+	for _,p in sgs.qlist(player:getSiblings()) do
+		if p:hasSkill(skname) and not (b4alive and p:isDead()) then return p end
+	end
+	return nil
+end
+
 
 function addsk(sk)
-if not sgs.Sanguosha:getSkill(sk:objectName()) then
-local sklist=sgs.SkillList()
-sklist:append(sk)
-sgs.Sanguosha:addSkills(sklist)
-end
+	if sgs.Sanguosha:getSkill(sk:objectName()) then return end
+	local sklist=sgs.SkillList()
+	sklist:append(sk)
+	sgs.Sanguosha:addSkills(sklist)
 end
 function addexsk(gn,skname)
-if sgs.Sanguosha:getSkill(skname) then
-gn:addSkill(skname)
-for _,tsk in sgs.qlist(sgs.Sanguosha:getRelatedSkills(skname)) do
-gn:addSkill(tsk:objectName())
-end
-end
+	if not sgs.Sanguosha:getSkill(skname) then return end
+	gn:addSkill(skname)
+	for _,tsk in sgs.qlist(sgs.Sanguosha:getRelatedSkills(skname)) do
+		gn:addSkill(tsk:objectName())
+	end
 end
 
 function addsktrans(t,name,trans,dscrpt,wds)
-t[name]=trans
-t[":"..name]=dscrpt
-if wds then
-if #wds==1 then t["$"..name]=wds[1]
-else table.foreach(wds,function(i,v) t[string.format("$%s%d",name,i)]=v end)
-end
-end
+	t[name]=trans
+	t[":"..name]=dscrpt
+	if wds then
+		if #wds==1 then t["$"..name]=wds[1]
+		else table.foreach(wds,function(i,v) t[string.format("$%s%d",name,i)]=v end)
+		end
+	end
 end
 function addgtrans(t,name,trans,title,wdf,cv)
-t[name]=trans
-t["#"..name]=title
-t["~"..name]=wdf
-t["cv:"..name]=cv
+	t[name]=trans
+	t["#"..name]=title
+	t["~"..name]=wdf
+	t["cv:"..name]=cv
 end
 function cmpltrans(t)
-local key,value
-local tmplist4here={}
-for key,value in pairs(t) do
-tmplist4here[key]=value
-if string.sub(key,1,1)==":" and not t["~"..string.sub(key,2)] then
-tmplist4here["~"..string.sub(key,2)]=value
-end
-if string.sub(key,1,1)==":" and not t["@"..string.sub(key,2)] then
-tmplist4here["@"..string.sub(key,2)]=t[string.sub(key,2)]
-end
-if string.sub(key,1,1)~=":" and not t[":"..key] then
-tmplist4here["designer:"..key]=tmplist4here["designer:"..key] or ""
-tmplist4here["illustrator:"..key]=tmplist4here["illustrator:"..key] or "Internet"
-end
-end
-return tmplist4here
+	local key,value
+	local tmplist={}
+	local prefix,str
+	for key,value in pairs(t) do
+		tmplist[key]=value
+		prefix=string.sub(key,1,1)
+		str=string.sub(key,2)
+		if prefix==":" and not t["~"..str] then
+			tmplist["~"..str]=value
+		end
+		if prefix==":" and not t["@"..str] then
+			tmplist["@"..str]=t[str]
+		end
+		if prefix~=":" and not t[":"..key] then
+			tmplist["designer:"..key]=tmplist["designer:"..key] or ""
+			tmplist["illustrator:"..key]=tmplist["illustrator:"..key] or "Internet"
+		end
+	end
+	return tmplist
 end

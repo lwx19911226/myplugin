@@ -31,6 +31,13 @@ public:
         if(b4r){rstr="\\"+splitstr;}
         return tstr.split(splitstr).replaceInStrings("\\\\",rstr);
     }
+    static QStringList myfilter_sw(QStringList getstrlist,QString getstr){
+        QStringList tstrlist;
+        foreach(QString stri,getstrlist){
+            if(stri.startsWith(getstr)){tstrlist<<stri;}
+        }
+        return tstrlist;
+    }
 
 signals:
     
@@ -64,6 +71,7 @@ public:
     bool removeBlock(myblock *getp);
     //virtual bool insertBlock(myblock *getp);
     QTreeWidgetItem *mytreeitem();
+    virtual bool isObjUsed(myobj *getp);
     int getLayer();
     QString getEvent();
     virtual QString getRemark();
@@ -89,6 +97,7 @@ public:
     void addBlock(myblock *, QString);
     myfunction *findFuncByObj(myobj *);
     QString getRemark();
+    bool isObjUsed(myobj *getp);
     static QString str4parameter(){return tr("Parameter");}
     static QString str4returnvalue(){return tr("Return value");}
     void myshow(){qWarning()<<funname;}

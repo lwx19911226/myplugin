@@ -45,7 +45,7 @@ public:
     bool delSkill(mysk *getp);
     mygeneral *findGeneralByName(QString getname);
     mysk *findSkillByName(QString getname);
-    myfunction *findFuncByObj(myobj *);
+    myfunction *findFuncByRTObj(myobj *);
     mydo *findDoByTag(QString dotag);
     QStringList trans();
     QStringList trans4design();

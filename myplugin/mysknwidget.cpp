@@ -6,8 +6,8 @@ QTableWidgetItem *mynewitem(QString getstr){
     return pitem;
 }
 
-mysknwidget::mysknwidget(MainWindow *getMain,QWidget *parent):QWidget(parent){
-    pmain=getMain;
+mysknwidget::mysknwidget(MainWindow *getmain,QWidget *parent):QWidget(parent){
+    pmain=getmain;
     setWindowTitle(tr("Skill Name List"));
 
     p_tablewidget=new QTableWidget(this);

@@ -125,13 +125,13 @@ public:
     }
     static QString num2str(int getnum){
         if(getnum<1||getnum>13){return "-";}
-        QByteArray array="-A23456789-JQK";
-        if(getnum==10){return "10";}
+        else if(getnum==10){return "10";}
         else{
-            return QString(array.at(getnum));
+            return QString(QByteArray("-A23456789-JQK").at(getnum));
         }
     }
     static QString objname_nullification(){return "nullification";}
+    static QString objname_skillcard(){return "SkillCard";}
 
     QString trans(){
         if(type==mystrc){return "\""+name+"\"";}
@@ -147,22 +147,30 @@ public:
         }
     }
 
-    static void myini();
-    static void myini_lang();
-    static void myini_cl();
+    static void myini(int getqsv);
+    static void myini_lang(int getqsv);
+    static void myini_cl(int getqsv);
+    static void iniwarning();
     //static QString isConst(QString getstr,QString abbstr);
-    static QStringList transConst(QString getstr,QString abbstr);
-    static QStringList transConst(QString getconststr);
-    static void newConst(QList<myobj *> &list,QObject *getpf,int getqsv,QString getbl,bool onlybl=false);
-    static QStringList getconstlist_tag(QString);
-    static QStringList getconstrmlist_tag(QString);
+    static QStringList transConst(QString getname,QString abbstr,int getqsv);
+    static QStringList transconst_str(QString getconststr);
+    static bool needtransconst_str(QString getconststr);
+    static void newConst(QList<myobj *> &list,QObject *getpf,int getqsv,QString abbstr,bool only);
+    static QStringList getconstlist_tag(int getqsv,QString gettag);
+    static QStringList getconstrmlist_tag(int getqsv, QString gettag);
     static QStringList getconsttaglist();
-    static QString name2str(QString getname,QString abbstr);
+    static QString name2str(QString getname,int getqsv, QString abbstr);
     static QString getblabb_str(QString getstr);
     static QString remark2name(QString);
-    static QString name2remark(QString, QString abbstr);
+    static QString name2remark(QString, int getqsv, QString abbstr);
     static QString remark2tag(QString);
     static bool matchtag_str(QString getstr,QString gettag);
+    static bool matchqsv_str(QString getstr,int getqsv);
+    static bool matchqsv0_str(QString getstr);
+    static bool matchblabb_str(QString getstr,QString abbstr,bool only);
+    static QString objname_default();
+    static QString ptname_default();
+    static QString skname_default();
     static bool mycmp(const QString &s1,const QString &s2){
         return s1.split("|").first().toLower()<s2.split("|").first().toLower();
     }
