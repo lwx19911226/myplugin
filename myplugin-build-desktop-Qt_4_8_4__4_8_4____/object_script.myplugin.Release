@@ -15,6 +15,7 @@ INPUT(
 ./release\mysk.o
 ./release\mysknwidget.o
 ./release\mydemowidget.o
+./release\myflowchart.o
 ./release\moc_mainwindow.o
 ./release\moc_mysys.o
 ./release\moc_myobj.o
@@ -30,4 +31,5 @@ INPUT(
 ./release\moc_mysk.o
 ./release\moc_mysknwidget.o
 ./release\moc_mydemowidget.o
+./release\moc_myflowchart.o
 );
